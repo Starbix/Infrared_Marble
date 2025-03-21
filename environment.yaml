@@ -1,0 +1,11 @@
+# Very simple conda environment file.
+#
+# This just creates an environment and delegates all dependency installation to pip.
+name: infrared-marble
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - "-r requirements.txt"

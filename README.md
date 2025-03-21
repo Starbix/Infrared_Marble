@@ -1,5 +1,41 @@
 # AI4Good - Satellite Overpass Time Comparison
 
+## Quickstart
+
+### With `venv`
+
+First, make sure you have a recent version of Python installed (>= 3.10). Create
+a virtual environment, activate it, and install dependencies:
+
+```sh
+cd Infrared_Marble              # Or wherever you cloned the repo
+python -m venv venv             # Create virtual environment
+source venv/bin/activate        # Activate virtual environment
+pip install -r requirements.txt # Install dependencies
+```
+
+Then you can open the repository in your favorite code editor and start coding!
+
+> **Note:** If the dependencies changed (`requirements.txt`), you need to re-run
+> `pip install -r requirements.txt`. If you installed a new dependency, please
+> add it to the `requirements.txt` file.
+
+### With `conda`
+
+If you have Anaconda (or any similar Python distribution) installed, you can
+also use `conda` to manage your environment:
+
+```sh
+conda env create -f environment.yaml    # Create from file
+conda activate infrared-marble          # Activate
+```
+
+> **Note:** The "single source of truth" for dependencies is `requirements.txt`,
+> and the provided `environment.yaml` simply installs `pip` in the Conda
+> environment and then uses Pip to install the dependencies. This means that if
+> you want to add new dependencies, you should use `pip` within the activated
+> Conda environment.
+
 ## Milestone I -- Project Proposal
 
 **Project: Comparing overpass times of infrared nighttime-light satellite

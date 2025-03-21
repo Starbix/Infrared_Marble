@@ -5,18 +5,23 @@
 #
 # If you want to add a new dependency, don't forget to add it to this file too.
 name: infrared-marble
-channels:
-  - conda-forge
-dependencies:
-  - python=3.12
-  - numpy
-  - pandas
-  - scikit
-  - blackmarblepy
-  - ipykernel
-  - notebook
 variables:
   # Black Marble profile Bearer token. This token expires on 2025-05-20. When
   # that happens, you need to re-generate one with the account info provided in
   # the README.
-  BLACKMARBLE_TOKEN: === REDACTED $BLACKMARBLE_TOKEN ===
+  BLACKMARBLE_TOKEN: "=== REDACTED $BLACKMARBLE_TOKEN ==="
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - numpy
+      - pandas
+      - scikit-learn
+      - ipykernel
+      - notebook
+      - folium
+      - matplotlib
+      - mapclassify
+      - blackmarblepy

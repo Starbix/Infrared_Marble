@@ -2,39 +2,40 @@
 
 ## Quickstart
 
-### With `venv`
-
-First, make sure you have a recent version of Python installed (>= 3.10). Create
-a virtual environment, activate it, and install dependencies:
-
-```sh
-cd Infrared_Marble              # Or wherever you cloned the repo
-python -m venv venv             # Create virtual environment
-source venv/bin/activate        # Activate virtual environment
-pip install -r requirements.txt # Install dependencies
-```
-
-Then you can open the repository in your favorite code editor and start coding!
-
-> **Note:** If the dependencies changed (`requirements.txt`), you need to re-run
-> `pip install -r requirements.txt`. If you installed a new dependency, please
-> add it to the `requirements.txt` file.
-
-### With `conda`
-
-If you have Anaconda (or any similar Python distribution) installed, you can
-also use `conda` to manage your environment:
+We use `conda`/`mamba` to manage the Python environment of this project. You can
+easily install `conda` through the Anaconda Python distribution. Once installed,
+set up the environment:
 
 ```sh
 conda env create -f environment.yaml    # Create from file
 conda activate infrared-marble          # Activate
 ```
 
-> **Note:** The "single source of truth" for dependencies is `requirements.txt`,
-> and the provided `environment.yaml` simply installs `pip` in the Conda
-> environment and then uses Pip to install the dependencies. This means that if
-> you want to add new dependencies, you should use `pip` within the activated
-> Conda environment.
+This will create a new environment called `infrared-marble`. This installs all
+necessary packages and sets some environment variables.
+
+> [!IMPORTANT] You should activate your environment with
+> `conda activate infrared-marble` whenever you are working on the project. In
+> VS Code, you should look for the "Select Python Interpreter" or "Select
+> Kernel" buttons, and choose the `infrared-marble` environment from the list.
+
+## Login and Authorization
+
+The Black Marble dataset requires users to authenticate with a Bearer token.
+This can be set up from the account I set up:
+
+| Login    | [Earthdata Login](https://urs.earthdata.nasa.gov/profile) |
+| -------- | --------------------------------------------------------- |
+| Username | ai4good_blackmarble                                       |
+| Password | cfx1EWU!jax4tcn2nku                                       |
+
+Please do not share this information with externals, nor set the GitHub
+repository to public, as this would reveal the login credentials.
+
+A bearer token can now be generated on the "Generate Token" page. I already
+generated one for convenience. This token **expires on May 20th 2025**. It is
+set as an environment variable in the Conda `environment.yaml` file, and should
+be available as an envrionment variable as `BLACKMARBLE_TOKEN`.
 
 ## Milestone I -- Project Proposal
 

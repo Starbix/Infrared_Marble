@@ -1,11 +1,22 @@
-# Very simple conda environment file.
+# Conda environment for the AI4Good Satellite Overpass Times project.
 #
-# This just creates an environment and delegates all dependency installation to pip.
+# This file includes necessary dependencies, as well as some environment
+# variables that should be set for the code to run.
+#
+# If you want to add a new dependency, don't forget to add it to this file too.
 name: infrared-marble
 channels:
   - conda-forge
 dependencies:
   - python=3.12
-  - pip
-  - pip:
-      - "-r requirements.txt"
+  - numpy
+  - pandas
+  - scikit
+  - blackmarblepy
+  - ipykernel
+  - notebook
+variables:
+  # Black Marble profile Bearer token. This token expires on 2025-05-20. When
+  # that happens, you need to re-generate one with the account info provided in
+  # the README.
+  BLACKMARBLE_TOKEN: === REDACTED $BLACKMARBLE_TOKEN ===

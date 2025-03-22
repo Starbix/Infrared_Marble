@@ -2,6 +2,27 @@
 
 ## Quickstart
 
+### Cloning the Repo
+
+I recommend setting up SSH for GitHub. You can find many great guides on this
+online. It just takes 5 minutes.
+
+Then, you can clone the repo. Since we use Git LFS and Git submodules for
+managing the code, the setup is a bit more involved, but you should only have to
+do it once.
+
+```sh
+# Get code
+cd ~/git/projects  # Or wherever you want to put the code
+git clone git@github.com:Starbix/Infrared_Marble.git
+cd Infrared_Marble
+# Set up Git LFS and Git submodules
+git lfs install && git lfs fetch
+git submodule update --init --recursive
+```
+
+### Python Environment
+
 We use `conda`/`mamba` to manage the Python environment of this project. You can
 easily install `conda` through the Anaconda Python distribution. Once installed,
 set up the environment:
@@ -20,6 +41,9 @@ necessary packages and sets some environment variables.
 > Kernel" buttons, and choose the `infrared-marble` environment from the list.
 
 ## Login and Authorization
+
+> [!WARNING] The following is sensitive information. If the repo should become
+> public, please remove this information first (git-filter-repo)
 
 The Black Marble dataset requires users to authenticate with a Bearer token.
 This can be set up from the account I set up:

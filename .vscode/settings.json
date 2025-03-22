@@ -1,1 +1,6 @@
-{}
+{
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/src/",
+    "${workspaceFolder}/blackmarblepy/src/blackmarble"
+  ]
+}

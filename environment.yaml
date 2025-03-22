@@ -13,7 +13,7 @@ variables:
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
+  - python=3.12
   - pip
   - pip:
       - numpy
@@ -24,4 +24,9 @@ dependencies:
       - folium
       - matplotlib
       - mapclassify
-      - blackmarblepy
+      - -e ./blackmarblepy
+      # - blackmarblepy
+      # Since blackmarbelpy currently has a bug in how downloads are handled, we cannot directy use
+      # the pip version. Thus we forke the blackmarblepy repo, and install it as an editable local
+      # dependency with pip install -e ./blackmarblepy. The git submodule should be set up to point
+      # to the correct patched commit.

@@ -35,15 +35,19 @@ conda activate infrared-marble          # Activate
 This will create a new environment called `infrared-marble`. This installs all
 necessary packages and sets some environment variables.
 
-> [!IMPORTANT] You should activate your environment with
-> `conda activate infrared-marble` whenever you are working on the project. In
-> VS Code, you should look for the "Select Python Interpreter" or "Select
-> Kernel" buttons, and choose the `infrared-marble` environment from the list.
+> [!IMPORTANT]
+>
+> You should activate your environment with `conda activate infrared-marble`
+> whenever you are working on the project. In VS Code, you should look for the
+> "Select Python Interpreter" or "Select Kernel" buttons, and choose the
+> `infrared-marble` environment from the list.
 
 ## Login and Authorization
 
-> [!WARNING] The following is sensitive information. If the repo should become
-> public, please remove this information first (git-filter-repo)
+> [!WARNING]
+>
+> The following is sensitive information. If the repo should become public,
+> please remove this information first (git-filter-repo)
 
 The Black Marble dataset requires users to authenticate with a Bearer token.
 This can be set up from the account I set up:

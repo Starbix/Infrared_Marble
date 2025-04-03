@@ -49,6 +49,8 @@ necessary packages and sets some environment variables.
 > The following is sensitive information. If the repo should become public,
 > please remove this information first (git-filter-repo)
 
+### Black Marble
+
 The Black Marble dataset requires users to authenticate with a Bearer token.
 This can be set up from the account I set up:
 
@@ -64,6 +66,13 @@ A bearer token can now be generated on the "Generate Token" page. I already
 generated one for convenience. This token **expires on May 20th 2025**. It is
 set as an environment variable in the Conda `environment.yaml` file, and should
 be available as an envrionment variable as `BLACKMARBLE_TOKEN`.
+
+### Louija
+
+| Login    | [Louija Login](http://59.175.109.173:8888/app/login_en.html) |
+| -------- | -------------------------------------------------------------|
+| Email    | spammer.ch@gmail.com                                         |
+| Password | OcnJOQ3Z!E8LBN                                               |
 
 ## Milestone I -- Project Proposal
 

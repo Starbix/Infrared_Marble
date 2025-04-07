@@ -55,6 +55,7 @@ def bm_download_all(gdf_url: str, dates: list[str]):
     gdf = get_gdf(gdf_url)
 
     for date_string in tqdm(dates, desc="PROCESSING DATES"):
+        print(f"Downloading raster for {date_string}")
         if not date_string in date_to_raster:
             date_to_raster[date_string] = bm_download(gdf, date_string)
 

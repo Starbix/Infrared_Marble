@@ -26,7 +26,7 @@ dependencies:
       - matplotlib
       - mapclassify
       - colorcet
-      - blackmarblepy
       - contextily
       - geopandas
       - seaborn
+      - -e ./blackmarblepy

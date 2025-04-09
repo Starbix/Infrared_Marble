@@ -1,5 +1,6 @@
 import datetime
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
+from concurrent.futures import ThreadPoolExecutor
 
 from matplotlib import pyplot as plt
 
@@ -44,7 +45,7 @@ def setup_bm_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
         formatter_class=ArgumentDefaultsHelpFormatter,
         help="Visualize data in the Blackmarble dataset",
     )
-    bm_show_parser.add_argument("date", help="Date to visualize")
+    bm_show_parser.add_argument("dates", nargs="+", help="Date(s) to visualize")
 
 
 def handle_bm_commands(args: Namespace):
@@ -61,7 +62,12 @@ def handle_bm_commands(args: Namespace):
 
     if args.bm_command == "show":
         gdf = fetch_gdf(args.gdf)
-        date = datetime.date.fromisoformat(args.date)
         raster = get_bm()
-        figure = plot_daily_radiance(gdf, raster, date)
+
+        # Show all figures in parallel
+        dates = [datetime.date.fromisoformat(d) for d in args.dates]
+
+        for date in dates:
+            figure = plot_daily_radiance(gdf, raster, date)
+
         plt.show(block=True)

@@ -1,6 +1,6 @@
 # AI4Good - Satellite Overpass Time Comparison
 
-[plots](plots.webp)
+![plots](plots.webp)
 
 ## Quickstart
 

@@ -20,14 +20,16 @@ dependencies:
       - pandas
       - scikit-learn
       - ipykernel
+      - ipywidgets
       - notebook
       - folium
       - matplotlib
       - mapclassify
-      - -e ./blackmarblepy
       - colorcet
-      # - blackmarblepy
-      # Since blackmarbelpy currently has a bug in how downloads are handled, we cannot directy use
-      # the pip version. Thus we forke the blackmarblepy repo, and install it as an editable local
-      # dependency with pip install -e ./blackmarblepy. The git submodule should be set up to point
-      # to the correct patched commit.
+      - contextily
+      - geopandas
+      - seaborn
+      - zarr
+      - bokeh
+      - tabulate
+      - -e ./blackmarblepy

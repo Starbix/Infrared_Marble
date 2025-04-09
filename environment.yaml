@@ -29,4 +29,7 @@ dependencies:
       - contextily
       - geopandas
       - seaborn
+      - zarr
+      - bokeh
+      - tabulate
       - -e ./blackmarblepy

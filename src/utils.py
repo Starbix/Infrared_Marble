@@ -12,11 +12,11 @@ else:
     DATA_DIR = Path(__file__).parents[1] / "data"
 
 # Derived constants
-BLACKMARBLE_DATA_DIR = DATA_DIR / "blackmarble"
+BM_DATA_DIR = DATA_DIR / "blackmarble"
 LUOJIA_DATA_DIR = DATA_DIR / "luojia"
 
 # Ensure data dirs exists
-for _d in [DATA_DIR, BLACKMARBLE_DATA_DIR, LUOJIA_DATA_DIR]:
+for _d in [DATA_DIR, BM_DATA_DIR, LUOJIA_DATA_DIR]:
     _d.mkdir(parents=True, exist_ok=True)
 
 # Get Bearer token from environment

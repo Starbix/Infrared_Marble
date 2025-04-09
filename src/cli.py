@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 from matplotlib.pylab import pareto
 
 from download import fetch_gdf, get_dates
+from misc import list_dates
 from utils import DEFAULT_DATES_FILE, DEFAULT_GDF_URL
 from visualization import plot_daily_radiance
 
@@ -32,6 +33,19 @@ def handle_bm_commands(args: Namespace):
         raster = bm_dataset_preprocess(gdf=gdf, dates=[date])
         figure = plot_daily_radiance(gdf, raster, date)
         plt.show(block=True)
+
+
+def handle_lj_commands(args: Namespace):
+    pass
+
+
+def handle_get_commands(args: Namespace):
+    res = args.resource
+
+    if res == "dates":
+        dates = list_dates(args.file)
+        print("Available dates:")
+        print("\n".join(d.isoformat() for d in dates))
 
 
 def setup_bm_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
@@ -76,6 +90,16 @@ def setup_lj_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
     pass
 
 
+def setup_get_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
+    parser.add_argument("resource", choices=["dates"], help="Resource to get")
+    parser.add_argument(
+        "-f",
+        "--file",
+        default=DEFAULT_DATES_FILE,
+        help="Input file with dates, one date per line, ISO format",
+    )
+
+
 def main():
     # Root parent parser
     root_parent = ArgumentParser()
@@ -102,12 +126,22 @@ def main():
     # Luojia parser
     parser_lj = subparsers.add_parser(
         "lj",
-        parents=[parser],
+        parents=[root_parent],
         add_help=False,
         formatter_class=ArgumentDefaultsHelpFormatter,
         help="Commands relating to the Luojia dataset",
     )
     setup_lj_parser(parser_lj, parents=[root_parent])
+
+    # Miscellaneous get parser
+    parser_get = subparsers.add_parser(
+        "get",
+        parents=[root_parent],
+        add_help=False,
+        formatter_class=ArgumentDefaultsHelpFormatter,
+        help="List/get resources",
+    )
+    setup_get_parser(parser_get, parents=[root_parent])
 
     # ... Add more subparsers here
 
@@ -117,6 +151,10 @@ def main():
     try:
         if args.command == "bm":
             handle_bm_commands(args)
+        elif args.command == "lj":
+            handle_lj_commands(args)
+        elif args.command == "get":
+            handle_get_commands(args)
 
         # ... Add more subcommands here
     except Exception as e:

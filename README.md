@@ -69,9 +69,9 @@ generated one for convenience. This token **expires on May 20th 2025**. It is
 set as an environment variable in the Conda `environment.yaml` file, and should
 be available as an envrionment variable as `BLACKMARBLE_TOKEN`.
 
-### Louija
+### Luojia
 
-| Login    | [Louija Login](http://59.175.109.173:8888/app/login_en.html) |
+| Login    | [Luojia Login](http://59.175.109.173:8888/app/login_en.html) |
 | -------- | ------------------------------------------------------------ |
 | Email    | <spammer.ch@gmail.com>                                       |
 | Password | OcnJOQ3Z!E8LBN                                               |

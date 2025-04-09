@@ -1,13 +1,12 @@
 import datetime
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
-from concurrent.futures import ThreadPoolExecutor
 
 from matplotlib import pyplot as plt
 
 from lib.download import bm_dataset_preprocess, fetch_gdf, get_dates
 from lib.loading import get_bm
 from lib.utils import DEFAULT_DATES_FILE, DEFAULT_GDF_URL
-from lib.visualization import plot_daily_radiance
+from lib.visualization import plot_daily_radiance, plot_difference
 
 
 def setup_bm_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
@@ -46,6 +45,9 @@ def setup_bm_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
         help="Visualize data in the Blackmarble dataset",
     )
     bm_show_parser.add_argument("dates", nargs="+", help="Date(s) to visualize")
+    bm_show_parser.add_argument(
+        "--diff", action="store_true", help="Show difference in radiance between two dates"
+    )
 
 
 def handle_bm_commands(args: Namespace):
@@ -67,7 +69,13 @@ def handle_bm_commands(args: Namespace):
         # Show all figures in parallel
         dates = [datetime.date.fromisoformat(d) for d in args.dates]
 
-        for date in dates:
-            figure = plot_daily_radiance(gdf, raster, date)
+        if args.diff:
+            # Show difference between two dates
+            assert len(dates) == 2, "When using --diff option, must provide exactly two dates"
+            plot_difference(gdf, raster, date1=dates[0], date2=dates[1])
+        else:
+            # Default: Plot radiance
+            for date in dates:
+                plot_daily_radiance(gdf, raster, date)
 
         plt.show(block=True)

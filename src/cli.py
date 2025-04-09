@@ -1,7 +1,9 @@
 import datetime
+import os
 import sys
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace, _SubParsersAction
 from os import isatty
+from pathlib import Path
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -50,14 +52,19 @@ def handle_get_commands(args: Namespace):
         dates = list_dates(args.file)
         raster = get_bm()
         if isatty(1):
-            print(f"Dates listed in file `{args.file}`")
+            print(f"Source: {Path(args.file).relative_to(os.getcwd())}")
+            print("---")
             print(
                 tabulate(
                     [
-                        (date.isoformat(), "Yes" if np.datetime64(date) in raster.time else "No")
+                        (
+                            date.isoformat(),
+                            "Yes" if np.datetime64(date) in raster.time else "No",
+                            "n/a",
+                        )
                         for date in dates
                     ],
-                    headers=("Date", "Downloaded"),
+                    headers=("Date", "Downloaded (BM)", "Downloaded (LJ)"),
                 )
             )
         else:

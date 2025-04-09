@@ -18,13 +18,10 @@ def get_subplots(raster: "xr.Dataset", figwidth: float = 8.0):
     return fig, ax
 
 
-def plot_daily_radiance(gdf: "GeoDataFrame", raster: "xr.Dataset", date: datetime.date | str):
+def plot_daily_radiance(gdf: "GeoDataFrame", raster: "xr.Dataset", date: datetime.date):
     fig, ax = get_subplots(raster)
 
-    if not isinstance(date, str):
-        date = date.isoformat()
-
-    raster["Gap_Filled_DNB_BRDF-Corrected_NTL"].sel(time=date).plot.pcolormesh(
+    raster["Gap_Filled_DNB_BRDF-Corrected_NTL"].sel(time=date.isoformat()).plot.pcolormesh(
         ax=ax,
         cmap=cc.cm.bmy,
         robust=True,
@@ -43,7 +40,7 @@ def plot_daily_radiance(gdf: "GeoDataFrame", raster: "xr.Dataset", date: datetim
         color="black",
         weight="normal",
     )
-    ax.set_title(f"Myanmar: NTL Radiance on {date}", fontsize=20)
+    ax.set_title(f"Myanmar: NTL Radiance on {date.isoformat()}", fontsize=20)
 
     return fig
 
@@ -51,18 +48,17 @@ def plot_daily_radiance(gdf: "GeoDataFrame", raster: "xr.Dataset", date: datetim
 def plot_difference(
     gdf: "GeoDataFrame",
     raster: "xr.Dataset",
-    date1: datetime.date | str,
-    date2: datetime.date | str,
+    date1: datetime.date,
+    date2: datetime.date,
 ):
-    date1 = date1 if isinstance(date1, str) else date1.isoformat()
-    date2 = date2 if isinstance(date2, str) else date2.isoformat()
-
     data = raster["Gap_Filled_DNB_BRDF-Corrected_NTL"]
-    delta = (data.sel(time=date2) - data.sel(time=date1)) / data.sel(time=date1)
+    delta = (data.sel(time=date2.isoformat()) - data.sel(time=date1.isoformat())) / data.sel(
+        time=date1.isoformat()
+    )
 
     fig, ax = get_subplots(raster)
     delta.plot.pcolormesh(ax=ax, cmap="Spectral", robust=True)
-    cx.add_basemap(ax, crs=gdf.crs.to_string(), source=cx.providers.CartoDB.DarkMatter)
+    cx.add_basemap(ax, crs=gdf.crs.to_string(), source=cx.providers.CartoDB.DarkMatter)  # type: ignore
 
     ax.text(
         0,
@@ -75,4 +71,41 @@ def plot_difference(
         color="black",
         weight="normal",
     )
-    ax.set_title("Ghana: NTL Radiance Increase/Decrease (2019-2022)", fontsize=16)
+    ax.set_title(
+        f"NTL Radiance Increase/Decrease ({date1.isoformat()}-{date2.isoformat()})", fontsize=16
+    )
+
+
+def plot_series(raster: "xr.Dataset", dates: list[datetime.date] | None = None):
+    # Plot the mean NTL radiance over the dimensions x and y
+    data = raster["Gap_Filled_DNB_BRDF-Corrected_NTL"]
+    if dates is not None:
+        data = data.sel(time=[date.isoformat() for date in dates])
+    mean = data.mean(dim=["x", "y"])
+
+    # Create the figure and axis
+    fig, ax = plt.subplots(figsize=(10, 6))
+    mean.plot.line(ax=ax)
+
+    # Add the data source text
+    ax.text(
+        0,
+        -0.2,
+        "Source: NASA Black Marble VNP46A2",
+        ha="left",
+        va="center",
+        transform=ax.transAxes,
+        fontsize=10,
+        color="black",
+        weight="normal",
+    )
+
+    # Set the title with appropriate fontsize
+    ax.set_title("Daily Average NTL Radiance", fontsize=20, weight="bold")
+
+    # Add labels to the axes
+    ax.set_xlabel("Date", fontsize=12)
+    ax.set_ylabel("Radiance (nW/cm²/sr)", fontsize=12)
+
+    # Adjust layout for better spacing
+    fig.tight_layout()

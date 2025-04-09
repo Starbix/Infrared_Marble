@@ -1,5 +1,7 @@
 # AI4Good - Satellite Overpass Time Comparison
 
+[plots](plots.png)
+
 ## Quickstart
 
 ### Cloning the Repo
@@ -70,8 +72,8 @@ be available as an envrionment variable as `BLACKMARBLE_TOKEN`.
 ### Louija
 
 | Login    | [Louija Login](http://59.175.109.173:8888/app/login_en.html) |
-| -------- | -------------------------------------------------------------|
-| Email    | === REDACTED login email ===                                         |
+| -------- | ------------------------------------------------------------ |
+| Email    | <=== REDACTED login email ===>                                       |
 | Password | === REDACTED luojia_password ===                                               |
 
 ## Milestone I -- Project Proposal

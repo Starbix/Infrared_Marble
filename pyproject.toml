@@ -1,0 +1,51 @@
+[tool.black]
+line-length = 120
+target-version = ['py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+src_paths = ["src", "tests"]
+known_first_party = ["your_package_name"]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+atomic = true
+filter_files = true
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint.master]
+ignore-patterns = ["^\\.#"]
+ignore = ["CVS"]
+persistent = "yes"
+
+[tool.pylint.messages_control]
+disable = ["missing-docstring", "invalid-name"]
+
+[tool.pylint.reports]
+output-format = "text"
+reports = "yes"
+evaluation = "10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)"
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"

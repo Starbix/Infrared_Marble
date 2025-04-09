@@ -1,11 +1,15 @@
 import datetime
 import sys
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace, _SubParsersAction
+from os import isatty
 
+import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.pylab import pareto
+from tabulate import tabulate
 
 from download import fetch_gdf, get_dates
+from loading import get_bm
 from misc import list_dates
 from utils import DEFAULT_DATES_FILE, DEFAULT_GDF_URL
 from visualization import plot_daily_radiance
@@ -30,7 +34,7 @@ def handle_bm_commands(args: Namespace):
 
         gdf = fetch_gdf(args.gdf)
         date = datetime.date.fromisoformat(args.date)
-        raster = bm_dataset_preprocess(gdf=gdf, dates=[date])
+        raster = get_bm()
         figure = plot_daily_radiance(gdf, raster, date)
         plt.show(block=True)
 
@@ -40,12 +44,24 @@ def handle_lj_commands(args: Namespace):
 
 
 def handle_get_commands(args: Namespace):
-    res = args.resource
 
+    res = args.resource
     if res == "dates":
         dates = list_dates(args.file)
-        print("Available dates:")
-        print("\n".join(d.isoformat() for d in dates))
+        raster = get_bm()
+        if isatty(1):
+            print(f"Dates listed in file `{args.file}`")
+            print(
+                tabulate(
+                    [
+                        (date.isoformat(), "Yes" if np.datetime64(date) in raster.time else "No")
+                        for date in dates
+                    ],
+                    headers=("Date", "Downloaded"),
+                )
+            )
+        else:
+            print("\n".join(d.isoformat() for d in dates))
 
 
 def setup_bm_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
@@ -98,6 +114,7 @@ def setup_get_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
         default=DEFAULT_DATES_FILE,
         help="Input file with dates, one date per line, ISO format",
     )
+    parser.add_argument("-g", "--gdf", default=DEFAULT_GDF_URL, help="URL to the GDF JSON file")
 
 
 def main():

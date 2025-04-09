@@ -10,6 +10,7 @@ from blackmarble.raster import bm_raster
 from blackmarble.types import Product
 from httpx import HTTPError
 
+from loading import get_bm
 from utils import BEARER_TOKEN, BM_DATA_DIR, DATA_DIR
 
 if TYPE_CHECKING:
@@ -69,7 +70,7 @@ def bm_dataset_preprocess(
     zarr_path.parent.mkdir(parents=True, exist_ok=True)
     if not force and zarr_path.exists():
         print("Dataset already preprocessed, skipping...")
-        return xr.open_zarr(zarr_path)
+        return get_bm(zarr_path)
 
     # Download all datasets for each date in parallel
     # Note: date_range does not download for each date individually, but for each date between any
@@ -87,4 +88,5 @@ def bm_dataset_preprocess(
     # Store in Zarr format for later
     combined.to_zarr(zarr_path)
 
-    return combined
+    # Loads fresh from disk
+    return get_bm(zarr_path)

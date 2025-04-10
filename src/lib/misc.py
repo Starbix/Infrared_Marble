@@ -19,8 +19,7 @@ def list_dates(file: str | Path | None = None):
 
 def get_day_cloud_coverage(date_str: str, location: str = None):
 
-    OLD = "C6FNLY48VY2CHXVP2TD9534X4"
-    API_KEY = "V2TQ5TGZCVETJJYQZRRPTUGF2"
+    API_KEY = "C6FNLY48VY2CHXVP2TD9534X4"
 
     luojia_time = datetime.combine(date.fromisoformat(date_str), time(22, 0)).isoformat()
     bm_time = datetime.combine(date.fromisoformat(date_str) + timedelta(days=1), time(1, 0)).isoformat()

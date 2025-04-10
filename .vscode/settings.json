@@ -1,5 +1,5 @@
 {
-  "python.analysis.extraPaths": ["${workspaceFolder}/src/", "${workspaceFolder}/blackmarblepy/src/blackmarble"],
+  "python.analysis.extraPaths": ["${workspaceFolder}/src/", "${workspaceFolder}/blackmarblepy/src"],
   "[python]": {
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.defaultColorDecorators": "never",
@@ -12,5 +12,6 @@
     "source.organizeImports": "explicit",
     "source.unusedImports": "explicit"
   },
-  "editor.rulers": [120]
+  "editor.rulers": [120],
+  "black-formatter.args": ["-l", "120", "-t", "py312"]
 }

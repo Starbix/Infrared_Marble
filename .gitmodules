@@ -1,0 +1,3 @@
+[submodule "blackmarblepy"]
+	path = blackmarblepy
+	url = git@github.com:fedj99/blackmarblepy.git

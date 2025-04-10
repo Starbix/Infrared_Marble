@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import pandas as pd
 import geopandas
 import httpx
 import requests
@@ -51,8 +52,11 @@ def get_dates(file: str | Path) -> list[datetime.date]:
 
     if not file.exists():
         raise ValueError(f"File does not exist: {file}")
-
-    return sorted([datetime.date.fromisoformat(l.strip()) for l in file.read_text().splitlines()])
+    
+    df = pd.read_csv(file)  
+    date_list = [datetime.date.fromisoformat(d) for d in df['date'].dropna()]
+    
+    return sorted(date_list)
 
 
 def bm_download(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.date]) -> xr.Dataset:

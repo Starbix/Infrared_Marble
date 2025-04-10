@@ -1,17 +1,27 @@
 import datetime
-from concurrent.futures import ThreadPoolExecutor
+import tarfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import geopandas
+import httpx
 import requests
 import xarray as xr
 from blackmarble.raster import bm_raster
-from blackmarble.types import Product
 from httpx import HTTPError
+from tqdm import tqdm
 
 from lib.loading import get_bm
-from lib.utils import BEARER_TOKEN, BM_DATA_DIR, DATA_DIR
+from lib.utils import (
+    BEARER_TOKEN,
+    BM_DATA_DIR,
+    BM_PRODUCT,
+    BM_QUALITY_FLAG,
+    BM_VARIABLE,
+    DATA_DIR,
+    LJ_DATA_DIR,
+)
 
 if TYPE_CHECKING:
     from geopandas import GeoDataFrame
@@ -50,10 +60,12 @@ def bm_download(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.d
     out_dir.mkdir(parents=True, exist_ok=True)
     raster = bm_raster(
         gdf,
-        product_id=Product.VNP46A2,
+        product_id=BM_PRODUCT,
         date_range=date_range,
         bearer=BEARER_TOKEN,
         output_directory=out_dir,
+        drop_values_by_quality_flag=BM_QUALITY_FLAG,
+        variable=BM_VARIABLE,
         output_skip_if_exists=True,
     )
     return raster
@@ -66,7 +78,9 @@ def bm_dataset_preprocess(
     force: bool = False,
 ) -> xr.Dataset:
     # Check if already preprocessed
-    zarr_path = Path(dest) if dest else (BM_DATA_DIR / "preprocessed" / "dataset.zarr")
+    zarr_path = (
+        Path(dest) if dest else (BM_DATA_DIR / "preprocessed" / f"dataset-{BM_PRODUCT}.zarr")
+    )
     zarr_path.parent.mkdir(parents=True, exist_ok=True)
     if not force and zarr_path.exists():
         print("Dataset already preprocessed, skipping...")

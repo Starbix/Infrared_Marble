@@ -1,5 +1,11 @@
 # Milestone II
 
+## Points to consider for the comparison
+
+- _Units:_ Luojia data has units $[L]=1\frac{W}{m^2\cdot sr \cdot \mu m}$. Consequently, we chose the product “VNP46A1” with the dataset “Radiance_M10” for black marble. This data has not only the same units, but also the same wavelength range $\lambda\in [0.5\mu m, 0.9\mu m]$.
+- _Post-processing:_ NASA often uses post-processing techniques to clean up the data (e.g. Moonlight adjusting, cloud coverage removal, …). We have not been able to find any data on post-processing for Luojia in the documentation (yet). Because of that and because Luojia is an early stage research project, we assumed that they upload the raw data. This is another reason of why we chose “Radiance_M10”.
+- _Cloud coverage:_ Since the cloud coverage at 10:30pm and at 1:30am is possibly different, we needed to extract the cloud coverage at the time of the image-taking. For this we used the weather source “visual crossing”.
+
 ## NTL-Tool
 
 `ntl-tool` is a command line interface (CLI) tool for interacting with the Blackmarble and Luojia datasets. It is meant as a quick way of exploring and analyzing the data, before building a fully-fledged web UI.

@@ -32,4 +32,7 @@ dependencies:
       - zarr
       - bokeh
       - tabulate
+      - gdal
+      - requests
+      - dask
       - -e ./blackmarblepy

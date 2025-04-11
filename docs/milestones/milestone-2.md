@@ -49,3 +49,10 @@ The tool shows that for the given dates, all files are available in the Blackmar
 `ntl-tool bm show --time-series <dates>` -- Shows the time series of average NTL radiance over the given dates. Dates can also be fed from a dates CSV file with the `-f/--file` option.
 
 ![image-20250409231221605](./milestone-2.assets/image-20250409231221605.png)
+
+## Challenges
+
+### Clouds
+One of the main challenges we faced is the presence of clouds. Due to the difference in time between both satellites, on a given night, clouds could be present for one satellite but not the other, which makes comparing the NTL data harder. We decide to use a global weather database called VisualCrossing to get cloud coverage data at the given time of the satellite images that we wanted to analyze. The cloud coverage is reprented in percentage, denoted the percentage of the area covered by clouds. We used VisualCrossing's API to get the data for the range of dates that we have for both satellites, and added it to the csv file containing the dates.
+
+This cloud coverage data could be used to either filter out clouded satellite images or to explain anomalies among the NTL data.

@@ -1,6 +1,10 @@
+import theme from "@/lib/theme";
+import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import clsx from "clsx";
+import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import NavBar from "./_components/navigation/NavBar";
 import "./global.scss";
 
 const inter = Inter({
@@ -15,10 +19,6 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
   variable: "--font-jetbrains-mono",
 });
-
-import theme from "@/lib/theme";
-import { CssBaseline, ThemeProvider } from "@mui/material";
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Infrared Marble",
@@ -36,6 +36,8 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <CssBaseline />
           <ThemeProvider theme={theme}>
+            {/* Navigation */}
+            <NavBar />
             {/* Main body */}
             {children}
           </ThemeProvider>

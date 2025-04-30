@@ -1,3 +1,4 @@
+import Map from "@/components/Map";
 import api from "@/lib/api/server";
 import { Box } from "@mui/material";
 import Toolbar from "./_components/Toolbar";
@@ -8,6 +9,7 @@ export default async function Page() {
 
   return (
     <Box sx={{ position: "fixed", inset: 0, bgcolor: "background.default" }}>
+      <Map />
       <Toolbar dates={dates} />
     </Box>
   );

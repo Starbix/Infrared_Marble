@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 
-from api.types import DatasetName
+from lib.misc import list_dates
+from lib.utils import PROJECT_ROOT
 
 router = APIRouter(prefix="/explore", tags=["Explore"])
 
 
-@router.get("/explore/dates/{dataset}")
-async def get_dates(dataset: DatasetName):
-    if dataset == DatasetName.blackmarble:
-        return "all dates"
-    if dataset == DatasetName.luojia:
-        return ["2020-01-01", "2021-03-27"]
+@router.get("/dates")
+async def get_dates():
+    print("PROJECT_ROOT:", PROJECT_ROOT)
+    dates = list_dates()
+    return dates

@@ -15,8 +15,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # Copy over editable Blackmarble package and install
 # Need .git folder for install to work
-COPY .gitattributes .gitmodules ./
-COPY .git .git
+COPY .gitmodules ./
+COPY .git/modules/blackmarblepy .git/modules/blackmarblepy
 COPY ./blackmarblepy ./blackmarblepy
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -e ./blackmarblepy
@@ -24,6 +24,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # Copy over source files
 COPY src src
+
+# Other required files
+COPY dates_luojia_myanmar.csv ./
 
 WORKDIR /app/src
 

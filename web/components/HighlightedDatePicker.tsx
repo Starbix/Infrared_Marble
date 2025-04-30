@@ -63,15 +63,9 @@ export const HighlightedDatePicker: React.FC<HighlightedDatePickerProps> = ({ va
   // Memoize sets for efficient lookup
   const availableDaysSet = React.useMemo(() => new Set(availableDates), [availableDates]);
 
-  const availableMonthsSet = React.useMemo(
-    () => new Set(availableDates.map((date) => dayjs(date).format("YYYY-MM"))),
-    [availableDates]
-  );
+  const availableMonthsSet = React.useMemo(() => new Set(availableDates.map((date) => dayjs(date).format("YYYY-MM"))), [availableDates]);
 
-  const availableYearsSet = React.useMemo(
-    () => new Set(availableDates.map((date) => dayjs(date).format("YYYY"))),
-    [availableDates]
-  );
+  const availableYearsSet = React.useMemo(() => new Set(availableDates.map((date) => dayjs(date).format("YYYY"))), [availableDates]);
 
   // --- Disabling Logic ---
   const shouldDisableDate = (date: Dayjs) => {

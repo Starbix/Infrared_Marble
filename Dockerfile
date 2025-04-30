@@ -25,8 +25,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # Copy over source files
 COPY src src
 
-# Other required files
-COPY dates_luojia_myanmar.csv ./
+# Copy static files
+COPY static/ static/
 
 WORKDIR /app/src
 

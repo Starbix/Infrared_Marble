@@ -31,12 +31,6 @@ export default function NavBar(props: NavBarProps) {
     setValue(valueFromPath);
   }, [pathname]);
 
-  useEffect(() => {
-    console.log("Component created");
-  });
-
-  console.log("Rendering...");
-
   return (
     <Box sx={{ width: 1, p: 2, position: "relative", zIndex: 1000, pointerEvents: "none" }}>
       <Panel sx={{ margin: "auto", pointerEvents: "auto" }}>

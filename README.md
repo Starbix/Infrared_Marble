@@ -23,6 +23,12 @@ git lfs install && git lfs fetch
 git submodule update --init --recursive
 ```
 
+### Dependencies
+
+- gdal
+
+macOS: `brew install gdal`
+
 ### Python Environment
 
 We use `conda`/`mamba` to manage the Python environment of this project. You can
@@ -43,6 +49,8 @@ necessary packages and sets some environment variables.
 > whenever you are working on the project. In VS Code, you should look for the
 > "Select Python Interpreter" or "Select Kernel" buttons, and choose the
 > `infrared-marble` environment from the list.
+
+
 
 ## Login and Authorization
 

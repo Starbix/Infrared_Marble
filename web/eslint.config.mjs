@@ -19,6 +19,7 @@ const eslintConfig = [
                     allowObjectTypes: "always",
                 },
             ],
+            "@typescript-eslint/no-explicit-any": "off",
         },
     },
 ];

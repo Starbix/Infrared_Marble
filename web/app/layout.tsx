@@ -7,6 +7,8 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import ClientProviders from "./_components/ClientProviders";
 import NavBar from "./_components/navigation/NavBar";
 import "./global.scss";
+import Head from "next/head";
+import Script from "next/script";
 
 const inter = Inter({
   subsets: ["latin"],

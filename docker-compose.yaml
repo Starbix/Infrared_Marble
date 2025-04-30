@@ -1,0 +1,33 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    develop:
+      watch:
+        - path: ./src/api/requirements.txt
+          action: rebuild
+        - path: ./.env
+          action: sync+restart
+          target: /app/.env
+        - path: ./src
+          action: sync
+          target: /app
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    develop:
+      watch:
+        - path: ./web/package-lock.json
+          action: rebuild
+        - path: ./web
+          action: sync
+          target: /app
+          ignore:
+            - node_modules/
+            - web/node_modules/

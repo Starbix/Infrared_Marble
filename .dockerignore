@@ -1,0 +1,15 @@
+.editorconfig
+.env
+.env.*
+.vscode/
+**/__pycache__/
+**/.venv/
+**/*.pyc
+**/node_modules/
+**/venv/
+data/
+docker-compose.yaml
+Dockerfile
+docs/
+environment.yaml
+notebooks/

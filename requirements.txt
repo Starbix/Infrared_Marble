@@ -1,0 +1,17 @@
+bokeh
+colorcet
+contextily
+dask
+fastapi[all]
+folium
+gdal
+geopandas
+mapclassify
+matplotlib
+numpy
+pandas
+requests
+scikit-learn
+seaborn
+tabulate
+zarr

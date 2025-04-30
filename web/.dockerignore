@@ -1,0 +1,6 @@
+.dockerignore
+.env
+.env.*
+docker-compose.yaml
+Dockerfile
+node_modules/

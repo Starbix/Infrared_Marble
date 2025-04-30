@@ -16,23 +16,12 @@ dependencies:
   - python=3.12
   - pip
   - pip:
-      - numpy
-      - pandas
-      - scikit-learn
+      # requirements.txt holds packages shared by interactive installation (conda) and Docker install (for API)
+      # Do NOT put unnecessary packages like jupyter-notebook in requirements.txt, as this just increases the Docker
+      # image size. You can still include them in this environment file.
+      - -r requirements.txt
       - ipykernel
       - ipywidgets
       - notebook
-      - folium
-      - matplotlib
-      - mapclassify
-      - colorcet
-      - contextily
-      - geopandas
-      - seaborn
-      - zarr
-      - bokeh
-      - tabulate
-      - gdal
-      - requests
-      - dask
+      # Install this separately as Dockerfile needs to install this in stages
       - -e ./blackmarblepy

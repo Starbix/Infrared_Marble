@@ -5,22 +5,25 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8000:8000
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
     develop:
       watch:
-        - path: ./src/api/requirements.txt
+        - path: ./requirements.txt
           action: rebuild
-        - path: ./.env
-          action: sync+restart
-          target: /app/.env
         - path: ./src
           action: sync
-          target: /app
+          target: /app/src
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
     ports:
       - 3000:3000
+    environment:
+      - API_URL=http://api:8000
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
     develop:
       watch:
         - path: ./web/package-lock.json

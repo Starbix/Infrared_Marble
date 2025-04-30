@@ -6,6 +6,8 @@ import contextily as cx
 import matplotlib.pyplot as plt
 from matplotlib import pyplot as plt
 
+from lib.utils import BM_PRODUCT, BM_VARIABLE, get_default_variable_for_product
+
 if TYPE_CHECKING:
     import xarray as xr
     from geopandas import GeoDataFrame
@@ -21,7 +23,8 @@ def get_subplots(raster: "xr.Dataset", figwidth: float = 8.0):
 def plot_daily_radiance(gdf: "GeoDataFrame", raster: "xr.Dataset", date: datetime.date):
     fig, ax = get_subplots(raster)
 
-    raster["Gap_Filled_DNB_BRDF-Corrected_NTL"].sel(time=date.isoformat()).plot.pcolormesh(
+    variable = BM_VARIABLE or get_default_variable_for_product(BM_PRODUCT)
+    raster[variable].sel(time=date.isoformat()).plot.pcolormesh(
         ax=ax,
         cmap=cc.cm.bmy,
         robust=True,

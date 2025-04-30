@@ -20,6 +20,10 @@ const theme = createTheme({
       dark: "#3f3bac",
       contrastText: "#fff",
     },
+    background: {
+      default: "#f2f2f2",
+      paper: "#fff",
+    },
   },
   shadows: [
     "none",

@@ -4,6 +4,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import clsx from "clsx";
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import ClientProviders from "./_components/ClientProviders";
 import NavBar from "./_components/navigation/NavBar";
 import "./global.scss";
 
@@ -34,13 +35,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={clsx(inter.variable, jetbrainsMono.variable)}>
         <AppRouterCacheProvider>
-          <CssBaseline />
-          <ThemeProvider theme={theme}>
-            {/* Navigation */}
-            <NavBar />
-            {/* Main body */}
-            {children}
-          </ThemeProvider>
+          <ClientProviders>
+            <CssBaseline />
+            <ThemeProvider theme={theme}>
+              {/* Navigation */}
+              <NavBar />
+              {/* Main body */}
+              {children}
+            </ThemeProvider>
+          </ClientProviders>
         </AppRouterCacheProvider>
       </body>
     </html>

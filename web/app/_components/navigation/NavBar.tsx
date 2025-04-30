@@ -1,7 +1,8 @@
 "use client";
 
 import AnimatedTabs, { TabProps } from "@/components/AnimatedTabs";
-import { Box, useTheme } from "@mui/material";
+import Panel from "@/components/Panel";
+import { Box } from "@mui/material";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -20,7 +21,6 @@ function pathMatches(path: string, href?: string) {
 }
 
 export default function NavBar(props: NavBarProps) {
-  const theme = useTheme();
   const [value, setValue] = useState(0);
 
   const pathname = usePathname();
@@ -38,20 +38,10 @@ export default function NavBar(props: NavBarProps) {
   console.log("Rendering...");
 
   return (
-    <Box sx={{ width: 1, p: 2 }}>
-      <Box
-        sx={{
-          width: "max-content",
-          border: "1px solid",
-          borderColor: theme.palette.divider,
-          borderRadius: `${4 * theme.shape.borderRadius}px`,
-          p: 0.5,
-          boxShadow: theme.shadows[8],
-          margin: "auto",
-        }}
-      >
+    <Box sx={{ width: 1, p: 2, position: "relative", zIndex: 1000, pointerEvents: "none" }}>
+      <Panel sx={{ margin: "auto", pointerEvents: "auto" }}>
         <AnimatedTabs tabs={tabs} value={value}></AnimatedTabs>
-      </Box>
+      </Panel>
     </Box>
   );
 }

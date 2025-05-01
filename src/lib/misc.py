@@ -58,3 +58,21 @@ def add_cloud_coverage(file: str | Path, location: str = None):
         df.at[i, 'bm_cloud'] = bm_cloud
 
     df.to_csv(file, index=False)
+
+def sort_by_cloud_coverage(file: str | Path, location: str = None):
+    file = Path(file)
+
+    data = []
+
+    if not file.exists():
+        raise ValueError(f"File does not exist: {file}")
+    
+    df = pd.read_csv(file)  
+    dates = df['date'].tolist()
+    
+    for date in dates:
+        luojia_cloud, bm_cloud = get_day_cloud_coverage(date, location)
+        data.append((date,luojia_cloud,bm_cloud))
+
+    return sorted(data, key=lambda tup: (tup[1] + tup[2]) / 2)
+

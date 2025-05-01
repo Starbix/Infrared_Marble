@@ -1,8 +1,10 @@
-from fastapi import APIRouter
+from typing import Literal
+
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
 from lib.misc import list_dates
-from lib.utils import ALL_ADMIN_AREAS_GEOJSON_FILE
+from lib.utils import ADMIN_AREA_FILE_MAPPING
 
 router = APIRouter(prefix="/explore", tags=["Explore"])
 
@@ -14,12 +16,12 @@ async def get_dates():
     return dates
 
 
-@router.get('/admin-areas')
-async def get_admin_areas():
+@router.get("/admin-areas")
+async def get_admin_areas(resolution: Literal["110m", "50m", "10m"] = "50m"):
+    # Validation performed by pydantic thanks to type annotation
+    file_path = ADMIN_AREA_FILE_MAPPING[resolution]
     return FileResponse(
-        ALL_ADMIN_AREAS_GEOJSON_FILE,
-        media_type='application/geo+json',
-        headers={
-            'Content-Encoding': 'gzip'
-        }
+        file_path,
+        media_type="application/geo+json",
+        headers={"Content-Encoding": "gzip"},
     )

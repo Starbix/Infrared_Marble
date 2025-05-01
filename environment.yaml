@@ -15,6 +15,8 @@ channels:
 dependencies:
   - python=3.12
   - pip
+  - gdal
+  - numcodecs
   - pip:
       # requirements.txt holds packages shared by interactive installation (conda) and Docker install (for API)
       # Do NOT put unnecessary packages like jupyter-notebook in requirements.txt, as this just increases the Docker

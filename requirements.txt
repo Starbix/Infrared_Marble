@@ -4,7 +4,7 @@ contextily
 dask
 fastapi[all]
 folium
-gdal
+GDAL==3.6.4
 geopandas
 mapclassify
 matplotlib

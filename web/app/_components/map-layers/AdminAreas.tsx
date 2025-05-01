@@ -39,7 +39,6 @@ const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m" }) 
           color: "#0000ff",
         });
 
-        console.log(feature.properties);
         layer.bindPopup(popupContent(feature.properties), { closeButton: false });
         layer.openPopup();
       },

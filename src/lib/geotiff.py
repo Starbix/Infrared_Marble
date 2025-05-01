@@ -5,9 +5,8 @@ from lib.utils import LJ_DATA_DIR, DATA_DIR
 from shapely.geometry import Polygon
 import geopandas
 import xarray
-from osgeo import gdal
+from osgeo import gdal, ogr
 from pathlib import Path
-import numpy as np
 
 if TYPE_CHECKING:
     from geopandas import GeoDataFrame
@@ -135,76 +134,92 @@ def merge_geotiffs(geotiff_list, output_name="merged.tif"):
     file_list = [ str(LJ_DATA_DIR / "tiles" / geotiff)+"_gec.tif" for geotiff in geotiff_list]
 
     for file in file_list:
-        convert_geotiff(file, file.replace(".tif", "_float.tif"))
+        metadata_path = str(LJ_DATA_DIR / "metadata" / file.split("/")[-1].replace("_gec.tif", "_meta.xml"))
+        convert_geotiff(file, file.replace(".tif", "_float.tif"), metadata_path)
 
-    new_file_list = [ str(LJ_DATA_DIR / "tiles" / geotiff)+"_gec.tif" for geotiff in geotiff_list]
+    new_file_list = [ str(LJ_DATA_DIR / "tiles" / geotiff)+"_gec_float.tif" for geotiff in geotiff_list]
 
     output_file = LJ_DATA_DIR / output_name
-    vrt_file = "merged.vrt"
-    gdal.BuildVRT(vrt_file,new_file_list,
-                  )
+
+    vrt_options = gdal.BuildVRTOptions(srcNodata=-1)
+    vrt_dataset = gdal.BuildVRT('', new_file_list, options=vrt_options)
 
     # Translate VRT to TIFF
-    gdal.Translate(output_file,vrt_file,
-                   noData="0")
+    gdal.Translate(output_file, vrt_dataset, noData=-1)
+
+    # Close the in-memory VRT dataset
+    vrt_dataset = None
 
 # convert uint32 to float32, 
-def convert_geotiff(input_path, output_path, nodata_value=-9999):
+def convert_geotiff(input_path, output_path, metadata_path, nodata_value=-1):
     # Open the input GeoTIFF file
     dataset = gdal.Open(input_path)
+    geotransform = dataset.GetGeoTransform()
+    projection = dataset.GetProjection()
     band = dataset.GetRasterBand(1)
 
     # Read the data as a numpy array
     data = band.ReadAsArray()
 
     # Apply the radiance conversion formula
-    radiance = (data**(3/2)) / (10**10)
+    radiance = (data ** (3/2)) * 10 ** (-10)
 
-    # Set NODATA value for out-of-bounds data
-
-
- # Get the geotransform
-    geotransform = dataset.GetGeoTransform()
-    min_x = geotransform[0]
-    max_y = geotransform[3]
-    pixel_size_x = geotransform[1]
-    pixel_size_y = geotransform[5]
-
-    # Calculate the coordinates for each pixel
-    x_coords = np.arange(min_x, min_x + dataset.RasterXSize * pixel_size_x, pixel_size_x)[:dataset.RasterXSize]
-    y_coords = np.arange(max_y, max_y + dataset.RasterYSize * pixel_size_y, pixel_size_y)[:dataset.RasterYSize]
-    xx, yy = np.meshgrid(x_coords, y_coords)
-
-    # Define the corner coordinates
-    corner_coords = {
-        'min_x': min_x,
-        'max_x': min_x + dataset.RasterXSize * pixel_size_x,
-        'min_y': max_y + dataset.RasterYSize * pixel_size_y,
-        'max_y': max_y
-    }
-
-    # Create a mask for the valid data region
-    valid_mask = (xx >= corner_coords['min_x']) & (xx < corner_coords['max_x']) & (yy >= corner_coords['min_y']) & (yy < corner_coords['max_y'])
-
-    # Apply the mask to set NODATA values
-    radiance[~valid_mask] = nodata_value
-    # Create a new GeoTIFF file
     driver = gdal.GetDriverByName('GTiff')
     out_dataset = driver.Create(output_path, dataset.RasterXSize, dataset.RasterYSize, 1, gdal.GDT_Float32)
-
-    # Copy the geotransform and projection
     out_dataset.SetGeoTransform(dataset.GetGeoTransform())
     out_dataset.SetProjection(dataset.GetProjection())
-
-    # Copy metadata
-    out_dataset.SetMetadata(dataset.GetMetadata())
-
-    # Write the radiance data to the new file
     out_band = out_dataset.GetRasterBand(1)
     out_band.WriteArray(radiance)
-    out_band.SetNoDataValue(nodata_value)  # Set NODATA value in metadata
     out_band.FlushCache()
 
+    # read metadata from the XML file
+    from xml.etree import ElementTree
+
+    tree = ElementTree.parse(metadata_path)
+    coordinates = {
+        "LT": (float(tree.find(".//LTLongitude").text), float(tree.find(".//LTLatitude").text)),
+        "RT": (float(tree.find(".//RTLongitude").text), float(tree.find(".//RTLatitude").text)),
+        "RB": (float(tree.find(".//RBLongitude").text), float(tree.find(".//RBLatitude").text)),
+        "LB": (float(tree.find(".//LBLongitude").text), float(tree.find(".//LBLatitude").text)),
+    }
+
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    ring.AddPoint(coordinates['LT'][0], coordinates['LT'][1])
+    ring.AddPoint(coordinates['RT'][0], coordinates['RT'][1])
+    ring.AddPoint(coordinates['RB'][0], coordinates['RB'][1])
+    ring.AddPoint(coordinates['LB'][0], coordinates['LB'][1])
+    ring.AddPoint(coordinates['LT'][0], coordinates['LT'][1])  # Close the ring
+
+    polygon = ogr.Geometry(ogr.wkbPolygon)
+    polygon.AddGeometry(ring)
+
+    # Create a memory layer to hold the polygon
+    mem_driver = ogr.GetDriverByName('MEMORY')
+    mem_source = mem_driver.CreateDataSource('memData')
+    mem_layer = mem_source.CreateLayer('memLayer', srs=ogr.osr.SpatialReference(wkt=projection))
+    feature = ogr.Feature(mem_layer.GetLayerDefn())
+    feature.SetGeometry(polygon)
+    mem_layer.CreateFeature(feature)
+
+    # Rasterize the polygon to create a mask
+    driver = gdal.GetDriverByName('MEM')
+    mask_dataset = driver.Create('', dataset.RasterXSize, dataset.RasterYSize, 1, gdal.GDT_Byte)
+    mask_dataset.SetGeoTransform(geotransform)
+    mask_dataset.SetProjection(projection)
+    gdal.RasterizeLayer(mask_dataset, [1], mem_layer, burn_values=[1])
+    mask = mask_dataset.GetRasterBand(1).ReadAsArray()
+
+    # Apply the mask to set values outside the mask to 1
+    radiance[mask == 0] = nodata_value
+
+    # Create a new GeoTIFF file to save the result
+    driver = gdal.GetDriverByName('GTiff')
+    out_dataset = driver.Create(output_path, dataset.RasterXSize, dataset.RasterYSize, 1, gdal.GDT_Float32)
+    out_dataset.SetGeoTransform(geotransform)
+    out_dataset.SetProjection(projection)
+    out_band = out_dataset.GetRasterBand(1)
+    out_band.WriteArray(radiance)
+    out_band.FlushCache()
     # Close the datasets
     dataset = None
     out_dataset = None
@@ -227,10 +242,6 @@ def visualize_geotiff(file: str):
     array = np.array(zarr_array)
 
 
-    
-
-
-
 if __name__ == "__main__":
     # visualize_geotiff("/Users/cedriclaubacher/ETH/Infrared_Marble/data/luojia/tiles/LuoJia1-01_LR201811208517_20181119160335_HDR_0024_gec.tif")
     # pass
@@ -247,7 +258,6 @@ if __name__ == "__main__":
         for year in [2018, 2019]
         for day in range(1, 31 )  # Days in November
     ]
-
 
     geotiff_list = get_geotiffs(gdf, date)
     print(geotiff_list)

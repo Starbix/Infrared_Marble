@@ -15,7 +15,7 @@ const Panel: React.FC<PanelProps> = ({ children, sx }) => {
         borderColor: theme.palette.divider,
         bgcolor: "background.paper",
         borderRadius: `${4 * theme.shape.borderRadius}px`,
-        p: 0.5,
+        p: 1,
         boxShadow: theme.shadows[8],
         ...sx,
       }}

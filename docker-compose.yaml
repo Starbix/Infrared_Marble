@@ -16,6 +16,9 @@ services:
         - path: ./src
           action: sync
           target: /app/src
+        - path: ./static
+          action: sync
+          target: /app/static
   web:
     build:
       context: ./web

@@ -5,7 +5,7 @@ WORKDIR /app
 # Install required packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt update && apt install -y --no-install-recommends git bash gdal-bin libgdal-dev
+    apt update && apt install -y --no-install-recommends git bash gdal-bin libgdal-dev g++
 
 # Install deps
 COPY requirements.txt ./

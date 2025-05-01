@@ -1,0 +1,41 @@
+services:
+  api:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - BLACKMARBLE_TOKEN==== REDACTED $BLACKMARBLE_TOKEN ===
+    develop:
+      watch:
+        - path: ./requirements.txt
+          action: rebuild
+        - path: ./src
+          action: sync
+          target: /app/src
+        - path: ./static
+          action: sync
+          target: /app/static
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    environment:
+      - API_URL=http://api:8000
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    develop:
+      watch:
+        - path: ./web/package-lock.json
+          action: rebuild
+        - path: ./web
+          action: sync
+          target: /app
+          ignore:
+            - node_modules/
+            - web/node_modules/

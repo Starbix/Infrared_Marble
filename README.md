@@ -2,6 +2,14 @@
 
 ![plots](plots.webp)
 
+## Members
+
+- [Oliver Calvet](mailto:ocalvet@student.ethz.ch)
+- [Yiyang He](mailto:yiyahe@student.ethz.ch)
+- [Alexandre Iskandar](mailto:aiskandar@student.ethz.ch)
+- [Cédric Laubacher](mailto:cedric@laubacher.io)
+- [Federico Mantovani](mailto:fmantova@student.ethz.ch)
+
 ## Quickstart
 
 ### Cloning the Repo

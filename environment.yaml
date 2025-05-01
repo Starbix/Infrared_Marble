@@ -15,6 +15,8 @@ channels:
 dependencies:
   - python=3.12
   - pip
+  - gdal
+  - numcodecs
   - pip:
       - numpy
       - pandas
@@ -35,4 +37,6 @@ dependencies:
       - gdal
       - requests
       - dask
+      - geotiff
+      - numcodecs
       - -e ./blackmarblepy

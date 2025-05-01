@@ -1,11 +1,11 @@
 import MapLoader from "@/components/map/MapLoader";
 import api from "@/lib/api/server";
-import { Box } from "@mui/material";
-import Toolbar from "./_components/Toolbar";
 import { querySchema } from "@/lib/schemas/explore";
-import dayjs from "dayjs";
+import { Box } from "@mui/material";
 import { Suspense } from "react";
-import AdminAreas from "./_components/map-layers/AdminAreas";
+import MapContent from "./_components/MapContent";
+import Toolbar from "./_components/Toolbar";
+import ComparisonModal from "./_components/modal/ComparisonModal";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   // Get all available dates from API
@@ -20,10 +20,11 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ [
       <Box sx={{ p: 1, overflow: "clip", height: 1, width: 1 }}>
         <MapLoader>
           <Suspense>
-            <AdminAreas dataUrl="/explore/admin-areas" />
+            <MapContent />
           </Suspense>
         </MapLoader>
       </Box>
+      <ComparisonModal />
       <Toolbar dates={dates} initialDate={date} sx={{ position: "absolute", bottom: 0, zIndex: 1000 }} />
     </Box>
   );

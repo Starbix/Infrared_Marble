@@ -1,23 +1,37 @@
 "use client";
 
 import { client } from "@/lib/api/client";
-import { Typography } from "@mui/material";
-import { Box } from "@mui/system";
+import numeral from "numeral";
 import { GeoJSON } from "react-leaflet";
 import useSWR from "swr";
-import numeral from "numeral";
 
 import "./admin-areas.scss";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export type AdminAreasProps = {
   dataUrl: string;
-  resolution: "10m" | "50m" | "110m";
+  resolution?: "10m" | "50m" | "110m";
+  onClick?: (adminArea: any) => void;
 };
 
-const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m" }) => {
+const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m", onClick }) => {
   // Fetch data from server
   const { data } = useSWR(dataUrl, (url) => client.get(url, { params: { resolution } }).then((res) => res.data), { suspense: true });
-  console.log(data);
+
+  // Need to set selected admin area over search params
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const setSelectedAdminArea = (adm0_a3: number | null) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (adm0_a3) {
+      newSearchParams.set("adm0_a3", adm0_a3.toString());
+    } else {
+      newSearchParams.delete("adm0_a3");
+    }
+    router.push(`${pathname}?${newSearchParams}`);
+  };
 
   // Styling
   const getStyle = () => {
@@ -50,6 +64,9 @@ const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m" }) 
         });
 
         layer.closePopup();
+      },
+      click: (e) => {
+        setSelectedAdminArea(e.target.feature.properties.adm0_a3);
       },
     });
   };

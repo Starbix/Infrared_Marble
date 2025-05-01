@@ -28,6 +28,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-leaflet": "^5.0.0",
+    "react-loading-skeleton": "^3.5.0",
     "sass": "^1.87.0",
     "swr": "^2.3.3",
     "zod": "^3.24.3"

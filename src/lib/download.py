@@ -81,7 +81,7 @@ def bm_dataset_preprocess(
 ) -> xr.Dataset:
     # Check if already preprocessed
     zarr_path = (
-        Path(dest) if dest else (BM_DATA_DIR / "preprocessed" / f"dataset-{BM_PRODUCT}.zarr")
+        Path(dest) if dest else (BM_DATA_DIR / "preprocessed" / f"{BM_PRODUCT}-{BM_VARIABLE}.zarr")
     )
     zarr_path.parent.mkdir(parents=True, exist_ok=True)
     if not force and zarr_path.exists():

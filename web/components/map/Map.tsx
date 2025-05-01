@@ -15,7 +15,7 @@ export type MapProps = PropsWithChildren<{
   zoom?: number;
 }>;
 
-const Map: React.FC<MapProps> = ({ children, center = [47.3769, 8.5417], zoom = 10 }) => {
+const Map: React.FC<MapProps> = ({ children, center = [47.3769, 8.5417], zoom = 8 }) => {
   const mapRef = useRef<any>(null); // To store the Leaflet map instance
   const containerRef = useRef<HTMLDivElement>(null); // To reference the container element
   const resizeObserverRef = useRef<ResizeObserver>(null); // To store the ResizeObserver instance

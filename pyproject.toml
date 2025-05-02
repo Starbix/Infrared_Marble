@@ -49,3 +49,13 @@ evaluation = "10.0 - ((float(5 * error + warning + refactor + convention) / stat
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+
+[tool.pyright]
+include = ["src"]
+executionEnvironments = [
+  { root = "src" }
+]
+reportExplicitAny = false
+reportAny = false
+reportUnusedCallResult = false

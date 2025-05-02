@@ -173,3 +173,9 @@ cython_debug/
 .pypirc
 
 .DS_Store
+
+# Editors
+.vscode/
+.zed/
+.fleet/
+.idea/

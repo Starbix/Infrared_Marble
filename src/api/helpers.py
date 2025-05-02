@@ -1,6 +1,6 @@
 import gzip
 import json
-from typing import Literal
+from typing import Any, Literal
 
 from fastapi.exceptions import HTTPException
 
@@ -10,7 +10,7 @@ from lib.utils import ADMIN_AREA_FILE_MAPPING
 Resolution = Literal["110m", "50m", "10m"]
 
 
-def get_admin_area_by_id(id: str, resolution: Resolution = "50m"):
+def get_admin_area_by_id(id: str, resolution: Resolution = "50m") -> dict[str, Any]:
     file_path = ADMIN_AREA_FILE_MAPPING[resolution]
     # Need to filter admin areas and get correct feature out
 

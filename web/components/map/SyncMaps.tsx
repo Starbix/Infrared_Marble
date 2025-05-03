@@ -7,7 +7,7 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 
 // This component syncs changes from one map to another
-const SyncMaps = ({ maps, currentMapId }: { maps: { [key: string]: L.Map }; currentMapId: string }) => {
+const SyncMaps = ({ maps, currentMapId }: { maps: React.RefObject<{ [key: string]: L.Map }>; currentMapId: string }) => {
   const map = useMap();
 
   // Add this map to the maps array
@@ -40,35 +40,3 @@ const SyncMaps = ({ maps, currentMapId }: { maps: { [key: string]: L.Map }; curr
 };
 
 export default SyncMaps;
-
-// const SynchronizedMaps = () => {
-//   const [center, setCenter] = useState([51.505, -0.09]);
-//   const [zoom, setZoom] = useState(13);
-//   const maps = useRef({});
-
-//   return (
-//     <div style={{ display: "flex" }}>
-//       <div style={{ width: "50%", height: "500px" }}>
-//         <MapContainer center={center} zoom={zoom} style={{ height: "100%", width: "100%" }}>
-//           <TileLayer
-//             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-//             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-//           />
-//           <SyncMaps maps={maps} currentMapId="map1" />
-//         </MapContainer>
-//       </div>
-
-//       <div style={{ width: "50%", height: "500px" }}>
-//         <MapContainer center={center} zoom={zoom} style={{ height: "100%", width: "100%" }}>
-//           <TileLayer
-//             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-//             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-//           />
-//           <SyncMaps maps={maps} currentMapId="map2" />
-//         </MapContainer>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default SynchronizedMaps;

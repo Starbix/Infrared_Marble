@@ -1,11 +1,11 @@
 import MapLoader from "@/components/map/MapLoader";
 import api from "@/lib/api/server";
 import { querySchema } from "@/lib/schemas/explore";
-import { Box } from "@mui/material";
+import { Box, NoSsr } from "@mui/material";
 import { Suspense } from "react";
-import MapContent from "./_components/MapContent";
+import MapContentLoader from "./_components/MapContentLoader";
 import Toolbar from "./_components/Toolbar";
-import ComparisonModal from "./_components/modal/ComparisonModal";
+import ComparisonModalLoader from "./_components/modal/ComparisonModalLoader";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   // Get all available dates from API
@@ -18,13 +18,15 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ [
   return (
     <Box sx={{ position: "absolute", inset: 0, bgcolor: "background.default", zIndex: 1 }}>
       <Box sx={{ p: 1, overflow: "clip", height: 1, width: 1 }}>
-        <MapLoader>
-          <Suspense>
-            <MapContent />
-          </Suspense>
-        </MapLoader>
+        <NoSsr>
+          <MapLoader>
+            <Suspense>
+              <MapContentLoader />
+            </Suspense>
+          </MapLoader>
+        </NoSsr>
       </Box>
-      <ComparisonModal />
+      <ComparisonModalLoader />
       <Toolbar dates={dates} initialDate={date} sx={{ position: "absolute", bottom: 0, zIndex: 1000 }} />
     </Box>
   );

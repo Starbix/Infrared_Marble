@@ -61,6 +61,8 @@ const Map: React.FC<MapProps> = ({ children, center = [47.3769, 8.5417], zoom = 
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          noWrap={true}
+          minZoom={4}
         />
         {children}
       </MapContainer>

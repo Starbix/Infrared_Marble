@@ -53,7 +53,7 @@ const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m", on
           color: "#0000ff",
         });
 
-        layer.bindPopup(popupContent(feature.properties), { closeButton: false });
+        layer.bindPopup(popupContent(feature.properties), { closeButton: false, autoPan: false });
         layer.openPopup();
       },
       mouseout: (e) => {

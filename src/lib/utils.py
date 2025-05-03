@@ -55,6 +55,8 @@ ADMIN_AREA_FILE_MAPPING = {
     "110m": STATIC_DIR / "admin-areas_110m.json.gz",
 }
 
+GEOJSON_ADMIN_KEY = "adm0_a3"
+
 
 def get_default_variable_for_product(product: Product):
     if product == Product.VNP46A1:

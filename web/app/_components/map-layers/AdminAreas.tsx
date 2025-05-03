@@ -7,6 +7,7 @@ import useSWR from "swr";
 
 import "./admin-areas.scss";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
 
 export type AdminAreasProps = {
   dataUrl: string;
@@ -23,12 +24,12 @@ const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m", on
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const setSelectedAdminArea = (adm0_a3: number | null) => {
+  const setSelectedAdminArea = (adminId: number | null) => {
     const newSearchParams = new URLSearchParams(searchParams);
-    if (adm0_a3) {
-      newSearchParams.set("adm0_a3", adm0_a3.toString());
+    if (adminId) {
+      newSearchParams.set(GEOJSON_ADMIN_KEY, adminId.toString());
     } else {
-      newSearchParams.delete("adm0_a3");
+      newSearchParams.delete(GEOJSON_ADMIN_KEY);
     }
     router.push(`${pathname}?${newSearchParams}`);
   };
@@ -66,7 +67,7 @@ const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m", on
         layer.closePopup();
       },
       click: (e) => {
-        setSelectedAdminArea(e.target.feature.properties.adm0_a3);
+        setSelectedAdminArea(e.target.feature.properties[GEOJSON_ADMIN_KEY]);
       },
     });
   };

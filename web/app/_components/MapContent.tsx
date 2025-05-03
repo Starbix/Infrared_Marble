@@ -2,7 +2,9 @@
 
 import AdminAreas from "./map-layers/AdminAreas";
 
-const MapContent: React.FC = (props) => {
+export type MapContentProps = {};
+
+const MapContent: React.FC<MapContentProps> = (props) => {
   const handleAdminAreaClick = (e) => {
     const layer = e.target;
     const adminAreaId = layer.feature.properties.woe_id;

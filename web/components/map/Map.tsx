@@ -1,21 +1,42 @@
 "use client";
 
 import { Box } from "@mui/material";
-import { PropsWithChildren, useEffect, useRef } from "react";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { PropsWithChildren, useCallback, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
+import { LatLngExpression } from "leaflet";
 
 // Import leaflet CSS
-import { LatLngExpression } from "leaflet";
-import "leaflet-defaulticon-compatibility";
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet/dist/leaflet.css";
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import "leaflet-defaulticon-compatibility";
 
 export type MapProps = PropsWithChildren<{
   center?: LatLngExpression;
   zoom?: number;
+  onMove?: (e: LatLngExpression) => void;
+  onZoom?: (e: number) => void;
 }>;
 
-const Map: React.FC<MapProps> = ({ children, center = [47.3769, 8.5417], zoom = 8 }) => {
+function MapEventHandler({ setCenter, setZoom }) {
+  const map = useMapEvents({
+    move: () => {
+      // Update state when map is moved
+      const center = map.getCenter();
+      setCenter([center.lat, center.lng]);
+      setZoom(map.getZoom());
+    },
+    zoom: () => {
+      // Update state when zoom changes
+      const center = map.getCenter();
+      setCenter([center.lat, center.lng]);
+      setZoom(map.getZoom());
+    },
+  });
+
+  return null;
+}
+
+const Map: React.FC<MapProps> = ({ children, center = [47.3769, 8.5417], zoom = 8, onMove, onZoom }) => {
   const mapRef = useRef<any>(null); // To store the Leaflet map instance
   const containerRef = useRef<HTMLDivElement>(null); // To reference the container element
   const resizeObserverRef = useRef<ResizeObserver>(null); // To store the ResizeObserver instance
@@ -65,6 +86,7 @@ const Map: React.FC<MapProps> = ({ children, center = [47.3769, 8.5417], zoom = 
           minZoom={4}
         />
         {children}
+        <MapEventHandler setCenter={(c) => onMove?.(c)} setZoom={(z) => onZoom?.(z)} />
       </MapContainer>
     </Box>
   );

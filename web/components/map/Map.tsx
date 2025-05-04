@@ -3,19 +3,17 @@
 import { Box } from "@mui/material";
 import { PropsWithChildren, useCallback, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
-import { LatLngExpression } from "leaflet";
+import { LatLngBoundsExpression, LatLngExpression } from "leaflet";
 
 // Import leaflet CSS
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
 
-export type MapProps = PropsWithChildren<{
-  center?: LatLngExpression;
-  zoom?: number;
-  onMove?: (e: LatLngExpression) => void;
-  onZoom?: (e: number) => void;
-}>;
+const bounds: LatLngBoundsExpression = [
+  [-90, -180], // Southwest coordinates
+  [90, 180], // Northeast coordinates
+];
 
 function MapEventHandler({ setCenter, setZoom }) {
   const map = useMapEvents({
@@ -35,6 +33,13 @@ function MapEventHandler({ setCenter, setZoom }) {
 
   return null;
 }
+
+export type MapProps = PropsWithChildren<{
+  center?: LatLngExpression;
+  zoom?: number;
+  onMove?: (e: LatLngExpression) => void;
+  onZoom?: (e: number) => void;
+}>;
 
 const Map: React.FC<MapProps> = ({ children, center = [47.3769, 8.5417], zoom = 8, onMove, onZoom }) => {
   const mapRef = useRef<any>(null); // To store the Leaflet map instance
@@ -78,7 +83,15 @@ const Map: React.FC<MapProps> = ({ children, center = [47.3769, 8.5417], zoom = 
       }}
       ref={containerRef}
     >
-      <MapContainer ref={mapRef} center={center} zoom={zoom} scrollWheelZoom={true} style={{ height: "100%" }}>
+      <MapContainer
+        ref={mapRef}
+        center={center}
+        zoom={zoom}
+        scrollWheelZoom={true}
+        style={{ height: "100%" }}
+        maxBounds={bounds}
+        maxBoundsViscosity={0.5}
+      >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

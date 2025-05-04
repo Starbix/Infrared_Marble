@@ -1,20 +1,19 @@
+from fastapi import APIRouter
 from fastapi.params import Path
+from fastapi.responses import FileResponse
 from typing_extensions import Annotated
 
-from fastapi import APIRouter
-from fastapi.responses import FileResponse
-
 from api.helpers import Resolution, get_admin_area_by_id
-from lib.misc import list_dates
+from lib.loading import avail_dates
 from lib.utils import ADMIN_AREA_FILE_MAPPING
 
 router = APIRouter(prefix="/explore", tags=["Explore"])
 
 
-@router.get("/dates")
-async def get_dates():
+@router.get("/dates/{admin_id}")
+async def get_dates(admin_id: str):
     # Frontend needs dates sorted in ascending order
-    dates = sorted(list_dates())
+    dates = sorted(avail_dates(admin_id))
     return dates
 
 
@@ -30,6 +29,8 @@ async def get_admin_areas(resolution: Resolution = "50m"):
 
 
 @router.get("/admin-areas/{id}")
-async def get_admin_area(id: Annotated[str, Path()], resolution: Resolution = "50m"):
+async def get_admin_area(
+    id: Annotated[str, Path()], resolution: Resolution = "50m"
+):
     admin_area = get_admin_area_by_id(id, resolution=resolution)
     return admin_area

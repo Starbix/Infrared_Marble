@@ -3,12 +3,13 @@
 import { client } from "@/lib/api/client";
 import parseGeoraster from "georaster";
 import GeoRasterLayer from "georaster-layer-for-leaflet";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 import chroma from "chroma-js";
 import { CET_L8 } from "@/lib/colormap";
 import { AxiosResponse } from "axios";
+import { Box, CircularProgress } from "@mui/material";
 
 const colorFn = (scale: chroma.Scale) => (values: number[]) => {
   const value = values[0]; // First band
@@ -74,6 +75,9 @@ export type GeoTiffLayerProps = {
   resolution?: number;
   legendTitle?: string;
   legendTickUnits?: string;
+  onLoadStart?: () => void;
+  onReady?: () => void;
+  onError?: (error: { error: any }) => void;
 };
 
 const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
@@ -83,6 +87,9 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
   resolution = 128,
   legendTitle = "Light intensity [nW·cm⁻²·sr⁻¹]",
   legendTickUnits = "",
+  onLoadStart,
+  onReady,
+  onError,
 }) => {
   const map = useMap();
   const layerRef = useRef<GeoRasterLayer | null>(null);
@@ -130,6 +137,8 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
       legendRef.current = legend;
 
       map.fitBounds(layer.getBounds());
+
+      onReady?.();
     },
     [map, colorMap, resolution, opacity, legendTitle, legendTickUnits],
   );
@@ -148,6 +157,7 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
 
   useEffect(() => {
     // Fetch GeoTIFF and set up map
+    onLoadStart?.();
     client
       .get(url, {
         params: { nocache: false },
@@ -157,7 +167,11 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
       })
       .then((response) => ({ data: response.data, stats: parseStats(response) }))
       .then(({ data, stats }) => parseGeoraster(data).then((georaster) => ({ georaster, stats })))
-      .then(setup);
+      .then(setup)
+      .catch((e) => {
+        console.error(e);
+        onError?.({ error: e });
+      });
 
     // Cleanup function
     return cleanup;

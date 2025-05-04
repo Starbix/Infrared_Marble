@@ -9,6 +9,7 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=8000
+      - REDIS_URL=redis://redis:6379/0
       - BLACKMARBLE_TOKEN=eyJ0eXAiOiJKV1QiLCJvcmlnaW4iOiJFYXJ0aGRhdGEgTG9naW4iLCJzaWciOiJlZGxqd3RwdWJrZXlfb3BzIiwiYWxnIjoiUlMyNTYifQ.eyJ0eXBlIjoiVXNlciIsInVpZCI6ImFpNGdvb2RfYmxhY2ttYXJibGUiLCJleHAiOjE3NDc3NjgwNDYsImlhdCI6MTc0MjU4NDA0NiwiaXNzIjoiaHR0cHM6Ly91cnMuZWFydGhkYXRhLm5hc2EuZ292IiwiaWRlbnRpdHlfcHJvdmlkZXIiOiJlZGxfb3BzIiwiYWNyIjoiZWRsIiwiYXNzdXJhbmNlX2xldmVsIjozfQ.Q4RAn4miryrNFeV3L0CyAngj24WI-mertHQUuvgmRyrTgKJuZIAYmvbuqTWjwSPCsEP01E3GCLnl0cBBom5FenwM_PuupdO3Uq-gZdT5GukEgmvVANX8iCfHvyhf_I7t5yWA20ZvQzB4hqmaxSqIYDrWNBXyET1-Cte1I1LV9CuoLaqvcRmNpp-RYj42zk-ugaqmOewG8BPA2fwRMO3-PisJ9jZGu7vKHpixoPJ91EKqIxJAb9kIrMyOquDZdE_Fu-r8Mj4wBzf0KndhRuVw_AEWQ3a7IxgFqy1LD_v-SZejaKTG8XpcGlwZgM6GkV_ArzJKqnfRh_QEvU_r7Ie7NA
     develop:
       watch:
@@ -20,6 +21,9 @@ services:
         - path: ./static
           action: sync
           target: /app/static
+    depends_on:
+      redis:
+        condition: service_healthy
   web:
     build:
       context: ./web
@@ -39,3 +43,12 @@ services:
           ignore:
             - node_modules/
             - web/node_modules/
+  redis:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 5s
+      retries: 5

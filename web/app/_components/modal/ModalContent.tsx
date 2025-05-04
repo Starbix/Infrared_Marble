@@ -1,9 +1,16 @@
+"use client";
+
 import { ChartType } from "@/lib/types";
 import { Box, Button, MenuItem, Select } from "@mui/material";
 import { LatLngBounds, LatLngExpression } from "leaflet";
 import { useState, useRef, useMemo } from "react";
 import Chart from "./Chart";
-import { Add as AddIcon, ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, Close as CloseIcon } from "@mui/icons-material";
+import {
+  Add as AddIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
+  Close as CloseIcon,
+} from "@mui/icons-material";
 
 const getBestZoomLevel = (bounds: LatLngBounds) => {
   // width of the map display area (approximate)
@@ -47,9 +54,19 @@ const toChartType = (str: string) => {
   }
 };
 
-export type ModalContentProps = { layer: L.GeoJSON; defaultChartType?: ChartType };
+export type ModalContentProps = {
+  layer: L.GeoJSON;
+  defaultChartType?: ChartType;
+  date: string;
+  adminId: string;
+};
 
-const ModalContent: React.FC<ModalContentProps> = ({ layer, defaultChartType = ChartType.BlackMarble }) => {
+const ModalContent: React.FC<ModalContentProps> = ({
+  layer,
+  defaultChartType = ChartType.BlackMarble,
+  date,
+  adminId,
+}) => {
   const bounds = layer.getBounds();
   const boundsCenter = bounds.getCenter();
 
@@ -58,7 +75,10 @@ const ModalContent: React.FC<ModalContentProps> = ({ layer, defaultChartType = C
   const maps = useRef<{ [key: string]: L.Map }>({});
 
   const [chartTypes, setChartTypes] = useState<ChartType[]>([ChartType.BlackMarble, ChartType.LuoJia]);
-  const unusedChartTypes = useMemo(() => new Set(Object.values(ChartType)).difference(new Set(chartTypes)), [chartTypes]);
+  const unusedChartTypes = useMemo(
+    () => new Set(Object.values(ChartType)).difference(new Set(chartTypes)),
+    [chartTypes],
+  );
   const nextUnusedChartType = useMemo(() => Array.from(unusedChartTypes).find(() => true), [unusedChartTypes]);
   const modifyCharts = (func: (charts: ChartType[]) => any) => {
     const newChartTypes = Array.from(chartTypes);
@@ -79,7 +99,18 @@ const ModalContent: React.FC<ModalContentProps> = ({ layer, defaultChartType = C
     });
 
   return (
-    <Box sx={{ flex: 1, width: 1, display: "flex", alignItems: "stretch", justifyContent: "stretch", gap: 3, overflowX: "auto", pb: 1 }}>
+    <Box
+      sx={{
+        flex: 1,
+        width: 1,
+        display: "flex",
+        alignItems: "stretch",
+        justifyContent: "stretch",
+        gap: 3,
+        overflowX: "auto",
+        pb: 1,
+      }}
+    >
       {/* Display charts */}
       {chartTypes.map((selectedType, idx) => (
         <Box key={idx} sx={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, minWidth: 600 }}>
@@ -99,26 +130,56 @@ const ModalContent: React.FC<ModalContentProps> = ({ layer, defaultChartType = C
             </Select>
             {/* Chart actions */}
             <Box sx={{ height: 1, display: "flex", gap: 0.5 }}>
-              <Button size="small" variant="outlined" onClick={() => reorderChart(idx, "prev")} sx={{ p: 0.5, minWidth: 0 }}>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => reorderChart(idx, "prev")}
+                sx={{ p: 0.5, minWidth: 0 }}
+              >
                 <ChevronLeftIcon />
               </Button>
-              <Button size="small" variant="outlined" onClick={() => reorderChart(idx, "next")} sx={{ p: 0.5, minWidth: 0 }}>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => reorderChart(idx, "next")}
+                sx={{ p: 0.5, minWidth: 0 }}
+              >
                 <ChevronRightIcon />
               </Button>
-              <Button color="error" size="small" variant="outlined" onClick={() => removeChart(idx)} sx={{ p: 0.5, minWidth: 0 }}>
+              <Button
+                color="error"
+                size="small"
+                variant="outlined"
+                onClick={() => removeChart(idx)}
+                sx={{ p: 0.5, minWidth: 0 }}
+              >
                 <CloseIcon />
               </Button>
             </Box>
           </Box>
           <Box sx={{ flex: 1 }}>
-            <Chart maps={maps} center={center} zoom={zoom} mapId={`map-${idx}`} />
+            <Chart
+              maps={maps}
+              center={center}
+              zoom={zoom}
+              mapId={`map-${idx}`}
+              date={date}
+              adminId={adminId}
+              layer={selectedType}
+            />
           </Box>
         </Box>
       ))}
       {/* Add chart button */}
       <Button
         variant="outlined"
-        sx={{ display: "block", width: chartTypes.length > 0 ? 32 : 1, height: 1, borderColor: "divider", borderStyle: "dashed" }}
+        sx={{
+          display: "block",
+          width: chartTypes.length > 0 ? 32 : 1,
+          height: 1,
+          borderColor: "divider",
+          borderStyle: "dashed",
+        }}
         onClick={() => addChart(nextUnusedChartType)}
         disabled={unusedChartTypes.size == 0}
       >

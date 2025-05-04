@@ -33,6 +33,7 @@ const getBestZoomLevel = (bounds: LatLngBounds) => {
 };
 
 const chartTypeNames: { [K in ChartType]: string } = {
+  [ChartType.BaseMap]: "Base map",
   [ChartType.BlackMarble]: "Blackmarble (moonlight-corrected, VNP46A2)",
   [ChartType.LuoJia]: "LuoJia1-01",
   [ChartType.Overlay]: "Overlay",
@@ -41,6 +42,8 @@ const chartTypeNames: { [K in ChartType]: string } = {
 
 const toChartType = (str: string) => {
   switch (str) {
+    case "base_map":
+      return ChartType.BaseMap;
     case "bm":
       return ChartType.BlackMarble;
     case "lj":

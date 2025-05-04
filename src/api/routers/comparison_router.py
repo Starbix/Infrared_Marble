@@ -53,7 +53,15 @@ async def get_bm_geotiff(
     with io.BytesIO() as buf:
         data_array = raster["Gap_Filled_DNB_BRDF-Corrected_NTL"].rio.write_crs("EPSG:4326")
         data_array = data_array.rio.clip(gdf.geometry.values, gdf.crs, drop=True)
+        pc02 = float(data_array.quantile(0.02).values)
+        pc98 = float(data_array.quantile(0.98).values)
         data_array.rio.to_raster(buf, driver="GTiff", compress="LZW")
         buf.seek(0)
         content = buf.getvalue()
-    return Response(content=content, media_type="image/tiff")
+    # We return some metadata in the headers as we can't use GDAL metadata on client
+    headers = {
+        "Access-Control-Expose-Headers": "*",  # Required for CORS
+        "X-Raster-P02": str(pc02),
+        "X-Raster-P98": str(pc98),
+    }
+    return Response(content=content, media_type="image/tiff", headers=headers)

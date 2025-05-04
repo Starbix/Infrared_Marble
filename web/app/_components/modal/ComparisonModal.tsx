@@ -20,8 +20,9 @@ const ComparisonModal: React.FC = (props) => {
 
   const query = querySchema.safeParse(Object.fromEntries(searchParams.entries()));
   const adminAreaId = query.data?.[GEOJSON_ADMIN_KEY];
+  const date = query.data?.date;
 
-  const open = Boolean(query.success && query.data[GEOJSON_ADMIN_KEY]);
+  const open = Boolean(query.success && date && adminAreaId);
 
   // Need to load data from API
   const { data, isLoading, error } = useSWR(adminAreaId ? `/explore/admin-areas/${adminAreaId}` : null, (url) =>
@@ -35,7 +36,11 @@ const ComparisonModal: React.FC = (props) => {
   };
 
   const CardTitle = () =>
-    isLoading ? <Skeleton variant="text" sx={{ fontSize: "1rem" }} /> : <span>NTL Comparison &mdash; {data.properties.name}</span>;
+    isLoading ? (
+      <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
+    ) : (
+      <span>NTL Comparison &mdash; {data.properties.name}</span>
+    );
   const CardSubHeader = () =>
     !query.success || isLoading ? (
       <Skeleton variant="text" sx={{ fontSize: "0.7rem" }} />
@@ -48,7 +53,7 @@ const ComparisonModal: React.FC = (props) => {
   return (
     <Modal open={open} onClose={closeModal}>
       <Box sx={{ position: "fixed", inset: 0, display: "flex", justifyContent: "center", alignItems: "center", p: 4 }}>
-        {query.success && (
+        {open && (
           <Card variant="outlined" sx={{ width: 1, height: 1, display: "flex", flexDirection: "column" }}>
             <CardHeader
               action={
@@ -59,7 +64,9 @@ const ComparisonModal: React.FC = (props) => {
               title={<CardTitle />}
               subheader={<CardSubHeader />}
             />
-            <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column" }}>{layer && <ModalContent layer={layer} />}</CardContent>
+            <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              {layer && <ModalContent layer={layer} date={date!} adminId={adminAreaId!} />}
+            </CardContent>
           </Card>
         )}
       </Box>

@@ -1,5 +1,4 @@
 import datetime
-from typing import TYPE_CHECKING
 from lib.utils import LJ_DATA_DIR, DATA_DIR
 
 from shapely.geometry import Polygon
@@ -7,9 +6,9 @@ import geopandas
 import xarray
 from osgeo import gdal, ogr
 from pathlib import Path
+from geopandas import GeoDataFrame
 
-if TYPE_CHECKING:
-    from geopandas import GeoDataFrame
+DEBUG = False
 
 def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.date]) -> list:
     """
@@ -18,16 +17,19 @@ def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.
     # assume metadata is downloaded in DATA_DIR / "luojia" / "metadata"
     relevant_geotiffs = []
     geotiff_metadata = LJ_DATA_DIR / "metadata"
-    # iterate through the geotiffs and check if they are in the date and location range
 
+    # iterate through the geotiffs and check if they are in the date and location range
     for geotiff in geotiff_metadata.glob("*.xml"):
         # parse XML file
-
         import xml
         from xml.etree import ElementTree
         tree = ElementTree.parse(geotiff)
         # path to Metadata.ProductInfo.imagingTime
         imaging_time = tree.find(".//imagingTime").text
+        if imaging_time is None:
+            if DEBUG:
+                print(f"imagingTime not found in {geotiff}")
+            continue
         # convert to datetime, format is 2018-6-3T5:50:57.157223
         imaging_time = datetime.datetime.strptime(imaging_time, "%Y-%m-%dT%H:%M:%S.%f")
         # check if the imaging time is in the date range
@@ -38,15 +40,7 @@ def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.
             if imaging_time.date() not in date_range:
                 continue
         
-
-        # <LTLongitude>-115.888656</LTLongitude>
-        # <LTLatitude>35.301386</LTLatitude>
-        # <RTLongitude>-115.211464</RTLongitude>
-        # <RTLatitude>33.013016</RTLatitude>
-        # <RBLongitude>-118.077200</RBLongitude>
-        # <RBLatitude>32.341746</RBLatitude>
-        # <LBLongitude>-118.911156</LBLongitude>
-        # <LBLatitude>34.815542</LBLatitude>
+        # check if the polygon intersects with the GeoDataFrame
         lt = (tree.find(".//LTLongitude").text, tree.find(".//LTLatitude").text)
         rt = (tree.find(".//RTLongitude").text, tree.find(".//RTLatitude").text)
         rb = (tree.find(".//RBLongitude").text, tree.find(".//RBLatitude").text)
@@ -59,14 +53,12 @@ def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.
                 (float(lb[0]), float(lb[1])),
             ]
         )
-        # check if the polygon intersects with the GeoDataFrame
         intersects = get_intersection(gdf, geotiff_polygon)
         if intersects:
             geotiff_name = geotiff.name
             # remove _meta.xml
             geotiff_name = geotiff_name.replace("_meta.xml", "")
             relevant_geotiffs.append(geotiff_name)
-            print_geotiff_metadata(geotiff_name)
 
 
     return relevant_geotiffs
@@ -248,7 +240,6 @@ if __name__ == "__main__":
     #exit(0)
     GDF_URL = "https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_MMR_1.json.zip"
     GDF_DOWNLOAD_PATH = DATA_DIR / Path(GDF_URL).name
-    print(GDF_DOWNLOAD_PATH)
 
     gdf = geopandas.read_file(GDF_DOWNLOAD_PATH)
     date = datetime.date(2018, 11, 2)
@@ -260,7 +251,6 @@ if __name__ == "__main__":
     ]
 
     geotiff_list = get_geotiffs(gdf, date)
-    print(geotiff_list)
 
     # download geotiffs
     from lib.download import luojia_tile_download
@@ -273,12 +263,9 @@ if __name__ == "__main__":
     # get xarray
     ds = get_xarray_from_geotiff("merged.tif")
     # print the xarray
-    print(ds)
-
 
     ds = downsample_xarray(ds, factor=10)
     # print the xarray
-    print(ds)
 
     import matplotlib.pyplot as plt
     import colorcet as cc

@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routers.explore_router import router as explore_router
 from api.routers.comparison_router import router as comparison_router
+from api.routers.statistics_router import router as statistics_router
 
 app = FastAPI()
 
@@ -28,3 +29,4 @@ def read_health():
 
 app.include_router(explore_router)
 app.include_router(comparison_router)
+app.include_router(statistics_router)

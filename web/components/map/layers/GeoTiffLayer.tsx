@@ -3,11 +3,12 @@
 import { client } from "@/lib/api/client";
 import parseGeoraster from "georaster";
 import GeoRasterLayer from "georaster-layer-for-leaflet";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
 import L from "leaflet";
 import chroma from "chroma-js";
 import { CET_L8 } from "@/lib/colormap";
+import { AxiosResponse } from "axios";
 
 const colorFn = (scale: chroma.Scale) => (values: number[]) => {
   const value = values[0]; // First band
@@ -60,73 +61,43 @@ const createLegend = (min: number, max: number, scale: chroma.Scale, title: stri
   return legend;
 };
 
-export type GeoTiffLayerProps = {
-  url: string;
-  colors?: string[];
-  scaleMode?: chroma.InterpolationMode;
+export type GeoTiffStats = {
+  pc02: number;
+  pc98: number;
 };
 
-const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({ url, colors = CET_L8, scaleMode = "lch" }) => {
+export type GeoTiffLayerProps = {
+  url: string;
+  colorMap?: string[];
+  scaleMode?: chroma.InterpolationMode;
+  opacity?: number;
+  resolution?: number;
+  legendTitle?: string;
+  legendTickUnits?: string;
+};
+
+const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
+  url,
+  colorMap = CET_L8,
+  opacity = 0.7,
+  resolution = 128,
+  legendTitle = "Light intensity [nW·cm⁻²·sr⁻¹]",
+  legendTickUnits = "",
+}) => {
   const map = useMap();
   const layerRef = useRef<GeoRasterLayer | null>(null);
   const legendRef = useRef<L.Control | null>(null);
-  const scaleRef = useRef<chroma.Scale | null>(null);
-  const dataRangeRef = useRef<[number, number] | null>(null);
 
-  useEffect(() => {
-    client
-      .get(url, { params: { nocache: true }, responseType: "arraybuffer", headers: { Accept: "image/tiff" } })
-      .then((response) => ({
-        data: response.data,
-        stats: {
-          pc02: parseFloat(response.headers["x-raster-p02"]),
-          pc98: parseFloat(response.headers["x-raster-p98"]),
-        },
-      }))
-      .then(({ data, stats }) => parseGeoraster(data).then((georaster) => ({ georaster, stats })))
-      .then(({ georaster, stats }) => {
-        // Clean previous layer
-        if (layerRef.current) {
-          map.removeLayer(layerRef.current);
-          layerRef.current = null;
-        }
-        if (legendRef.current) {
-          map.removeControl(legendRef.current);
-          legendRef.current = null;
-        }
+  // Function to parse stats from request
+  const parseStats = (response: AxiosResponse) => ({
+    pc02: parseFloat(response.headers["x-raster-p02"]),
+    pc98: parseFloat(response.headers["x-raster-p98"]),
+  });
 
-        // Create color scale
-        console.log(stats);
-        const min = !isNaN(stats.pc02) ? stats.pc02 : georaster.mins[0];
-        const max = !isNaN(stats.pc98) ? stats.pc98 : georaster.maxs[0];
-        dataRangeRef.current = [min, max];
-        console.log("Min max range from file:", dataRangeRef.current);
-
-        const scale = chroma.scale(colors).mode(scaleMode).correctLightness().domain([min, max]);
-        scaleRef.current = scale;
-
-        // Create new layer
-        const layer = new GeoRasterLayer({
-          georaster: georaster,
-          opacity: 1.0,
-          resolution: 128,
-          resampleMethod: "bilinear",
-          tileSize: 256,
-          pixelValuesToColorFn: colorFn(scale),
-        });
-        layerRef.current = layer;
-        layer.addTo(map);
-
-        // Create legend
-        const legend = createLegend(min, max, scale, "Light intensity [nW·cm⁻²·sr⁻¹]", "");
-        legend.addTo(map);
-        legendRef.current = legend;
-
-        map.fitBounds(layer.getBounds());
-      });
-
-    // Cleanup function
-    return () => {
+  // Function to set up the map
+  const setup = useCallback(
+    ({ georaster, stats }: { georaster: any; stats: GeoTiffStats }) => {
+      // Clean previous layer
       if (layerRef.current) {
         map.removeLayer(layerRef.current);
         layerRef.current = null;
@@ -135,8 +106,62 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({ url, colors = CET_L8, scale
         map.removeControl(legendRef.current);
         legendRef.current = null;
       }
-    };
-  }, [map, url, colors, scaleMode]);
+
+      // Create color scale
+      const min = !isNaN(stats.pc02) ? stats.pc02 : georaster.mins[0];
+      const max = !isNaN(stats.pc98) ? stats.pc98 : georaster.maxs[0];
+
+      const scale = chroma.scale(colorMap).mode("lch").correctLightness().domain([min, max]);
+
+      // Create new layer
+      const layer = new GeoRasterLayer({
+        georaster,
+        opacity,
+        resolution,
+        tileSize: 256,
+        pixelValuesToColorFn: colorFn(scale),
+      });
+      layerRef.current = layer;
+      layer.addTo(map);
+
+      // Create legend
+      const legend = createLegend(min, max, scale, legendTitle, legendTickUnits);
+      legend.addTo(map);
+      legendRef.current = legend;
+
+      map.fitBounds(layer.getBounds());
+    },
+    [map, colorMap, resolution, opacity, legendTitle, legendTickUnits],
+  );
+
+  // Remove layers when component is removed
+  const cleanup = useCallback(() => {
+    if (layerRef.current) {
+      map.removeLayer(layerRef.current);
+      layerRef.current = null;
+    }
+    if (legendRef.current) {
+      map.removeControl(legendRef.current);
+      legendRef.current = null;
+    }
+  }, [map]);
+
+  useEffect(() => {
+    // Fetch GeoTIFF and set up map
+    client
+      .get(url, {
+        params: { nocache: false },
+        responseType: "arraybuffer",
+        headers: { Accept: "image/tiff" },
+        cache: false,
+      })
+      .then((response) => ({ data: response.data, stats: parseStats(response) }))
+      .then(({ data, stats }) => parseGeoraster(data).then((georaster) => ({ georaster, stats })))
+      .then(setup);
+
+    // Cleanup function
+    return cleanup;
+  }, [map, url, setup, cleanup]);
 
   return null;
 };

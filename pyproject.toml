@@ -59,3 +59,6 @@ executionEnvironments = [
 reportExplicitAny = false
 reportAny = false
 reportUnusedCallResult = false
+
+[tool.ruff]
+line-length = 120

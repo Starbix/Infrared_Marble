@@ -10,6 +10,7 @@ mapclassify
 matplotlib
 numpy
 pandas
+redis
 requests
 scikit-learn
 seaborn

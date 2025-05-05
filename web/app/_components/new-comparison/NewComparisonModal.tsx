@@ -78,7 +78,7 @@ const Content = forwardRef(function Content({ availableDates, adminId, adminMeta
         {/* Date select */}
         <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 1.5 }}>
           <Typography variant="h4" textTransform="uppercase" fontSize="12pt">
-            LuoJia Data Availability
+            LuoJia1-01 Data Availability
           </Typography>
           {availableDates.length === 0 && (
             <Typography color="error">

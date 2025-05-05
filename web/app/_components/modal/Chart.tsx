@@ -5,9 +5,10 @@ import MapLoader from "@/components/map/MapLoader";
 import SyncMaps from "@/components/map/SyncMaps";
 import { ChartType } from "@/lib/types";
 import ErrorIcon from "@mui/icons-material/Error";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { LatLngExpression } from "leaflet";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { KeyedMutator, useSWRConfig } from "swr";
 
 const supportedChartTypes = new Set([ChartType.BlackMarble]);
 
@@ -23,9 +24,18 @@ export type ChartProps = {
 
 const Chart: React.FC<ChartProps> = ({ center, zoom, maps, mapId, date, adminId, layer }) => {
   const layerUrl = `/compare/${date}/${adminId}/${layer}`;
+  const mutateRef = useRef<KeyedMutator<any> | null>(null);
 
   const [loading, setLoading] = useState(supportedChartTypes.has(layer));
   const [error, setError] = useState<{ error: any } | null>(null);
+
+  const retry = () => {
+    if (mutateRef.current) {
+      setError(null);
+      setLoading(true);
+      mutateRef.current(layerUrl);
+    }
+  };
 
   return (
     <>
@@ -34,6 +44,7 @@ const Chart: React.FC<ChartProps> = ({ center, zoom, maps, mapId, date, adminId,
         {supportedChartTypes.has(layer) && (
           <GeoTiffLayer
             url={layerUrl}
+            mutateRef={mutateRef}
             onLoadStart={() => setLoading(true)}
             onReady={() => setLoading(false)}
             onError={(e) => {
@@ -68,6 +79,9 @@ const Chart: React.FC<ChartProps> = ({ center, zoom, maps, mapId, date, adminId,
                 <ErrorIcon />
                 Raster data cannot be displayed due to an error.
               </Typography>
+              <Button variant="outlined" sx={{ color: "white", borderColor: "white" }} onClick={retry}>
+                Retry
+              </Button>
             </>
           ) : (
             <>

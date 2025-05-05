@@ -14,7 +14,7 @@ const supportedChartTypes = new Set([ChartType.BlackMarble, ChartType.LuoJia]);
 const chartTitles: { [_ in ChartType]: string } = {
   [ChartType.BaseMap]: "Base map",
   [ChartType.BlackMarble]: "Light intensity [nW·cm⁻²·sr⁻¹]",
-  [ChartType.LuoJia]: "Light intensity [nW·cm⁻²·sr⁻¹]", // TODO: @Oli Adjust this to correct units
+  [ChartType.LuoJia]: "Light intensity [W·m⁻²·sr⁻¹·µm⁻¹]",
   [ChartType.Overlay]: "<not yet supported>",
   [ChartType.Difference]: "<not yet supported>",
 };

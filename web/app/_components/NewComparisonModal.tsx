@@ -7,9 +7,11 @@ import { client } from "@/lib/api/client";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
+  Button,
   CircularProgress,
   IconButton,
   Modal,
+  NoSsr,
   Paper,
   Table,
   TableBody,
@@ -63,18 +65,25 @@ type ContentProps = {
 };
 
 const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta }) => {
-  const { setAdminId } = useExploreQuery();
+  const {
+    params: { date },
+    setParams,
+  } = useExploreQuery();
 
   const props = adminMeta.properties;
+
+  const close = () => {
+    setParams({ adminId: null, date: null });
+  };
 
   return (
     <Panel sx={{ p: 4, pt: 2, minWidth: 480 }}>
       {/* Header */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Typography variant="h3" fontWeight="bold" fontSize="14pt">
-          Details &mdash; {props.name}
+          Country Details &mdash; {props.name}
         </Typography>
-        <IconButton sx={{ ml: "auto" }} onClick={() => setAdminId(null)}>
+        <IconButton sx={{ ml: "auto" }} onClick={close}>
           <CloseIcon />
         </IconButton>
       </Box>
@@ -86,9 +95,32 @@ const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta })
 
         {/* Date select */}
         <Box sx={{ flex: 1 }}>
-          <AvailDateCalendar availDates={availableDates} />
+          <NoSsr>
+            <AvailDateCalendar availDates={availableDates} onChange={(date) => setParams({ date })} />
+          </NoSsr>
         </Box>
       </Box>
+
+      {/* Start comparison button */}
+      <AnimatePresence>
+        {adminId && date && (
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+          >
+            <Button
+              variant="contained"
+              size="large"
+              sx={{ width: 1, mt: 2 }}
+              onClick={() => setParams({ compare: true })}
+            >
+              Start comparison
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Panel>
   );
 };

@@ -2,7 +2,7 @@
 
 import { querySchema } from "@/lib/schemas/explore";
 import { Dayjs } from "dayjs";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
 export default function useExploreQuery() {
   const pathname = usePathname();
@@ -16,16 +16,22 @@ export default function useExploreQuery() {
     func(newSearchParams);
     router.push(`${pathname}?${newSearchParams}`);
   };
-  const setDate = (date?: Dayjs | null) =>
-    modifySearchParams((params) => {
-      if (date) params.set("date", date.format("YYYY-MM-DD"));
-      else params.delete("date");
-    });
-  const setAdminId = (adminId?: string | null) =>
-    modifySearchParams((params) => {
-      if (adminId) params.set("admin", adminId);
-      else params.delete("admin");
-    });
 
-  return { date: queryRes.data?.date, adminId: queryRes.data?.admin, setDate, setAdminId };
+  const setParams = (values: { date?: Dayjs | null; adminId?: string | null; compare?: boolean | null }) => {
+    modifySearchParams((params) => {
+      const set = (k: string, v?: string | null) => (v ? params.set(k, v) : params.delete(k));
+      set("date", values.date?.format("YYYY-MM-DD"));
+      set("admin", values.adminId);
+      set("compare", values.compare ? "true" : null);
+    });
+  };
+
+  return {
+    params: {
+      date: queryRes.data?.date,
+      adminId: queryRes.data?.admin,
+      compare: queryRes.data?.compare,
+    },
+    setParams,
+  };
 }

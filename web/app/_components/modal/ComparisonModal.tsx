@@ -1,55 +1,54 @@
 "use client";
 
-import { querySchema } from "@/lib/schemas/explore";
-import { Box, Card, CardContent, CardHeader, IconButton, Modal, Skeleton, Typography } from "@mui/material";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { Close as CloseIcon } from "@mui/icons-material";
-import dayjs from "dayjs";
-import useSWR from "swr";
+import useExploreQuery from "@/hooks/explore-query";
 import { client } from "@/lib/api/client";
-import MapLoader from "@/components/map/MapLoader";
-import { LatLngExpression } from "leaflet";
+import { Close as CloseIcon } from "@mui/icons-material";
+import { Box, Card, CardContent, CardHeader, IconButton, Modal, Skeleton, Typography } from "@mui/material";
+import dayjs from "dayjs";
+import L from "leaflet";
+import useSWR from "swr";
+import ModalContent from "./ModalContent";
 
 export type ComparisonModalProps = {};
 
 const ComparisonModal: React.FC = (props) => {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
+  const {
+    params: { adminId, date, compare },
+    setParams,
+  } = useExploreQuery();
 
-  const query = querySchema.safeParse(Object.fromEntries(searchParams.entries()));
-  const adminAreaId = query.data?.adm0_a3;
-
-  const open = Boolean(query.success && query.data.adm0_a3);
+  const open = Boolean(compare);
 
   // Need to load data from API
-  const { data, isLoading, error } = useSWR(adminAreaId ? `/explore/admin-areas/${adminAreaId}` : null, (url) =>
+  const { data, isLoading, error } = useSWR(adminId ? `/explore/admin-areas/${adminId}` : null, (url) =>
     client.get(url, { params: { resolution: "50m" } }).then((res) => res.data),
   );
 
   const closeModal = () => {
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.delete("adm0_a3");
-    router.push(`${pathname}?${newSearchParams}`);
+    setParams({ compare: false });
   };
 
   const CardTitle = () =>
-    isLoading ? <Skeleton variant="text" sx={{ fontSize: "1rem" }} /> : <span>NTL Comparison &mdash; {data.properties.name}</span>;
-  const CardSubHeader = () =>
-    !query.success || isLoading ? (
-      <Skeleton variant="text" sx={{ fontSize: "0.7rem" }} />
+    isLoading ? (
+      <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
+    ) : error ? (
+      <Typography color="error">An error occurred.</Typography>
     ) : (
-      <span>Date: {dayjs(query.data.date).toString()}</span>
+      <span>NTL Comparison &mdash; {data.properties.name}</span>
+    );
+  const CardSubHeader = () =>
+    isLoading ? (
+      <Skeleton variant="text" sx={{ fontSize: "0.7rem" }} />
+    ) : error ? undefined : (
+      <span>Date: {dayjs(date).toString()}</span>
     );
 
-  const center: LatLngExpression | undefined = data ? [data.properties.label_y, data.properties.label_x] : undefined;
-  const zoom: number | undefined = data?.properties.min_zoom;
+  const layer = data ? L.geoJSON(data) : undefined;
 
   return (
     <Modal open={open} onClose={closeModal}>
       <Box sx={{ position: "fixed", inset: 0, display: "flex", justifyContent: "center", alignItems: "center", p: 4 }}>
-        {query.success && (
+        {open && (
           <Card variant="outlined" sx={{ width: 1, height: 1, display: "flex", flexDirection: "column" }}>
             <CardHeader
               action={
@@ -60,14 +59,19 @@ const ComparisonModal: React.FC = (props) => {
               title={<CardTitle />}
               subheader={<CardSubHeader />}
             />
-            <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-              {data && (
-                <Box sx={{ flex: 1, width: 1, display: "flex", alignItems: "stretch", justifyContent: "stretch", gap: 2 }}>
-                  <MapLoader center={center} />
-                  <MapLoader center={center} />
-                </Box>
-              )}
-            </CardContent>
+            {error ? (
+              <Typography>
+                An error occurred while loading region data. Please check the console for more information.
+              </Typography>
+            ) : (
+              <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                {layer && date && adminId ? (
+                  <ModalContent layer={layer} date={date} adminId={adminId} />
+                ) : (
+                  <Typography>Loading region info...</Typography>
+                )}
+              </CardContent>
+            )}
           </Card>
         )}
       </Box>

@@ -7,7 +7,7 @@ from api.routers.statistics_router import router as statistics_router
 app = FastAPI()
 
 # CORS Stuff
-origins = ["http://localhost", "http://localhost:3000"]
+origins = ["http://localhost", "http://localhost:3000", "http://localhost:8000"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

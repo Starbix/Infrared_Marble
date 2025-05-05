@@ -11,6 +11,7 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=8000
+      - REDIS_URL=redis://redis:6379/0
       - BLACKMARBLE_TOKEN==== REDACTED $BLACKMARBLE_TOKEN ===
     develop:
       watch:
@@ -22,6 +23,9 @@ services:
         - path: ./static
           action: sync
           target: /app/static
+    depends_on:
+      redis:
+        condition: service_healthy
   web:
     build:
       context: ./web
@@ -41,3 +45,12 @@ services:
           ignore:
             - node_modules/
             - web/node_modules/
+  redis:
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 5s
+      retries: 5

@@ -5,13 +5,16 @@ WORKDIR /app
 # Install required packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt update && apt install -y --no-install-recommends git bash gdal-bin libgdal-dev g++
+    apt-get update && \
+    apt-get install -y --no-install-recommends git bash gdal-bin libgdal-dev g++
 
 # Install deps
+# gdal requires special care: https://gis.stackexchange.com/questions/153199/import-error-no-module-named-gdal-array/465888#465888
 COPY requirements.txt ./
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install -r requirements.txt && \
+    pip install --no-build-isolation --no-cache-dir --force-reinstall gdal==$(gdal-config --version)
 
 # Copy over editable Blackmarble package and install
 # Need .git folder for install to work

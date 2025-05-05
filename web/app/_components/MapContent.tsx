@@ -1,12 +1,16 @@
 "use client";
 
+import useExploreQuery from "@/hooks/explore-query";
 import AdminAreas from "./map-layers/AdminAreas";
 
-const MapContent: React.FC = (props) => {
-  const handleAdminAreaClick = (e) => {
-    const layer = e.target;
-    const adminAreaId = layer.feature.properties.woe_id;
-    console.log("Selected feature with ID:", adminAreaId);
+export type MapContentProps = {};
+
+const MapContent: React.FC<MapContentProps> = (props) => {
+  const { setParams } = useExploreQuery();
+
+  const handleAdminAreaClick = (adminId: string) => {
+    // Reset date when changing admin areas, as they might have different available dates
+    setParams({ date: null, adminId });
   };
 
   return (

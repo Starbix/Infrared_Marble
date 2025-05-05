@@ -165,4 +165,4 @@ if __name__ == "__main__":
 
     luojia_metadata(LJ_METADATA_URL)
     tile_name = "LuoJia1-01_LR201806057936_20180603055109_HDR_0029"
-    luojia_tile_download(tile_name)
+    #luojia_tile_download(tile_name)

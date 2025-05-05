@@ -7,7 +7,7 @@
 - [ ] Research and decide on data format for tile layers (visualization)
 - [ ] Provide endpoints for visualizations:
     - [ ] Blackmarble (corrected)
-    - [ ] LuoJia
+    - [x] LuoJia
     - [ ] Overlay: Merged GeoTiff with different colors for BM and LJ
     - [ ] Difference: Difference map between BM and LJ
 - [ ] Add statistics endpoint for "Tiles Per Country Area" metric &rarr; 1 number per country/admin area

@@ -3,11 +3,12 @@
 import Panel from "@/components/Panel";
 import useExploreQuery from "@/hooks/explore-query";
 import CloseIcon from "@mui/icons-material/Close";
-import { Box, Button, IconButton, MenuItem, NoSsr, TextField, Typography } from "@mui/material";
+import { Box, Button, Divider, IconButton, MenuItem, NoSsr, TextField, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { AnimatePresence, motion } from "motion/react";
 import CalendarWithAvailability from "../CalendarWithAvailability";
 import CountryDetails from "./CountryDetails";
+import { forwardRef, useEffect, useRef, useState } from "react";
 
 export type NewComparisonModalProps = {
   availableDates?: string[];
@@ -19,20 +20,7 @@ const NewComparisonModal: React.FC<NewComparisonModalProps> = ({ availableDates,
   return (
     <AnimatePresence>
       {adminId && availableDates && adminMeta && (
-        <motion.div
-          initial={{ y: "120%", height: "auto" }}
-          animate={{ y: 0, height: "auto" }}
-          exit={{ y: "120%", height: "auto" }}
-          transition={{
-            type: "spring",
-            damping: 25,
-            stiffness: 300,
-            height: { type: "tween", duration: 0.6, ease: "easeOut" },
-            width: { type: "tween", duration: 0.6, ease: "easeOut" },
-          }}
-          style={{ overflow: "clip" }}
-          layout
-        >
+        <motion.div initial={{ x: "120%" }} animate={{ x: 0 }} exit={{ x: "120%" }}>
           <Content key="content" availableDates={availableDates} adminId={adminId} adminMeta={adminMeta} />
         </motion.div>
       )}
@@ -48,7 +36,7 @@ type ContentProps = {
   adminMeta: any;
 };
 
-const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta }) => {
+const Content = forwardRef(function Content({ availableDates, adminId, adminMeta }: ContentProps, ref) {
   const {
     params: { date },
     setParams,
@@ -61,45 +49,58 @@ const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta })
   };
 
   return (
-    <Panel sx={{ p: 4, pt: 2, minWidth: 480 }}>
+    <Panel ref={ref} sx={{ p: 4, pt: 2, maxWidth: 460, overflow: "hidden" }} transition={{ duration: 0.6 }} layout>
       {/* Header */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Typography variant="h3" fontWeight="bold" fontSize="14pt">
-          Country Details &mdash; {props.name}
+          <span style={{ fontWeight: "normal" }}>Region of Interest &mdash;</span> {props.name}
         </Typography>
         <IconButton sx={{ ml: "auto" }} onClick={close}>
           <CloseIcon />
         </IconButton>
       </Box>
 
+      <Divider sx={{ mb: 2 }} />
+
       {/* Main content */}
-      <Box sx={{ display: "flex", gap: 4 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
         {/* Country details */}
-        <CountryDetails props={props} />
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 1.5 }}>
+          <Typography variant="h4" textTransform="uppercase" fontSize="12pt">
+            Geopolitical Details
+          </Typography>
+
+          <CountryDetails props={props} />
+        </Box>
+
+        <Divider />
 
         {/* Date select */}
-        <Box sx={{ flex: 1 }}>
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 1.5 }}>
+          <Typography variant="h4" textTransform="uppercase" fontSize="12pt">
+            LuoJia Data Availability
+          </Typography>
           {availableDates.length === 0 && (
-            <Typography color="error" sx={{ pb: 2 }}>
+            <Typography color="error">
               There is currently no data for the selected region in the LuoJia dataset.
             </Typography>
           )}
+          <TextField
+            fullWidth
+            type="date"
+            label={date ? "Selected date" : "Select a date from the list"}
+            value={date ?? ""}
+            select
+            onChange={(e) => setParams({ date: e.target.value ? dayjs(e.target.value) : null })}
+          >
+            <MenuItem value="">Select a date</MenuItem>
+            {availableDates.map((availDate) => (
+              <MenuItem key={availDate} value={availDate}>
+                {availDate}
+              </MenuItem>
+            ))}
+          </TextField>
           <NoSsr>
-            <TextField
-              fullWidth
-              type="date"
-              label={date ? "Selected date" : "Select a date from the list"}
-              value={date ?? ""}
-              select
-              onChange={(e) => setParams({ date: e.target.value ? dayjs(e.target.value) : null })}
-            >
-              <MenuItem value="">Select a date</MenuItem>
-              {availableDates.map((availDate) => (
-                <MenuItem key={availDate} value={availDate}>
-                  {availDate}
-                </MenuItem>
-              ))}
-            </TextField>
             <CalendarWithAvailability
               availDates={availableDates}
               value={date ? dayjs(date) : null}
@@ -118,6 +119,8 @@ const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta })
             exit={{ y: 50, opacity: 0 }}
             transition={{ type: "spring", damping: 20, stiffness: 300 }}
           >
+            <Divider sx={{ mb: 2 }} />
+
             <Button
               variant="contained"
               size="large"
@@ -131,4 +134,4 @@ const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta })
       </AnimatePresence>
     </Panel>
   );
-};
+});

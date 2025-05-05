@@ -20,9 +20,9 @@ export default function useExploreQuery() {
   const setParams = (values: { date?: Dayjs | null; adminId?: string | null; compare?: boolean | null }) => {
     modifySearchParams((params) => {
       const set = (k: string, v?: string | null) => (v ? params.set(k, v) : params.delete(k));
-      set("date", values.date?.format("YYYY-MM-DD"));
-      set("admin", values.adminId);
-      set("compare", values.compare ? "true" : null);
+      if ("date" in values) set("date", values.date?.format("YYYY-MM-DD"));
+      if ("adminId" in values) set("admin", values.adminId);
+      if ("compare" in values) set("compare", values.compare ? "true" : null);
     });
   };
 

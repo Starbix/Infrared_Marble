@@ -41,7 +41,7 @@ export default function DateSlider({ dates }: DateSliderProps) {
   const handleChange = (e, newValue) => {
     // Find closest available index
     const closest = availableIndices.reduce((prev, curr) =>
-      Math.abs(curr - newValue) < Math.abs(prev - newValue) ? curr : prev
+      Math.abs(curr - newValue) < Math.abs(prev - newValue) ? curr : prev,
     );
     setValue(closest);
   };

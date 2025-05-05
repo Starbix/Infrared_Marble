@@ -140,7 +140,7 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
 
       onReady?.();
     },
-    [map, colorMap, resolution, opacity, legendTitle, legendTickUnits],
+    [map, colorMap, resolution, opacity, legendTitle, legendTickUnits, onReady],
   );
 
   // Remove layers when component is removed
@@ -175,7 +175,7 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
 
     // Cleanup function
     return cleanup;
-  }, [map, url, setup, cleanup]);
+  }, [map, url, setup, cleanup, onError, onLoadStart]);
 
   return null;
 };

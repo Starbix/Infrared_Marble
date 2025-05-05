@@ -1,33 +1,13 @@
 "use client";
 
-import { HighlightedDatePicker } from "@/components/HighlightedDatePicker";
 import Panel from "@/components/Panel";
 import useExploreQuery from "@/hooks/explore-query";
-import { client } from "@/lib/api/client";
 import CloseIcon from "@mui/icons-material/Close";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  IconButton,
-  MenuItem,
-  Modal,
-  NoSsr,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { AnimatePresence, motion } from "motion/react";
-import numeral from "numeral";
-import useSWR from "swr";
-import AvailDateCalendar from "../AvailDateCalendar";
-import CountryDetails from "./CountryDetails";
+import { Box, Button, IconButton, MenuItem, NoSsr, TextField, Typography } from "@mui/material";
 import dayjs from "dayjs";
+import { AnimatePresence, motion } from "motion/react";
+import CalendarWithAvailability from "../CalendarWithAvailability";
+import CountryDetails from "./CountryDetails";
 
 export type NewComparisonModalProps = {
   availableDates?: string[];
@@ -120,7 +100,7 @@ const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta })
                 </MenuItem>
               ))}
             </TextField>
-            <AvailDateCalendar
+            <CalendarWithAvailability
               availDates={availableDates}
               value={date ? dayjs(date) : null}
               onChange={(date) => setParams({ date })}

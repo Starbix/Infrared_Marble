@@ -1,33 +1,52 @@
 import MapLoader from "@/components/map/MapLoader";
 import api from "@/lib/api/server";
 import { querySchema } from "@/lib/schemas/explore";
-import { Box, NoSsr } from "@mui/material";
+import { Box } from "@mui/material";
 import { Suspense } from "react";
 import MapContentLoader from "./_components/MapContentLoader";
-import Toolbar from "./_components/Toolbar";
+import NewComparisonModal from "./_components/NewComparisonModal";
 import ComparisonModalLoader from "./_components/modal/ComparisonModalLoader";
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
-  // Get all available dates from API
-  const dates = await api.get<string[]>("/explore/dates").then((res) => res.data);
-
-  // Get selected date, use this to fetch more data
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const query = await querySchema.safeParseAsync(await searchParams);
-  const date = query.success ? query.data.date : null;
+  const adminId = query.data?.admin;
+  const [availDates, adminMeta] = adminId
+    ? await Promise.all([
+        api.get(`/explore/dates/${adminId}`).then((res) => res.data),
+        api.get(`/explore/admin-areas/${adminId}`).then((res) => res.data),
+      ])
+    : [undefined, undefined];
+  const center: L.LatLngExpression | undefined = adminMeta
+    ? [adminMeta.properties.label_y, adminMeta.properties.label_x]
+    : undefined;
 
   return (
     <Box sx={{ position: "absolute", inset: 0, bgcolor: "background.default", zIndex: 1 }}>
-      <Box sx={{ p: 1, overflow: "clip", height: 1, width: 1 }}>
-        <NoSsr>
-          <MapLoader>
-            <Suspense>
-              <MapContentLoader />
-            </Suspense>
-          </MapLoader>
-        </NoSsr>
+      <Box sx={{ p: 1, overflow: "clip", height: 1, width: 1, position: "relative" }}>
+        <MapLoader center={center} zoom={6}>
+          <Suspense>
+            <MapContentLoader />
+          </Suspense>
+        </MapLoader>
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 0,
+            insetInline: 0,
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "center",
+            pb: 4,
+          }}
+        >
+          <NewComparisonModal adminId={adminId} availableDates={availDates} adminMeta={adminMeta} />
+        </Box>
       </Box>
       <ComparisonModalLoader />
-      <Toolbar dates={dates} initialDate={date} sx={{ position: "absolute", bottom: 0, zIndex: 1000 }} />
     </Box>
   );
 }

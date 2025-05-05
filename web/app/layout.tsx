@@ -9,6 +9,11 @@ import NavBar from "./_components/navigation/NavBar";
 import "./global.scss";
 import Head from "next/head";
 import Script from "next/script";
+import { StrictMode } from "react";
+import { querySchema } from "@/lib/schemas/explore";
+import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
+import api from "@/lib/api/server";
+import DateSelect from "./_components/navigation/DateSelect";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,26 +33,30 @@ export const metadata: Metadata = {
   description: "Visualization Dashboard for Blackmarble and LuoJia NTL datasets.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  searchParams,
 }: Readonly<{
   children: React.ReactNode;
+  searchParams: Promise<{ [key: string]: string | string[] }>;
 }>) {
   return (
-    <html lang="en">
-      <body className={clsx(inter.variable, jetbrainsMono.variable)}>
-        <AppRouterCacheProvider>
-          <ClientProviders>
-            <CssBaseline />
-            <ThemeProvider theme={theme}>
-              {/* Navigation */}
-              <NavBar />
-              {/* Main body */}
-              {children}
-            </ThemeProvider>
-          </ClientProviders>
-        </AppRouterCacheProvider>
-      </body>
-    </html>
+    <StrictMode>
+      <html lang="en">
+        <body className={clsx(inter.variable, jetbrainsMono.variable)}>
+          <AppRouterCacheProvider>
+            <ClientProviders>
+              <CssBaseline />
+              <ThemeProvider theme={theme}>
+                {/* Navigation */}
+                <NavBar>{/* Put additional navbar content here */}</NavBar>
+                {/* Main body */}
+                {children}
+              </ThemeProvider>
+            </ClientProviders>
+          </AppRouterCacheProvider>
+        </body>
+      </html>
+    </StrictMode>
   );
 }

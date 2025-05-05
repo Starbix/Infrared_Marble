@@ -1,36 +1,17 @@
 "use client";
 
 import { ChartType } from "@/lib/types";
-import { Box, Button, MenuItem, Select } from "@mui/material";
-import { LatLngBounds, LatLngExpression } from "leaflet";
-import { useState, useRef, useMemo } from "react";
-import Chart from "./Chart";
 import {
   Add as AddIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
   Close as CloseIcon,
 } from "@mui/icons-material";
-
-const getBestZoomLevel = (bounds: LatLngBounds) => {
-  // width of the map display area (approximate)
-  const mapWidthPixels = 800; // reasonable default, adjust as needed
-
-  // get bounds width in degrees
-  const westEast = bounds.getEast() - bounds.getWest();
-  const northSouth = bounds.getNorth() - bounds.getSouth();
-
-  // use the larger of the two dimensions to ensure the entire area fits
-  const largerDimension = Math.max(westEast, northSouth);
-
-  // Approximate calculation based on the concept that zoom level 0 shows the entire world
-  // Each zoom level doubles the resolution
-  // World width is approximately 360 degrees
-  const zoomLevel = Math.log2(360 / largerDimension) + 2;
-
-  // Constrain zoom level between reasonable values
-  return Math.min(Math.max(Math.floor(zoomLevel), 1), 18);
-};
+import { Box, Button, MenuItem, Select } from "@mui/material";
+import { LatLngExpression } from "leaflet";
+import { useMemo, useRef, useState } from "react";
+import Chart from "./Chart";
+import { getBestZoomLevel } from "@/lib/geo";
 
 const chartTypeNames: { [K in ChartType]: string } = {
   [ChartType.BaseMap]: "Base map",

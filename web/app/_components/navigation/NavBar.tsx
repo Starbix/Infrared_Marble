@@ -2,11 +2,13 @@
 
 import AnimatedTabs, { TabProps } from "@/components/AnimatedTabs";
 import Panel from "@/components/Panel";
-import { Box } from "@mui/material";
+import { Box, Divider } from "@mui/material";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Children, useEffect, useState } from "react";
 
-export type NavBarProps = {};
+export type NavBarProps = {
+  children?: React.ReactNode;
+};
 
 const tabs: TabProps[] = [
   { label: "Explore", href: "/" },
@@ -20,7 +22,7 @@ function pathMatches(path: string, href?: string) {
   return path.startsWith(href);
 }
 
-export default function NavBar(props: NavBarProps) {
+export default function NavBar({ children }: NavBarProps) {
   const [value, setValue] = useState(0);
 
   const pathname = usePathname();
@@ -35,6 +37,13 @@ export default function NavBar(props: NavBarProps) {
     <Box sx={{ width: 1, p: 2, position: "relative", zIndex: 1000, pointerEvents: "none" }}>
       <Panel sx={{ margin: "auto", pointerEvents: "auto" }}>
         <AnimatedTabs tabs={tabs} value={value}></AnimatedTabs>
+        {children &&
+          Children.map(children, (child) => (
+            <>
+              <Divider orientation="vertical" />
+              {child}
+            </>
+          ))}
       </Panel>
     </Box>
   );

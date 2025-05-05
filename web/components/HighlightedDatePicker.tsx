@@ -53,19 +53,29 @@ const CustomDay: React.FC<CustomDayProps> = (props) => {
 
 // --- Main DatePicker Component Props ---
 type HighlightedDatePickerProps = {
-  value: Dayjs | null;
+  value?: Dayjs | null;
   onChange?: (value: Dayjs | null) => void;
   availableDates: string[]; // Array of 'YYYY-MM-DD' strings
 };
 
 // --- Main DatePicker Component ---
-export const HighlightedDatePicker: React.FC<HighlightedDatePickerProps> = ({ value, onChange, availableDates }) => {
+export const HighlightedDatePicker: React.FC<HighlightedDatePickerProps> = ({
+  value = null,
+  onChange,
+  availableDates,
+}) => {
   // Memoize sets for efficient lookup
   const availableDaysSet = React.useMemo(() => new Set(availableDates), [availableDates]);
 
-  const availableMonthsSet = React.useMemo(() => new Set(availableDates.map((date) => dayjs(date).format("YYYY-MM"))), [availableDates]);
+  const availableMonthsSet = React.useMemo(
+    () => new Set(availableDates.map((date) => dayjs(date).format("YYYY-MM"))),
+    [availableDates],
+  );
 
-  const availableYearsSet = React.useMemo(() => new Set(availableDates.map((date) => dayjs(date).format("YYYY"))), [availableDates]);
+  const availableYearsSet = React.useMemo(
+    () => new Set(availableDates.map((date) => dayjs(date).format("YYYY"))),
+    [availableDates],
+  );
 
   // --- Disabling Logic ---
   const shouldDisableDate = (date: Dayjs) => {

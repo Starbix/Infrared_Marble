@@ -23,7 +23,8 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import numeral from "numeral";
 import useSWR from "swr";
-import AvailDateCalendar from "./AvailDateCalendar";
+import AvailDateCalendar from "../AvailDateCalendar";
+import CountryDetails from "./CountryDetails";
 
 export type NewComparisonModalProps = {
   availableDates?: string[];
@@ -122,46 +123,5 @@ const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta })
         )}
       </AnimatePresence>
     </Panel>
-  );
-};
-
-const CountryDetails = ({ props }) => {
-  return (
-    <TableContainer component={Paper} variant="outlined">
-      <Table size="small">
-        <TableBody>
-          <TableRow>
-            <TableCell component="th" scope="row">
-              Population (est.)
-            </TableCell>
-            <TableCell>{numeral(props.pop_est).format("0.0a")}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell component="th" scope="row">
-              Economy
-            </TableCell>
-            <TableCell>{props.economy}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell component="th" scope="row">
-              Income Group
-            </TableCell>
-            <TableCell>{props.income_grp}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell component="th" scope="row">
-              GDP
-            </TableCell>
-            <TableCell>{numeral(props.gdp_md * 1_000_000).format("$0.00a")}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell component="th" scope="row">
-              Country Type
-            </TableCell>
-            <TableCell>{props.type}</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </TableContainer>
   );
 };

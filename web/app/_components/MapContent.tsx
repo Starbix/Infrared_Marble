@@ -9,7 +9,6 @@ const MapContent: React.FC<MapContentProps> = (props) => {
   const { setParams } = useExploreQuery();
 
   const handleAdminAreaClick = (adminId: string) => {
-    console.log("Selected feature with ID:", adminId);
     setParams({ adminId });
   };
 

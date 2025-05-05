@@ -1,109 +1,120 @@
 "use client";
 
 import { client } from "@/lib/api/client";
-import numeral from "numeral";
+import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
 import { GeoJSON } from "react-leaflet";
 import useSWR from "swr";
 
+import useExploreQuery from "@/hooks/explore-query";
+import { FeatureGroup, LeafletMouseEvent } from "leaflet";
+import { useCallback, useEffect, useRef } from "react";
 import "./admin-areas.scss";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
 
 export type AdminAreasProps = {
   dataUrl: string;
   resolution?: "10m" | "50m" | "110m";
-  onClick?: (adminArea: any) => void;
+  onClick?: (adminId: string, feature: GeoJSON.Feature) => void;
 };
 
 const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m", onClick }) => {
+  const {
+    params: { adminId },
+  } = useExploreQuery();
+  const selectedAdminId = useRef<string | null>(adminId ?? null);
+  const selectedLayer = useRef<FeatureGroup | null>(null);
+  const hoveredAdminId = useRef<string | null>(null);
+
   // Fetch data from server
-  const { data } = useSWR(dataUrl, (url) => client.get(url, { params: { resolution } }).then((res) => res.data), { suspense: true });
+  const { data } = useSWR(dataUrl, (url) => client.get(url, { params: { resolution } }).then((res) => res.data), {
+    suspense: true,
+  });
 
-  // Need to set selected admin area over search params
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const setSelectedAdminArea = (adminId: number | null) => {
-    const newSearchParams = new URLSearchParams(searchParams);
-    if (adminId) {
-      newSearchParams.set(GEOJSON_ADMIN_KEY, adminId.toString());
-    } else {
-      newSearchParams.delete(GEOJSON_ADMIN_KEY);
-    }
-    router.push(`${pathname}?${newSearchParams}`);
-  };
+  const isSelected = (feature?: GeoJSON.Feature) =>
+    feature?.properties?.[GEOJSON_ADMIN_KEY] === selectedAdminId.current;
+  const isHovered = (feature?: GeoJSON.Feature) => feature?.properties?.[GEOJSON_ADMIN_KEY] === hoveredAdminId.current;
 
   // Styling
-  const getStyle = () => {
+  const getStyle = useCallback((feature?: GeoJSON.Feature) => {
+    const selected = isSelected(feature);
+    const hovered = isHovered(feature);
     return {
-      fillOpacity: 0,
-      opacity: 0,
+      fillOpacity: hovered && selected ? 0.4 : hovered || selected ? 0.3 : 0,
+      opacity: selected || hovered ? 1 : 0,
+      fillColor: selected ? "#ff8c00" : "#3388ff",
+      color: selected ? "#ff8c00" : "#0000ff",
+      weight: hovered && selected ? 3 : 1,
     };
+  }, []);
+  const recomputeStyles = useCallback(
+    (layer: L.FeatureGroup) => {
+      layer.setStyle(getStyle(layer.feature as GeoJSON.Feature));
+    },
+    [getStyle],
+  );
+
+  useEffect(() => {
+    selectedAdminId.current = adminId ?? null;
+    if (adminId) {
+      // TODO: Update selectedLayer somehow
+    } else if (selectedLayer.current) {
+      recomputeStyles(selectedLayer.current);
+      selectedLayer.current = null;
+    }
+  }, [adminId, recomputeStyles]);
+
+  const onEachFeature = (feature: GeoJSON.Feature, layer: L.FeatureGroup) => {
+    // Sync selected state
+    const featureAdminId = feature.properties?.[GEOJSON_ADMIN_KEY];
+    if (!selectedLayer.current && featureAdminId === selectedAdminId.current) {
+      selectedAdminId.current = featureAdminId;
+      selectedLayer.current = layer;
+    }
   };
 
-  // Event handlers for each feature
-  const onEachFeature = (feature, layer) => {
-    layer.on({
-      mouseover: (e) => {
-        const layer = e.target;
-        layer.setStyle({
-          fillOpacity: 0.7,
-          opacity: 1,
-          fillColor: "#3388ff",
-          color: "#0000ff",
-        });
+  const clickHandler = (e: LeafletMouseEvent) => {
+    const layer: L.FeatureGroup = e.propagatedFrom;
+    const feature = layer.feature as GeoJSON.Feature;
+    const adminId = feature.properties?.[GEOJSON_ADMIN_KEY];
 
-        layer.bindPopup(popupContent(feature.properties), { closeButton: false, autoPan: false });
-        layer.openPopup();
-      },
-      mouseout: (e) => {
-        const layer = e.target;
-        layer.setStyle({
-          fillOpacity: 0,
-          opacity: 0,
-        });
+    // Remove styles from currently selected feature (update selectedLayer first for immediate propagation)
+    const prevLayer = selectedLayer.current;
+    selectedLayer.current = layer;
+    selectedAdminId.current = adminId;
+    hoveredAdminId.current = adminId;
+    if (prevLayer) {
+      recomputeStyles(prevLayer);
+    }
 
-        layer.closePopup();
-      },
-      click: (e) => {
-        setSelectedAdminArea(e.target.feature.properties[GEOJSON_ADMIN_KEY]);
-      },
-    });
+    // Update own styles and fire event
+    recomputeStyles(layer);
+    onClick?.(adminId, feature);
   };
 
-  return <GeoJSON data={data} onEachFeature={onEachFeature} style={getStyle} />;
+  const mouseOverHandler = (e: LeafletMouseEvent) => {
+    const layer: L.FeatureGroup = e.propagatedFrom;
+    const feature = layer.feature as GeoJSON.Feature;
+    hoveredAdminId.current = feature.properties?.[GEOJSON_ADMIN_KEY];
+    recomputeStyles(layer);
+  };
+
+  const mouseOutHandler = (e: LeafletMouseEvent) => {
+    const layer: L.FeatureGroup = e.propagatedFrom;
+    const feature = layer.feature as GeoJSON.Feature;
+    const adminId = feature.properties?.[GEOJSON_ADMIN_KEY];
+    if (hoveredAdminId.current === adminId) {
+      hoveredAdminId.current = null;
+    }
+    recomputeStyles(layer);
+  };
+
+  return (
+    <GeoJSON
+      data={data}
+      eventHandlers={{ click: clickHandler, mouseover: mouseOverHandler, mouseout: mouseOutHandler }}
+      onEachFeature={onEachFeature}
+      style={getStyle}
+    />
+  );
 };
 
 export default AdminAreas;
-
-function popupContent(props: any) {
-  return `<div>
-    <h3>${props.name}</h3>
-    <table>
-      <tbody>
-        <tr>
-          <td>Population (est.)</td>
-          <td>${numeral(props.pop_est).format("0.0a")}</td>
-        </tr>
-        <tr>
-          <td>Economy</td>
-          <td>${props.economy}</td>
-        </tr>
-        <tr>
-          <td>Income Group</td>
-          <td>${props.income_grp}</td>
-        </tr>
-        <tr>
-          <td>GDP</td>
-          <td>${numeral(props.gdp_md * 1_000_000).format("$0.00a")}</td>
-        </tr>
-        <tr>
-          <td>Country Type</td>
-          <td>${props.type}</td>
-        </tr>
-      </tbody>
-    </table>
-    <p>Click the admin area to start a comparison.</p>
-  </div>`;
-}

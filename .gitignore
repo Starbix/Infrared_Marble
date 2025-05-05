@@ -179,3 +179,6 @@ cython_debug/
 .zed/
 .fleet/
 .idea/
+
+# Scratch
+scratch/

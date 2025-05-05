@@ -59,6 +59,10 @@ executionEnvironments = [
 reportExplicitAny = false
 reportAny = false
 reportUnusedCallResult = false
+reportUnknownArgumentType = false
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownParameterType = false
 
 [tool.ruff]
 line-length = 120

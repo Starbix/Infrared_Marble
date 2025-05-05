@@ -7,8 +7,9 @@ import chroma from "chroma-js";
 import parseGeoraster from "georaster";
 import GeoRasterLayer from "georaster-layer-for-leaflet";
 import L from "leaflet";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMap } from "react-leaflet";
+import useSWR from "swr";
 
 const colorFn = (scale: chroma.Scale) => (values: number[]) => {
   const value = values[0]; // First band
@@ -66,6 +67,19 @@ export type GeoTiffStats = {
   pc98: number;
 };
 
+// Function to parse stats from request
+const parseStats = (response: AxiosResponse) => ({
+  pc02: parseFloat(response.headers["x-raster-p02"]),
+  pc98: parseFloat(response.headers["x-raster-p98"]),
+});
+
+// Fetcher function to get GeoTIFF and stats
+const fetcher: (url: string) => Promise<{ georaster: any; stats: GeoTiffStats }> = (url) =>
+  client
+    .get(url, { responseType: "arraybuffer", headers: { Accept: "image/tiff" }, cache: false })
+    .then((response) => ({ data: response.data, stats: parseStats(response) }))
+    .then(({ data, stats }) => parseGeoraster(data).then((georaster) => ({ georaster, stats })));
+
 export type GeoTiffLayerProps = {
   url: string;
   colorMap?: string[];
@@ -91,91 +105,81 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
   onError,
 }) => {
   const map = useMap();
-  const layerRef = useRef<GeoRasterLayer | null>(null);
-  const legendRef = useRef<L.Control | null>(null);
-
-  // Function to parse stats from request
-  const parseStats = (response: AxiosResponse) => ({
-    pc02: parseFloat(response.headers["x-raster-p02"]),
-    pc98: parseFloat(response.headers["x-raster-p98"]),
-  });
-
-  // Function to set up the map
-  const setup = useCallback(
-    ({ georaster, stats }: { georaster: any; stats: GeoTiffStats }) => {
-      // Clean previous layer
-      if (layerRef.current) {
-        map.removeLayer(layerRef.current);
-        layerRef.current = null;
-      }
-      if (legendRef.current) {
-        map.removeControl(legendRef.current);
-        legendRef.current = null;
-      }
-
-      // Create color scale
-      const min = !isNaN(stats.pc02) ? stats.pc02 : georaster.mins[0];
-      const max = !isNaN(stats.pc98) ? stats.pc98 : georaster.maxs[0];
-
-      const scale = chroma.scale(colorMap).mode("lch").correctLightness().domain([min, max]);
-
-      // Create new layer
-      const layer = new GeoRasterLayer({
-        georaster,
-        opacity,
-        resolution,
-        tileSize: 256,
-        pixelValuesToColorFn: colorFn(scale),
-      });
-      layerRef.current = layer;
-      layer.addTo(map);
-
-      // Create legend
-      const legend = createLegend(min, max, scale, legendTitle, legendTickUnits);
-      legend.addTo(map);
-      legendRef.current = legend;
-
-      map.fitBounds(layer.getBounds());
-
-      onReady?.();
-    },
-    [map, colorMap, resolution, opacity, legendTitle, legendTickUnits, onReady],
+  const mapState = useRef<{ layer: GeoRasterLayer; legend: L.Control } | null>(null);
+  const config = useMemo(
+    () => ({ url, colorMap, opacity, resolution, legendTitle, legendTickUnits }),
+    [url, colorMap, opacity, resolution, legendTitle, legendTickUnits],
   );
 
-  // Remove layers when component is removed
-  const cleanup = useCallback(() => {
-    if (layerRef.current) {
-      map.removeLayer(layerRef.current);
-      layerRef.current = null;
-    }
-    if (legendRef.current) {
-      map.removeControl(legendRef.current);
-      legendRef.current = null;
-    }
+  const { data, isLoading, error } = useSWR(url, fetcher);
+
+  // Handle firing events
+  useEffect(() => {
+    if (error) onError?.(error);
+    if (isLoading) onLoadStart?.();
+    else if (!error) onReady?.();
+  }, [isLoading, error, onLoadStart, onReady, onError]);
+
+  useEffect(() => {
+    console.log("SWR param change:", isLoading, error, data);
+  }, [isLoading, error, data]);
+
+  useEffect(() => {
+    console.log("Map change", map);
   }, [map]);
 
   useEffect(() => {
-    // Fetch GeoTIFF and set up map
-    onLoadStart?.();
-    client
-      .get(url, {
-        params: { nocache: false },
-        responseType: "arraybuffer",
-        headers: { Accept: "image/tiff" },
-        cache: false,
-      })
-      .then((response) => ({ data: response.data, stats: parseStats(response) }))
-      .then(({ data, stats }) => parseGeoraster(data).then((georaster) => ({ georaster, stats })))
-      .then(setup)
-      .catch((e) => {
-        console.error(e);
-        onError?.({ error: e });
-      });
+    console.log("Config change", config);
+  }, [config]);
+
+  // Handle mounting raster layer
+  useEffect(() => {
+    if (error || isLoading || !data) return;
+
+    console.log("Rendering map", map, data, error, isLoading, config);
+
+    const resetMap = () => {
+      if (mapState.current) {
+        map.removeLayer(mapState.current.layer);
+        map.removeControl(mapState.current.legend);
+        mapState.current = null;
+      }
+    };
+
+    // Render map
+    const { georaster, stats } = data;
+
+    // Clean previous layer
+    resetMap();
+
+    // Create color scale
+    const min = !isNaN(stats.pc02) ? stats.pc02 : georaster.mins[0];
+    const max = !isNaN(stats.pc98) ? stats.pc98 : georaster.maxs[0];
+
+    const scale = chroma.scale(config.colorMap).mode("lch").correctLightness().domain([min, max]);
+
+    // Create new layer
+    const layer = new GeoRasterLayer({
+      georaster,
+      opacity: config.opacity,
+      resolution: config.resolution,
+      tileSize: 256,
+      pixelValuesToColorFn: colorFn(scale),
+    });
+    layer.addTo(map);
+
+    // Create legend
+    const legend = createLegend(min, max, scale, config.legendTitle, config.legendTickUnits);
+    legend.addTo(map);
+
+    mapState.current = { layer, legend };
+    map.fitBounds(layer.getBounds());
 
     // Cleanup function
-    return cleanup;
-  }, [map, url, setup, cleanup, onError, onLoadStart]);
+    return resetMap;
+  }, [map, data, error, isLoading, config]);
 
+  // This component doesn't render anything directly
   return null;
 };
 

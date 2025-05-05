@@ -36,7 +36,11 @@ const Chart: React.FC<ChartProps> = ({ center, zoom, maps, mapId, date, adminId,
             url={layerUrl}
             onLoadStart={() => setLoading(true)}
             onReady={() => setLoading(false)}
-            onError={setError}
+            onError={(e) => {
+              console.error(e);
+              setLoading(false);
+              setError(e);
+            }}
           />
         )}
       </MapLoader>

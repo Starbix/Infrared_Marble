@@ -6,7 +6,7 @@ from api.routers.comparison_router import router as comparison_router
 app = FastAPI()
 
 # CORS Stuff
-origins = ["http://localhost", "http://localhost:3000"]
+origins = ["http://localhost", "http://localhost:3000", "http://localhost:8000"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

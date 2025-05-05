@@ -14,8 +14,6 @@ DEBUG = False
 NODATA_VALUE = "nan"
 from geopandas import GeoDataFrame
 
-DEBUG = False
-
 def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.date]) -> list:
     """
     Get the list of geotiffs from the given GeoDataFrame and date range.
@@ -52,10 +50,10 @@ def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.
             if imaging_time.date() not in date_range:
                 continue
 
-        lt = (tree.findtext(".//LTLongitude"), tree.find(".//LTLatitude"))
-        rt = (tree.findtext(".//RTLongitude"), tree.find(".//RTLatitude"))
-        rb = (tree.findtext(".//RBLongitude"), tree.find(".//RBLatitude"))
-        lb = (tree.findtext(".//LBLongitude"), tree.find(".//LBLatitude"))
+        lt = (tree.findtext(".//LTLongitude"), tree.findtext(".//LTLatitude"))
+        rt = (tree.findtext(".//RTLongitude"), tree.findtext(".//RTLatitude"))
+        rb = (tree.findtext(".//RBLongitude"), tree.findtext(".//RBLatitude"))
+        lb = (tree.findtext(".//LBLongitude"), tree.findtext(".//LBLatitude"))
         # check if the coordinates are valid
         if lt is None or rt is None or rb is None or lb is None:
             print(f"Coordinates not found in {geotiff}")

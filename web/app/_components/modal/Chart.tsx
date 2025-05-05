@@ -10,7 +10,7 @@ import { LatLngExpression } from "leaflet";
 import { useRef, useState } from "react";
 import { KeyedMutator, useSWRConfig } from "swr";
 
-const supportedChartTypes = new Set([ChartType.BlackMarble]);
+const supportedChartTypes = new Set([ChartType.BlackMarble, ChartType.LuoJia]);
 
 export type ChartProps = {
   center: LatLngExpression;

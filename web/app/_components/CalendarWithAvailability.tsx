@@ -5,13 +5,13 @@ import { DateCalendar, PickersDay, PickersDayProps } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 
-export type AvailDateCalendarProps = {
+export type CalendarWithAvailabilityProps = {
   value?: Dayjs | null;
   onChange?: (date: Dayjs | null) => void;
   availDates: string[];
 };
 
-const AvailDateCalendar: React.FC<AvailDateCalendarProps> = ({ availDates, value = null, onChange }) => {
+const CalendarWithAvailability: React.FC<CalendarWithAvailabilityProps> = ({ availDates, value = null, onChange }) => {
   const [displayValue, setDisplayValue] = useState<Dayjs | null>(value);
   const availDateSet = useMemo(() => new Set(availDates), [availDates]);
 
@@ -80,7 +80,7 @@ const AvailDateCalendar: React.FC<AvailDateCalendarProps> = ({ availDates, value
   );
 };
 
-export default AvailDateCalendar;
+export default CalendarWithAvailability;
 
 interface CustomDayProps extends PickersDayProps {
   availableSet: Set<string>; // Set of 'YYYY-MM-DD'

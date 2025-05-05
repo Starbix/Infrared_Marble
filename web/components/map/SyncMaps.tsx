@@ -7,7 +7,13 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 
 // This component syncs changes from one map to another
-const SyncMaps = ({ maps, currentMapId }: { maps: React.RefObject<{ [key: string]: L.Map }>; currentMapId: string }) => {
+const SyncMaps = ({
+  maps,
+  currentMapId,
+}: {
+  maps: React.RefObject<{ [key: string]: L.Map }>;
+  currentMapId: string;
+}) => {
   const map = useMap();
 
   // Add this map to the maps array
@@ -15,6 +21,7 @@ const SyncMaps = ({ maps, currentMapId }: { maps: React.RefObject<{ [key: string
     maps.current[currentMapId] = map;
 
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       delete maps.current[currentMapId];
     };
   }, [map, maps, currentMapId]);

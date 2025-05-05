@@ -73,7 +73,10 @@ export default function AnimatedTabs({ tabs = [], value, onChange }: AnimatedTab
                 style={{
                   position: "relative",
                   zIndex: 2,
-                  color: value === idx && indicatorProps.width > 0 ? theme.palette.primary.contrastText : theme.palette.text.primary,
+                  color:
+                    value === idx && indicatorProps.width > 0
+                      ? theme.palette.primary.contrastText
+                      : theme.palette.text.primary,
                   transition: theme.transitions.create("color"),
                 }}
               >

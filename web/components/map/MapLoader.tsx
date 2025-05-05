@@ -6,7 +6,17 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import { AnimatePresence, motion } from "motion/react";
 
 const Loading = () => (
-  <Box sx={{ width: 1, height: 1, display: "flex", flexDirection: "column", gap: 2, justifyContent: "center", alignItems: "center" }}>
+  <Box
+    sx={{
+      width: 1,
+      height: 1,
+      display: "flex",
+      flexDirection: "column",
+      gap: 2,
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
     <CircularProgress />
     <Typography>Loading map...</Typography>
   </Box>

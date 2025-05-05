@@ -6,68 +6,115 @@ import { GeoJSON } from "react-leaflet";
 import useSWR from "swr";
 
 import useExploreQuery from "@/hooks/explore-query";
+import { FeatureGroup, LeafletEvent, LeafletMouseEvent } from "leaflet";
+import { useCallback, useEffect, useRef } from "react";
 import "./admin-areas.scss";
 
 export type AdminAreasProps = {
   dataUrl: string;
   resolution?: "10m" | "50m" | "110m";
-  onClick?: (adminArea: any) => void;
+  onClick?: (adminId: string, feature: GeoJSON.Feature) => void;
 };
 
 const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m", onClick }) => {
-  const { adminId, setAdminId } = useExploreQuery();
+  const {
+    params: { adminId },
+  } = useExploreQuery();
+  const selectedAdminId = useRef<string | null>(adminId ?? null);
+  const selectedLayer = useRef<FeatureGroup | null>(null);
+  const hoveredAdminId = useRef<string | null>(null);
 
   // Fetch data from server
   const { data } = useSWR(dataUrl, (url) => client.get(url, { params: { resolution } }).then((res) => res.data), {
     suspense: true,
   });
 
+  const isSelected = (feature?: GeoJSON.Feature) =>
+    feature?.properties?.[GEOJSON_ADMIN_KEY] === selectedAdminId.current;
+  const isHovered = (feature?: GeoJSON.Feature) => feature?.properties?.[GEOJSON_ADMIN_KEY] === hoveredAdminId.current;
+
   // Styling
-  const getStyle = (feature: GeoJSON.Feature) => {
-    const selected = feature.properties?.[GEOJSON_ADMIN_KEY] === adminId;
+  const getStyle = useCallback((feature?: GeoJSON.Feature) => {
+    const selected = isSelected(feature);
+    const hovered = isHovered(feature);
     return {
-      fillOpacity: selected ? 0.5 : 0,
-      opacity: selected ? 1 : 0,
-      fillColor: "#ff8c00",
-      color: "#ff8c00",
-      weight: 1,
+      fillOpacity: hovered && selected ? 0.4 : hovered || selected ? 0.3 : 0,
+      opacity: selected || hovered ? 1 : 0,
+      fillColor: selected ? "#ff8c00" : "#3388ff",
+      color: selected ? "#ff8c00" : "#0000ff",
+      weight: hovered && selected ? 3 : 1,
     };
+  }, []);
+  const recomputeStyles = useCallback(
+    (layer: L.FeatureGroup) => {
+      layer.setStyle(getStyle(layer.feature as GeoJSON.Feature));
+    },
+    [getStyle],
+  );
+
+  useEffect(() => {
+    selectedAdminId.current = adminId ?? null;
+    if (adminId) {
+      // TODO: Update selectedLayer somehow
+    } else if (selectedLayer.current) {
+      recomputeStyles(selectedLayer.current);
+      selectedLayer.current = null;
+    }
+  }, [adminId, recomputeStyles]);
+
+  const onEachFeature = (feature: GeoJSON.Feature, layer: L.FeatureGroup) => {
+    // Sync selected state
+    const featureAdminId = feature.properties?.[GEOJSON_ADMIN_KEY];
+    if (!selectedLayer.current && featureAdminId === selectedAdminId.current) {
+      selectedAdminId.current = featureAdminId;
+      selectedLayer.current = layer;
+    }
   };
 
-  // Event handlers for each feature
-  const onEachFeature = (feature: GeoJSON.Feature, layer: L.Layer) => {
-    layer.on({
-      mouseover: (e) => {
-        const layer: L.SVGOverlay = e.target;
-        const selected = feature.properties?.[GEOJSON_ADMIN_KEY] === adminId;
-        layer.setStyle(
-          selected
-            ? { ...getStyle(feature), weight: 3 }
-            : {
-                fillOpacity: 0.3,
-                opacity: 1,
-                fillColor: "#3388ff",
-                color: "#0000ff",
-                weight: 1,
-              },
-        );
+  const clickHandler = (e: LeafletMouseEvent) => {
+    const layer: L.FeatureGroup = e.propagatedFrom;
+    const feature = layer.feature as GeoJSON.Feature;
+    const adminId = feature.properties?.[GEOJSON_ADMIN_KEY];
 
-        // layer.bindPopup(popupContent(feature.properties), { closeButton: false, autoPan: false });
-        // layer.openPopup();
-      },
-      mouseout: (e) => {
-        const layer = e.target;
-        layer.setStyle(getStyle(feature));
+    // Remove styles from currently selected feature (update selectedLayer first for immediate propagation)
+    const prevLayer = selectedLayer.current;
+    selectedLayer.current = layer;
+    selectedAdminId.current = adminId;
+    hoveredAdminId.current = adminId;
+    if (prevLayer) {
+      recomputeStyles(prevLayer);
+    }
 
-        layer.closePopup();
-      },
-      click: (e) => {
-        setAdminId(e.target.feature.properties[GEOJSON_ADMIN_KEY]);
-      },
-    });
+    // Update own styles and fire event
+    recomputeStyles(layer);
+    onClick?.(adminId, feature);
   };
 
-  return <GeoJSON data={data} onEachFeature={onEachFeature} style={getStyle} />;
+  const mouseOverHandler = (e: LeafletMouseEvent) => {
+    const layer: L.FeatureGroup = e.propagatedFrom;
+    const feature = layer.feature as GeoJSON.Feature;
+    hoveredAdminId.current = feature.properties?.[GEOJSON_ADMIN_KEY];
+    recomputeStyles(layer);
+  };
+
+  const mouseOutHandler = (e: LeafletMouseEvent) => {
+    const layer: L.FeatureGroup = e.propagatedFrom;
+    const feature = layer.feature as GeoJSON.Feature;
+    const adminId = feature.properties?.[GEOJSON_ADMIN_KEY];
+    if (hoveredAdminId.current === adminId) {
+      hoveredAdminId.current = null;
+    }
+    recomputeStyles(layer);
+  };
+
+  return (
+    <GeoJSON
+      data={data}
+      eventHandlers={{ click: clickHandler, mouseover: mouseOverHandler, mouseout: mouseOutHandler }}
+      onEachFeature={onEachFeature}
+      style={getStyle}
+    />
+  );
 };
 
 export default AdminAreas;

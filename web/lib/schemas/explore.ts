@@ -4,4 +4,5 @@ import { GEOJSON_ADMIN_KEY } from "../constants";
 export const querySchema = z.object({
   date: z.string().date().optional(),
   admin: z.string().optional(),
+  compare: z.coerce.boolean().optional(),
 });

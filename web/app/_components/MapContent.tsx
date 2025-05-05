@@ -1,14 +1,15 @@
 "use client";
 
+import useExploreQuery from "@/hooks/explore-query";
 import AdminAreas from "./map-layers/AdminAreas";
 
 export type MapContentProps = {};
 
 const MapContent: React.FC<MapContentProps> = (props) => {
-  const handleAdminAreaClick = (e) => {
-    const layer = e.target;
-    const adminAreaId = layer.feature.properties.woe_id;
-    console.log("Selected feature with ID:", adminAreaId);
+  const { setParams } = useExploreQuery();
+
+  const handleAdminAreaClick = (adminId: string) => {
+    setParams({ adminId });
   };
 
   return (

@@ -1,38 +1,31 @@
 "use client";
 
+import useExploreQuery from "@/hooks/explore-query";
 import { client } from "@/lib/api/client";
-import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
-import { querySchema } from "@/lib/schemas/explore";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { Box, Card, CardContent, CardHeader, IconButton, Modal, Skeleton } from "@mui/material";
 import dayjs from "dayjs";
 import L from "leaflet";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import ModalContent from "./ModalContent";
 
 export type ComparisonModalProps = {};
 
 const ComparisonModal: React.FC = (props) => {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
+  const {
+    params: { adminId, date, compare },
+    setParams,
+  } = useExploreQuery();
 
-  const query = querySchema.safeParse(Object.fromEntries(searchParams.entries()));
-  const adminAreaId = query.data?.[GEOJSON_ADMIN_KEY];
-  const date = query.data?.date;
-
-  const open = Boolean(query.success && date && adminAreaId);
+  const open = Boolean(compare);
 
   // Need to load data from API
-  const { data, isLoading, error } = useSWR(adminAreaId ? `/explore/admin-areas/${adminAreaId}` : null, (url) =>
+  const { data, isLoading, error } = useSWR(adminId ? `/explore/admin-areas/${adminId}` : null, (url) =>
     client.get(url, { params: { resolution: "50m" } }).then((res) => res.data),
   );
 
   const closeModal = () => {
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.delete(GEOJSON_ADMIN_KEY);
-    router.push(`${pathname}?${newSearchParams}`);
+    setParams({ compare: false });
   };
 
   const CardTitle = () =>
@@ -42,11 +35,7 @@ const ComparisonModal: React.FC = (props) => {
       <span>NTL Comparison &mdash; {data.properties.name}</span>
     );
   const CardSubHeader = () =>
-    !query.success || isLoading ? (
-      <Skeleton variant="text" sx={{ fontSize: "0.7rem" }} />
-    ) : (
-      <span>Date: {dayjs(query.data.date).toString()}</span>
-    );
+    isLoading ? <Skeleton variant="text" sx={{ fontSize: "0.7rem" }} /> : <span>Date: {dayjs(date).toString()}</span>;
 
   const layer = data ? L.geoJSON(data) : undefined;
 
@@ -65,7 +54,7 @@ const ComparisonModal: React.FC = (props) => {
               subheader={<CardSubHeader />}
             />
             <CardContent sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-              {layer && <ModalContent layer={layer} date={date!} adminId={adminAreaId!} />}
+              {layer && <ModalContent layer={layer} date={date!} adminId={adminId!} />}
             </CardContent>
           </Card>
         )}

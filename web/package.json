@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint-and-fix": "prettier -w . && next lint --fix"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",

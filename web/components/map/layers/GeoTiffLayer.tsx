@@ -1,15 +1,14 @@
 "use client";
 
 import { client } from "@/lib/api/client";
-import parseGeoraster from "georaster";
-import GeoRasterLayer from "georaster-layer-for-leaflet";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useMap } from "react-leaflet";
-import L from "leaflet";
-import chroma from "chroma-js";
 import { CET_L8 } from "@/lib/colormap";
 import { AxiosResponse } from "axios";
-import { Box, CircularProgress } from "@mui/material";
+import chroma from "chroma-js";
+import parseGeoraster from "georaster";
+import GeoRasterLayer from "georaster-layer-for-leaflet";
+import L from "leaflet";
+import { useCallback, useEffect, useRef } from "react";
+import { useMap } from "react-leaflet";
 
 const colorFn = (scale: chroma.Scale) => (values: number[]) => {
   const value = values[0]; // First band
@@ -140,7 +139,7 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
 
       onReady?.();
     },
-    [map, colorMap, resolution, opacity, legendTitle, legendTickUnits],
+    [map, colorMap, resolution, opacity, legendTitle, legendTickUnits, onReady],
   );
 
   // Remove layers when component is removed
@@ -175,7 +174,7 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
 
     // Cleanup function
     return cleanup;
-  }, [map, url, setup, cleanup]);
+  }, [map, url, setup, cleanup, onError, onLoadStart]);
 
   return null;
 };

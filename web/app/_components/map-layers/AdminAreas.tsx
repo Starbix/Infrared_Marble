@@ -6,7 +6,7 @@ import { GeoJSON } from "react-leaflet";
 import useSWR from "swr";
 
 import useExploreQuery from "@/hooks/explore-query";
-import { FeatureGroup, LeafletEvent, LeafletMouseEvent } from "leaflet";
+import { FeatureGroup, LeafletMouseEvent } from "leaflet";
 import { useCallback, useEffect, useRef } from "react";
 import "./admin-areas.scss";
 

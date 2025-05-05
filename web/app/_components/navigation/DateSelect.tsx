@@ -1,9 +1,9 @@
 "use client";
 
-import { HighlightedDatePicker } from "@/components/HighlightedDatePicker";
+import { DatePickerWithAvailability } from "@/components/DatePickerWithAvailability";
 import { Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
-import { useSearchParams, usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -36,7 +36,7 @@ const DateSelect: React.FC<DateSelectProps> = ({ availableDates, initialDate }) 
   return (
     <>
       <Typography variant="button">Select Date</Typography>
-      <HighlightedDatePicker availableDates={availableDates} value={selectedDate} onChange={onDateSelected} />
+      <DatePickerWithAvailability availableDates={availableDates} value={selectedDate} onChange={onDateSelected} />
     </>
   );
 };

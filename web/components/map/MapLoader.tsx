@@ -1,9 +1,9 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { MapProps } from "./Map";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { AnimatePresence, motion } from "motion/react";
+import dynamic from "next/dynamic";
+import { MapProps } from "./Map";
 
 const Loading = () => (
   <Box

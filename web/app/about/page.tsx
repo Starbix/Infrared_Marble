@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Paper, Grid, List, ListItem, ListItemText, Divider, Avatar } from "@mui/material";
+import { Avatar, Box, Container, Divider, Grid, List, ListItem, ListItemText, Paper, Typography } from "@mui/material";
 
 const teamMembers = [
   { name: "Oliver Calvet", email: "ocalvet@student.ethz.ch" },

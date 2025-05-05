@@ -1,14 +1,14 @@
 "use client";
 
+import CalendarWithAvailability from "@/components/CalendarWithAvailability";
 import Panel from "@/components/Panel";
 import useExploreQuery from "@/hooks/explore-query";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Button, Divider, IconButton, MenuItem, NoSsr, TextField, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { AnimatePresence, motion } from "motion/react";
-import CalendarWithAvailability from "../../../components/CalendarWithAvailability";
+import { forwardRef } from "react";
 import CountryDetails from "./CountryDetails";
-import { forwardRef, useEffect, useRef, useState } from "react";
 
 export type NewComparisonModalProps = {
   availableDates?: string[];

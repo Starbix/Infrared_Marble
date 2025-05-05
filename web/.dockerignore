@@ -3,5 +3,6 @@
 .editorconfig
 .env
 .env.*
+.next/
 Dockerfile
 node_modules/

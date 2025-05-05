@@ -1,16 +1,13 @@
 "use client";
 
+import useExploreQuery from "@/hooks/explore-query";
 import { client } from "@/lib/api/client";
-import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
-import { querySchema } from "@/lib/schemas/explore";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { Box, Card, CardContent, CardHeader, IconButton, Modal, Skeleton } from "@mui/material";
 import dayjs from "dayjs";
 import L from "leaflet";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import ModalContent from "./ModalContent";
-import useExploreQuery from "@/hooks/explore-query";
 
 export type ComparisonModalProps = {};
 

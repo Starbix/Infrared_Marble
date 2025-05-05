@@ -1,5 +1,6 @@
 "use client";
 
+import { getBestZoomLevel } from "@/lib/geo";
 import { ChartType } from "@/lib/types";
 import {
   Add as AddIcon,
@@ -11,7 +12,6 @@ import { Box, Button, MenuItem, Select } from "@mui/material";
 import { LatLngExpression } from "leaflet";
 import { useMemo, useRef, useState } from "react";
 import Chart from "./Chart";
-import { getBestZoomLevel } from "@/lib/geo";
 
 const chartTypeNames: { [K in ChartType]: string } = {
   [ChartType.BaseMap]: "Base map",

@@ -4,16 +4,10 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import clsx from "clsx";
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { StrictMode } from "react";
 import ClientProviders from "./_components/ClientProviders";
 import NavBar from "./_components/navigation/NavBar";
 import "./global.scss";
-import Head from "next/head";
-import Script from "next/script";
-import { StrictMode } from "react";
-import { querySchema } from "@/lib/schemas/explore";
-import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
-import api from "@/lib/api/server";
-import DateSelect from "./_components/navigation/DateSelect";
 
 const inter = Inter({
   subsets: ["latin"],

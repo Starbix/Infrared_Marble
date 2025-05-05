@@ -4,10 +4,10 @@ import GeoTiffLayer from "@/components/map/layers/GeoTiffLayer";
 import MapLoader from "@/components/map/MapLoader";
 import SyncMaps from "@/components/map/SyncMaps";
 import { ChartType } from "@/lib/types";
+import ErrorIcon from "@mui/icons-material/Error";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { LatLngExpression } from "leaflet";
 import { useState } from "react";
-import ErrorIcon from "@mui/icons-material/Error";
 
 const supportedChartTypes = new Set([ChartType.BlackMarble]);
 

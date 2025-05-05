@@ -1,4 +1,4 @@
-import { TableContainer, Paper, Table, TableBody, TableRow, TableCell } from "@mui/material";
+import { Paper, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
 import numeral from "numeral";
 
 const CountryDetails = ({ props }) => {

@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
-import { MapContainer, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import React, { useEffect } from "react";
+import { useMap, useMapEvents } from "react-leaflet";
 
 // Import leaflet CSS
-import "leaflet/dist/leaflet.css";
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import "leaflet/dist/leaflet.css";
 
 // This component syncs changes from one map to another
 const SyncMaps = ({

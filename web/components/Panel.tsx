@@ -1,8 +1,8 @@
 "use client";
 
 import { Box, BoxProps, useTheme } from "@mui/material";
-import React, { PropsWithChildren } from "react";
 import { motion } from "motion/react";
+import React, { PropsWithChildren } from "react";
 
 export type PanelProps = PropsWithChildren<{}> & BoxProps<typeof motion.div>;
 

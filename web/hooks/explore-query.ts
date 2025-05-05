@@ -2,7 +2,7 @@
 
 import { querySchema } from "@/lib/schemas/explore";
 import { Dayjs } from "dayjs";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function useExploreQuery() {
   const pathname = usePathname();

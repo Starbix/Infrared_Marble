@@ -4,8 +4,8 @@ import { querySchema } from "@/lib/schemas/explore";
 import { Box } from "@mui/material";
 import { Suspense } from "react";
 import MapContentLoader from "./_components/MapContentLoader";
-import NewComparisonModal from "./_components/new-comparison/NewComparisonModal";
 import ComparisonModalLoader from "./_components/modal/ComparisonModalLoader";
+import NewComparisonModal from "./_components/new-comparison/NewComparisonModal";
 
 export default async function Page({
   searchParams,

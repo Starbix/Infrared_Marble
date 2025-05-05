@@ -1,8 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { setupCache, buildMemoryStorage } from "axios-cache-interceptor";
-import { clear, del, get, set } from "idb-keyval";
+import { buildMemoryStorage, setupCache } from "axios-cache-interceptor";
 
 /**
  * Use to mutate data

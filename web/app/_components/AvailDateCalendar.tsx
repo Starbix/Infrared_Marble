@@ -3,7 +3,7 @@
 import { Badge } from "@mui/material";
 import { DateCalendar, PickersDay, PickersDayProps } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export type AvailDateCalendarProps = {
   value?: Dayjs | null;
@@ -37,6 +37,10 @@ const AvailDateCalendar: React.FC<AvailDateCalendarProps> = ({ availDates, value
     onChange?.(newDate);
   };
 
+  useEffect(() => {
+    setDisplayValue(value);
+  }, [value]);
+
   const shouldDisableDate = (date: Dayjs) => {
     const dateStr = date.format("YYYY-MM-DD");
     return !availDateSet.has(dateStr);
@@ -58,6 +62,7 @@ const AvailDateCalendar: React.FC<AvailDateCalendarProps> = ({ availDates, value
       shouldDisableYear={shouldDisableYear}
       views={["year", "month", "day"]}
       openTo="day"
+      key={displayValue?.toString()} // Add key to force re-render when displayValue changes
       disableHighlightToday={false}
       minDate={dayjs(availDates[0])}
       maxDate={dayjs(availDates[availDates.length - 1])}
@@ -111,8 +116,8 @@ const CustomDay: React.FC<CustomDayProps> = (props) => {
             borderRadius: "50%",
             "&:hover": { backgroundColor: "action.hover" },
             "&.Mui-selected": {
-              backgroundColor: "primary.light",
-              "&:hover": { backgroundColor: "primary.main" },
+              backgroundColor: "primary.main",
+              "&:hover": { backgroundColor: "primary.light" },
             },
           }),
         }}

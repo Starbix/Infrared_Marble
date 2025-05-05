@@ -99,6 +99,11 @@ const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta })
 
         {/* Date select */}
         <Box sx={{ flex: 1 }}>
+          {availableDates.length === 0 && (
+            <Typography color="error" sx={{ pb: 2 }}>
+              There is currently no data for the selected region in the LuoJia dataset.
+            </Typography>
+          )}
           <NoSsr>
             <TextField
               fullWidth
@@ -115,7 +120,11 @@ const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta })
                 </MenuItem>
               ))}
             </TextField>
-            <AvailDateCalendar availDates={availableDates} onChange={(date) => setParams({ date })} />
+            <AvailDateCalendar
+              availDates={availableDates}
+              value={date ? dayjs(date) : null}
+              onChange={(date) => setParams({ date })}
+            />
           </NoSsr>
         </Box>
       </Box>

@@ -52,14 +52,14 @@ const CustomDay: React.FC<CustomDayProps> = (props) => {
 };
 
 // --- Main DatePicker Component Props ---
-type HighlightedDatePickerProps = {
+type DatePickerWithAvailabilityProps = {
   value?: Dayjs | null;
   onChange?: (value: Dayjs | null) => void;
   availableDates: string[]; // Array of 'YYYY-MM-DD' strings
 };
 
 // --- Main DatePicker Component ---
-export const HighlightedDatePicker: React.FC<HighlightedDatePickerProps> = ({
+export const DatePickerWithAvailability: React.FC<DatePickerWithAvailabilityProps> = ({
   value = null,
   onChange,
   availableDates,

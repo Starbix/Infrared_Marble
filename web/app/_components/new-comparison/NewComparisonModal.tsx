@@ -6,7 +6,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Box, Button, Divider, IconButton, MenuItem, NoSsr, TextField, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { AnimatePresence, motion } from "motion/react";
-import CalendarWithAvailability from "../CalendarWithAvailability";
+import CalendarWithAvailability from "../../../components/CalendarWithAvailability";
 import CountryDetails from "./CountryDetails";
 import { forwardRef, useEffect, useRef, useState } from "react";
 

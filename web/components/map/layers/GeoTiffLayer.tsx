@@ -7,9 +7,9 @@ import chroma from "chroma-js";
 import parseGeoraster from "georaster";
 import GeoRasterLayer from "georaster-layer-for-leaflet";
 import L from "leaflet";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMap } from "react-leaflet";
-import useSWR from "swr";
+import useSWR, { KeyedMutator } from "swr";
 
 const colorFn = (scale: chroma.Scale) => (values: number[]) => {
   const value = values[0]; // First band
@@ -91,6 +91,7 @@ export type GeoTiffLayerProps = {
   onLoadStart?: () => void;
   onReady?: () => void;
   onError?: (error: { error: any }) => void;
+  mutateRef?: RefObject<KeyedMutator<any> | null>;
 };
 
 const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
@@ -103,6 +104,7 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
   onLoadStart,
   onReady,
   onError,
+  mutateRef,
 }) => {
   const map = useMap();
   const mapState = useRef<{ layer: GeoRasterLayer; legend: L.Control } | null>(null);
@@ -111,7 +113,16 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
     [url, colorMap, opacity, resolution, legendTitle, legendTickUnits],
   );
 
-  const { data, isLoading, error } = useSWR(url, fetcher);
+  const { data, isLoading, error, mutate } = useSWR(url, fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+
+  useEffect(() => {
+    if (mutateRef) {
+      mutateRef.current = mutate;
+    }
+  }, [mutateRef, mutate]);
 
   // Handle firing events
   useEffect(() => {

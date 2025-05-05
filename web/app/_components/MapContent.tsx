@@ -9,7 +9,8 @@ const MapContent: React.FC<MapContentProps> = (props) => {
   const { setParams } = useExploreQuery();
 
   const handleAdminAreaClick = (adminId: string) => {
-    setParams({ adminId });
+    // Reset date when changing admin areas, as they might have different available dates
+    setParams({ date: null, adminId });
   };
 
   return (

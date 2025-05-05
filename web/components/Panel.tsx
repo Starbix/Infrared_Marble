@@ -2,13 +2,16 @@
 
 import { Box, BoxProps, useTheme } from "@mui/material";
 import React, { PropsWithChildren } from "react";
+import { motion } from "motion/react";
 
-export type PanelProps = PropsWithChildren<{}> & BoxProps;
+export type PanelProps = PropsWithChildren<{}> & BoxProps<typeof motion.div>;
 
-const Panel: React.FC<PanelProps> = ({ children, sx }) => {
+const Panel = React.forwardRef(function Panel({ children, sx, ...props }: PanelProps, ref) {
   const theme = useTheme();
   return (
     <Box
+      component={motion.div}
+      ref={ref}
       sx={{
         width: "max-content",
         border: "1px solid",
@@ -19,10 +22,11 @@ const Panel: React.FC<PanelProps> = ({ children, sx }) => {
         boxShadow: theme.shadows[8],
         ...sx,
       }}
+      {...props}
     >
       {children}
     </Box>
   );
-};
+});
 
 export default Panel;

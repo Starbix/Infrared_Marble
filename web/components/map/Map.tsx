@@ -11,8 +11,8 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 
 const bounds: LatLngBoundsExpression = [
-  [-90, -180], // Southwest coordinates
-  [90, 180], // Northeast coordinates
+  [-90, -240], // Southwest coordinates
+  [90, 240], // Northeast coordinates
 ];
 
 function MapEventHandler({ setCenter, setZoom }) {
@@ -96,7 +96,7 @@ const Map: React.FC<MapProps> = ({ children, center = [47.3769, 8.5417], zoom = 
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           noWrap={true}
-          minZoom={4}
+          minZoom={3}
         />
         {children}
         <MapEventHandler setCenter={(c) => onMove?.(c)} setZoom={(z) => onZoom?.(z)} />

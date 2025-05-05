@@ -35,12 +35,10 @@ export default async function Page({
         <Box
           sx={{
             position: "absolute",
-            bottom: 0,
-            insetInline: 0,
+            insetBlock: 0,
+            right: 0,
             zIndex: 1000,
-            display: "flex",
-            justifyContent: "center",
-            pb: 4,
+            p: 2,
           }}
         >
           <NewComparisonModal adminId={adminId} availableDates={availDates} adminMeta={adminMeta} />

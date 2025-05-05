@@ -138,7 +138,7 @@ export default function AboutPage() {
         </Typography>
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {teamMembers.map((member) => (
-            <Grid item xs={12} sm={6} md={4} key={member.name}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={member.name}>
               <Box display="flex" alignItems="center">
                 <Avatar sx={{ mr: 2 }}>{member.name[0]}</Avatar>
                 <Box>
@@ -157,7 +157,7 @@ export default function AboutPage() {
         </Typography>
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {supervisors.map((sup) => (
-            <Grid item xs={12} sm={6} md={4} key={sup.name}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={sup.name}>
               <Box display="flex" alignItems="center">
                 <Avatar sx={{ mr: 2 }}>{sup.name[0]}</Avatar>
                 <Box>

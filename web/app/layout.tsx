@@ -3,24 +3,11 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import clsx from "clsx";
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
 import { StrictMode } from "react";
 import ClientProviders from "./_components/ClientProviders";
 import NavBar from "./_components/navigation/NavBar";
 import "./global.scss";
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
-  display: "swap",
-  variable: "--font-inter",
-});
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-  variable: "--font-jetbrains-mono",
-});
+import { inter, jetbrainsMono } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: "Infrared Marble",

@@ -54,8 +54,6 @@ const ModalContent: React.FC<ModalContentProps> = ({
   const bounds = layer.getBounds();
   const boundsCenter = bounds.getCenter();
 
-  const [center, setCenter] = useState<LatLngExpression>([boundsCenter.lat, boundsCenter.lng]);
-  const [zoom, setZoom] = useState<number>(getBestZoomLevel(bounds));
   const maps = useRef<{ [key: string]: L.Map }>({});
 
   const [chartTypes, setChartTypes] = useState<ChartType[]>([ChartType.BlackMarble, ChartType.LuoJia]);
@@ -144,8 +142,8 @@ const ModalContent: React.FC<ModalContentProps> = ({
           <Box sx={{ flex: 1, position: "relative" }}>
             <Chart
               maps={maps}
-              center={center}
-              zoom={zoom}
+              center={[boundsCenter.lat, boundsCenter.lng]}
+              zoom={getBestZoomLevel(bounds)}
               mapId={`map-${idx}`}
               date={date}
               adminId={adminId}

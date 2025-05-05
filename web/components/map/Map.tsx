@@ -1,14 +1,14 @@
 "use client";
 
 import { Box } from "@mui/material";
-import { PropsWithChildren, useCallback, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
 import { LatLngBoundsExpression, LatLngExpression } from "leaflet";
+import { PropsWithChildren, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
 
 // Import leaflet CSS
-import "leaflet/dist/leaflet.css";
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import "leaflet/dist/leaflet.css";
 
 const bounds: LatLngBoundsExpression = [
   [-90, -240], // Southwest coordinates

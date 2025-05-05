@@ -110,7 +110,7 @@ def bm_dataset_preprocess(
 
 ## LUOJIA
 
-METADATA_URL = "https://polybox.ethz.ch/index.php/s/dnP82nHZkjR4gr7/download/file?path=%2Fmetadata%2FMETA.tar.gz"
+LJ_METADATA_URL = "https://polybox.ethz.ch/index.php/s/dnP82nHZkjR4gr7/download/file?path=%2Fmetadata%2FMETA.tar.gz"
 
 def luojia_metadata(metadata_url: str):
     # download it, if it doesn't exist
@@ -163,6 +163,6 @@ def luojia_tile_download(tile_name: str):
 
 if __name__ == "__main__":
 
-    luojia_metadata(METADATA_URL)
+    luojia_metadata(LJ_METADATA_URL)
     tile_name = "LuoJia1-01_LR201806057936_20180603055109_HDR_0029"
     #luojia_tile_download(tile_name)

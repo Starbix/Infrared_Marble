@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Paper, Grid, List, ListItem, ListItemText, Divider, Avatar } from "@mui/material";
+import { Avatar, Box, Container, Divider, Grid, List, ListItem, ListItemText, Paper, Typography } from "@mui/material";
 
 const teamMembers = [
   { name: "Oliver Calvet", email: "ocalvet@student.ethz.ch" },
@@ -26,9 +26,9 @@ export default function AboutPage() {
         </Typography>
 
         <Typography variant="body1" paragraph>
-          This interdisciplinary research project aims to develop an automated tool for detecting humanitarian crises in conflict-affected
-          regions using nighttime light (NTL) satellite imagery. The initiative is a collaboration between ETH Zurich, EPFL, the University
-          of Zurich, and the International Committee of the Red Cross (ICRC).
+          This interdisciplinary research project aims to develop an automated tool for detecting humanitarian crises in
+          conflict-affected regions using nighttime light (NTL) satellite imagery. The initiative is a collaboration
+          between ETH Zurich, EPFL, the University of Zurich, and the International Committee of the Red Cross (ICRC).
         </Typography>
 
         <Divider sx={{ my: 3 }} />
@@ -37,10 +37,10 @@ export default function AboutPage() {
           Motivation
         </Typography>
         <Typography variant="body1" paragraph>
-          Humanitarian organizations often struggle to obtain timely, accurate information about crises, especially in remote or
-          inaccessible areas. Nighttime light data, which captures patterns of human activity visible from space, offers a promising and
-          underutilized approach for early crisis detection, complementing traditional monitoring methods like news reporting and
-          high-resolution satellite imagery.
+          Humanitarian organizations often struggle to obtain timely, accurate information about crises, especially in
+          remote or inaccessible areas. Nighttime light data, which captures patterns of human activity visible from
+          space, offers a promising and underutilized approach for early crisis detection, complementing traditional
+          monitoring methods like news reporting and high-resolution satellite imagery.
         </Typography>
 
         <Typography variant="h6" gutterBottom>
@@ -138,7 +138,7 @@ export default function AboutPage() {
         </Typography>
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {teamMembers.map((member) => (
-            <Grid item xs={12} sm={6} md={4} key={member.name}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={member.name}>
               <Box display="flex" alignItems="center">
                 <Avatar sx={{ mr: 2 }}>{member.name[0]}</Avatar>
                 <Box>
@@ -157,7 +157,7 @@ export default function AboutPage() {
         </Typography>
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {supervisors.map((sup) => (
-            <Grid item xs={12} sm={6} md={4} key={sup.name}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={sup.name}>
               <Box display="flex" alignItems="center">
                 <Avatar sx={{ mr: 2 }}>{sup.name[0]}</Avatar>
                 <Box>
@@ -177,8 +177,8 @@ export default function AboutPage() {
           Partners & Support
         </Typography>
         <Typography variant="body2" paragraph>
-          This project is supported by ETH Zurich, EPFL, the University of Zurich, and the ICRC, and is part of the ETH4D Humanitarian
-          Action Challenge.
+          This project is supported by ETH Zurich, EPFL, the University of Zurich, and the ICRC, and is part of the
+          ETH4D Humanitarian Action Challenge.
         </Typography>
 
         <Typography variant="body2" color="text.secondary">

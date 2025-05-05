@@ -171,3 +171,14 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+.DS_Store
+
+# Editors
+.vscode/
+.zed/
+.fleet/
+.idea/
+
+# Scratch
+scratch/

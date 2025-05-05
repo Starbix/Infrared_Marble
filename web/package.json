@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint-and-fix": "prettier -w . && next lint --fix"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -18,8 +19,14 @@
     "@mui/x-date-pickers": "^8.0.0-beta.3",
     "@types/numeral": "^2.0.5",
     "axios": "^1.9.0",
+    "axios-cache-interceptor": "^1.8.0",
+    "chroma-js": "^3.1.2",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
+    "encoding": "^0.1.13",
+    "georaster": "^1.6.0",
+    "georaster-layer-for-leaflet": "^3.10.0",
+    "idb-keyval": "^6.2.1",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
     "motion": "^12.9.2",
@@ -35,12 +42,14 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/chroma-js": "^3.1.1",
     "@types/leaflet": "^1.9.17",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.1",
+    "prettier": "^3.5.3",
     "typescript": "^5"
   }
 }

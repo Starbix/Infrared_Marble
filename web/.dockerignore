@@ -1,6 +1,8 @@
+**/node_modules/
 .dockerignore
+.editorconfig
 .env
 .env.*
-docker-compose.yaml
+.next/
 Dockerfile
 node_modules/

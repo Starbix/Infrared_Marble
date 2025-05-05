@@ -1,16 +1,18 @@
 import datetime
-from typing import TYPE_CHECKING
 from lib.utils import LJ_DATA_DIR, DATA_DIR
+from lib.download import luojia_metadata, LJ_METADATA_URL
 
 from shapely.geometry import Polygon
 import geopandas
 import xarray
-from osgeo import gdal
+from osgeo import gdal, ogr
 from pathlib import Path
+import io
 import numpy as np
 
-if TYPE_CHECKING:
-    from geopandas import GeoDataFrame
+DEBUG = False
+NODATA_VALUE = "nan"
+from geopandas import GeoDataFrame
 
 def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.date]) -> list:
     """
@@ -19,16 +21,25 @@ def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.
     # assume metadata is downloaded in DATA_DIR / "luojia" / "metadata"
     relevant_geotiffs = []
     geotiff_metadata = LJ_DATA_DIR / "metadata"
+
+    # ensure metadata is downloaded
+    if not geotiff_metadata.exists():
+        luojia_metadata(LJ_METADATA_URL)
+
+
     # iterate through the geotiffs and check if they are in the date and location range
-
     for geotiff in geotiff_metadata.glob("*.xml"):
-        # parse XML file
 
+        # parse XML file
         import xml
         from xml.etree import ElementTree
         tree = ElementTree.parse(geotiff)
         # path to Metadata.ProductInfo.imagingTime
-        imaging_time = tree.find(".//imagingTime").text
+        imaging_time = tree.findtext(".//imagingTime")
+        if imaging_time is None:
+            print(f"imagingTime not found in {geotiff}")
+            continue
+
         # convert to datetime, format is 2018-6-3T5:50:57.157223
         imaging_time = datetime.datetime.strptime(imaging_time, "%Y-%m-%dT%H:%M:%S.%f")
         # check if the imaging time is in the date range
@@ -38,20 +49,15 @@ def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.
         elif isinstance(date_range, list):
             if imaging_time.date() not in date_range:
                 continue
-        
 
-        # <LTLongitude>-115.888656</LTLongitude>
-        # <LTLatitude>35.301386</LTLatitude>
-        # <RTLongitude>-115.211464</RTLongitude>
-        # <RTLatitude>33.013016</RTLatitude>
-        # <RBLongitude>-118.077200</RBLongitude>
-        # <RBLatitude>32.341746</RBLatitude>
-        # <LBLongitude>-118.911156</LBLongitude>
-        # <LBLatitude>34.815542</LBLatitude>
-        lt = (tree.find(".//LTLongitude").text, tree.find(".//LTLatitude").text)
-        rt = (tree.find(".//RTLongitude").text, tree.find(".//RTLatitude").text)
-        rb = (tree.find(".//RBLongitude").text, tree.find(".//RBLatitude").text)
-        lb = (tree.find(".//LBLongitude").text, tree.find(".//LBLatitude").text)
+        lt = (tree.findtext(".//LTLongitude"), tree.findtext(".//LTLatitude"))
+        rt = (tree.findtext(".//RTLongitude"), tree.findtext(".//RTLatitude"))
+        rb = (tree.findtext(".//RBLongitude"), tree.findtext(".//RBLatitude"))
+        lb = (tree.findtext(".//LBLongitude"), tree.findtext(".//LBLatitude"))
+        # check if the coordinates are valid
+        if lt is None or rt is None or rb is None or lb is None:
+            print(f"Coordinates not found in {geotiff}")
+            continue
         geotiff_polygon = Polygon(
             [
                 (float(lt[0]), float(lt[1])),
@@ -60,15 +66,12 @@ def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.
                 (float(lb[0]), float(lb[1])),
             ]
         )
-        # check if the polygon intersects with the GeoDataFrame
         intersects = get_intersection(gdf, geotiff_polygon)
         if intersects:
             geotiff_name = geotiff.name
             # remove _meta.xml
             geotiff_name = geotiff_name.replace("_meta.xml", "")
             relevant_geotiffs.append(geotiff_name)
-            print_geotiff_metadata(geotiff_name)
-
 
     return relevant_geotiffs
 
@@ -95,7 +98,6 @@ def print_geotiff_metadata(geotiff: str):
     # get the min and max values
     min_value = band.GetMinimum()
     max_value = band.GetMaximum()   
-
 
     print(f"Metadata for {geotiff}:")
     print(f"Projection: {projection}")
@@ -128,107 +130,192 @@ def downsample_xarray(ds: xarray.Dataset, factor: int = 2) -> xarray.Dataset:
 
     return ds
 
+def empty_geotiff() -> bytes:
+    """
+    Create a minimal empty GeoTIFF with NaN as the no-data value and return it as bytes.
+
+    Returns:
+    - bytes: The GeoTIFF file as bytes.
+    """
+    # Create an in-memory file for the GeoTIFF
+    driver = gdal.GetDriverByName('GTiff')
+    dataset = driver.Create('/vsimem/temp.tif', 1, 1, 1, gdal.GDT_Float32)
+
+    # Set the no-data value to NaN
+    band = dataset.GetRasterBand(1)
+    band.SetNoDataValue(np.nan)
+
+    # Write NaN to the single pixel
+    band.WriteArray(np.array([[np.nan]]))
+
+    # Flush data to the virtual file system
+    dataset.FlushCache()
+
+    # Read the dataset into a bytes object
+    vsi_file = gdal.VSIFOpenL('/vsimem/temp.tif', 'rb')
+    gdal.VSIFSeekL(vsi_file, 0, 2)  # Seek to the end
+    size = gdal.VSIFTellL(vsi_file)  # Get the size of the file
+    gdal.VSIFSeekL(vsi_file, 0, 0)  # Seek to the beginning
+
+    bytes_io = io.BytesIO()
+    buffer = bytearray(size)
+    gdal.VSIFReadL(size, size, vsi_file)
+    bytes_io.seek(0)
+
+    # Clean up
+    gdal.VSIFCloseL(vsi_file)
+    dataset = None
+    gdal.Unlink('/vsimem/temp.tif')
+
+    return bytes_io.getvalue()
 
 ## problematic: noData from geotiffs overwrite actual data
 # need to take geometry into account
-def merge_geotiffs(geotiff_list, output_name="merged.tif"):
+def merge_geotiffs(geotiff_list) -> tuple[bytes, float, float]:
+    if geotiff_list is None or len(geotiff_list) == 0:
+        print("No geotiffs found, serving empty file")
+        return empty_geotiff(), 0, 0
+
+    file_list = [str(LJ_DATA_DIR / "tiles" / geotiff) + "_gec.tif" for geotiff in geotiff_list]
+
+    for file in file_list:
+        metadata_path = str(LJ_DATA_DIR / "metadata" / file.split("/")[-1].replace("_gec.tif", "_meta.xml"))
+        convert_geotiff(file, file.replace(".tif", "_float.tif"), metadata_path)
+
+    new_file_list = [str(LJ_DATA_DIR / "tiles" / geotiff) + "_gec_float.tif" for geotiff in geotiff_list]
+
+
+    vrt_options = gdal.BuildVRTOptions(srcNodata=NODATA_VALUE)
+    vrt_dataset = gdal.BuildVRT('', new_file_list, options=vrt_options)
+
+    # Create an in-memory buffer to hold the GeoTIFF data
+    mem_driver = gdal.GetDriverByName('MEM')
+    mem_dataset = mem_driver.CreateCopy('', vrt_dataset, 0)
+
+    compression_options = [
+        'COMPRESS=LZW'  # You can use other compression methods like 'DEFLATE' or 'JPEG'
+    ]
+
+    # Serialize the in-memory dataset to a byte buffer
+    buffer = io.BytesIO()
+    gdal.Translate('/vsimem/temp.tif', mem_dataset, format='GTiff', creationOptions=compression_options, noData=NODATA_VALUE)
+
+    # Open the virtual file and read its content into the buffer
+    vsi_file = gdal.VSIFOpenL('/vsimem/temp.tif', 'rb')
+    gdal.VSIFSeekL(vsi_file, 0, 2)  # Seek to the end of the file
+    file_size = gdal.VSIFTellL(vsi_file)  # Get the file size
+    gdal.VSIFSeekL(vsi_file, 0, 0)  # Seek back to the beginning
+    buffer.write(gdal.VSIFReadL(1, file_size, vsi_file))
+    buffer.seek(0)
+
+    data_array = mem_dataset.GetRasterBand(1).ReadAsArray()
+
+    # Calculate the 2nd and 98th percentiles, ignoring NaN values
+    pc02 = np.nanpercentile(data_array, 2)
+    pc98 = np.nanpercentile(data_array, 98)
+
+    # Close the datasets
+    vrt_dataset = None
+    mem_dataset = None
+
+    # Clean up the virtual file system
+    gdal.Unlink('/vsimem/temp.tif')
+
+    return buffer.read(), pc02, pc98
+
+def merge_geotiffs_to_file(geotiff_list, output_name="merged.tif"):
     file_list = [ str(LJ_DATA_DIR / "tiles" / geotiff)+"_gec.tif" for geotiff in geotiff_list]
 
     for file in file_list:
-        convert_geotiff(file, file.replace(".tif", "_float.tif"))
+        metadata_path = str(LJ_DATA_DIR / "metadata" / file.split("/")[-1].replace("_gec.tif", "_meta.xml"))
+        convert_geotiff(file, file.replace(".tif", "_float.tif"), metadata_path)
 
-    new_file_list = [ str(LJ_DATA_DIR / "tiles" / geotiff)+"_gec.tif" for geotiff in geotiff_list]
+    new_file_list = [ str(LJ_DATA_DIR / "tiles" / geotiff)+"_gec_float.tif" for geotiff in geotiff_list]
 
     output_file = LJ_DATA_DIR / output_name
-    vrt_file = "merged.vrt"
-    gdal.BuildVRT(vrt_file,new_file_list,
-                  )
+
+    vrt_options = gdal.BuildVRTOptions(srcNodata=NODATA_VALUE)
+    vrt_dataset = gdal.BuildVRT('', new_file_list, options=vrt_options)
 
     # Translate VRT to TIFF
-    gdal.Translate(output_file,vrt_file,
-                   noData="0")
+    gdal.Translate(output_file, vrt_dataset, noData=NODATA_VALUE)
+
+    # Close the in-memory VRT dataset
+    vrt_dataset = None
 
 # convert uint32 to float32, 
-def convert_geotiff(input_path, output_path, nodata_value=-9999):
+def convert_geotiff(input_path, output_path, metadata_path, nodata_value=NODATA_VALUE):
     # Open the input GeoTIFF file
     dataset = gdal.Open(input_path)
+    geotransform = dataset.GetGeoTransform()
+    projection = dataset.GetProjection()
     band = dataset.GetRasterBand(1)
 
     # Read the data as a numpy array
     data = band.ReadAsArray()
 
     # Apply the radiance conversion formula
-    radiance = (data**(3/2)) / (10**10)
+    radiance = (data ** (3/2)) * 10 ** (-10)
 
-    # Set NODATA value for out-of-bounds data
-
-
- # Get the geotransform
-    geotransform = dataset.GetGeoTransform()
-    min_x = geotransform[0]
-    max_y = geotransform[3]
-    pixel_size_x = geotransform[1]
-    pixel_size_y = geotransform[5]
-
-    # Calculate the coordinates for each pixel
-    x_coords = np.arange(min_x, min_x + dataset.RasterXSize * pixel_size_x, pixel_size_x)[:dataset.RasterXSize]
-    y_coords = np.arange(max_y, max_y + dataset.RasterYSize * pixel_size_y, pixel_size_y)[:dataset.RasterYSize]
-    xx, yy = np.meshgrid(x_coords, y_coords)
-
-    # Define the corner coordinates
-    corner_coords = {
-        'min_x': min_x,
-        'max_x': min_x + dataset.RasterXSize * pixel_size_x,
-        'min_y': max_y + dataset.RasterYSize * pixel_size_y,
-        'max_y': max_y
-    }
-
-    # Create a mask for the valid data region
-    valid_mask = (xx >= corner_coords['min_x']) & (xx < corner_coords['max_x']) & (yy >= corner_coords['min_y']) & (yy < corner_coords['max_y'])
-
-    # Apply the mask to set NODATA values
-    radiance[~valid_mask] = nodata_value
-    # Create a new GeoTIFF file
     driver = gdal.GetDriverByName('GTiff')
     out_dataset = driver.Create(output_path, dataset.RasterXSize, dataset.RasterYSize, 1, gdal.GDT_Float32)
-
-    # Copy the geotransform and projection
     out_dataset.SetGeoTransform(dataset.GetGeoTransform())
     out_dataset.SetProjection(dataset.GetProjection())
-
-    # Copy metadata
-    out_dataset.SetMetadata(dataset.GetMetadata())
-
-    # Write the radiance data to the new file
     out_band = out_dataset.GetRasterBand(1)
     out_band.WriteArray(radiance)
-    out_band.SetNoDataValue(nodata_value)  # Set NODATA value in metadata
     out_band.FlushCache()
 
+    # read metadata from the XML file
+    from xml.etree import ElementTree
+
+    tree = ElementTree.parse(metadata_path)
+    coordinates = {
+        "LT": (float(tree.findtext(".//LTLongitude") or 0.0), float(tree.findtext(".//LTLatitude") or 0.0)),
+        "RT": (float(tree.findtext(".//RTLongitude") or 0.0), float(tree.findtext(".//RTLatitude") or 0.0)),
+        "RB": (float(tree.findtext(".//RBLongitude") or 0.0), float(tree.findtext(".//RBLatitude") or 0.0)),
+        "LB": (float(tree.findtext(".//LBLongitude") or 0.0), float(tree.findtext(".//LBLatitude") or 0.0)),
+    }
+
+    ring = ogr.Geometry(ogr.wkbLinearRing)
+    ring.AddPoint(coordinates['LT'][0], coordinates['LT'][1])
+    ring.AddPoint(coordinates['RT'][0], coordinates['RT'][1])
+    ring.AddPoint(coordinates['RB'][0], coordinates['RB'][1])
+    ring.AddPoint(coordinates['LB'][0], coordinates['LB'][1])
+    ring.AddPoint(coordinates['LT'][0], coordinates['LT'][1])  # Close the ring
+
+    polygon = ogr.Geometry(ogr.wkbPolygon)
+    polygon.AddGeometry(ring)
+
+    # Create a memory layer to hold the polygon
+    mem_driver = ogr.GetDriverByName('MEMORY')
+    mem_source = mem_driver.CreateDataSource('memData')
+    mem_layer = mem_source.CreateLayer('memLayer', srs=ogr.osr.SpatialReference(wkt=projection))
+    feature = ogr.Feature(mem_layer.GetLayerDefn())
+    feature.SetGeometry(polygon)
+    mem_layer.CreateFeature(feature)
+
+    # Rasterize the polygon to create a mask
+    driver = gdal.GetDriverByName('MEM')
+    mask_dataset = driver.Create('', dataset.RasterXSize, dataset.RasterYSize, 1, gdal.GDT_Byte)
+    mask_dataset.SetGeoTransform(geotransform)
+    mask_dataset.SetProjection(projection)
+    gdal.RasterizeLayer(mask_dataset, [1], mem_layer, burn_values=[1])
+    mask = mask_dataset.GetRasterBand(1).ReadAsArray()
+
+    # Apply the mask to set values outside the mask to 1
+    radiance[mask == 0] = nodata_value
+
+    # Create a new GeoTIFF file to save the result
+    driver = gdal.GetDriverByName('GTiff')
+    out_dataset = driver.Create(output_path, dataset.RasterXSize, dataset.RasterYSize, 1, gdal.GDT_Float32)
+    out_dataset.SetGeoTransform(geotransform)
+    out_dataset.SetProjection(projection)
+    out_band = out_dataset.GetRasterBand(1)
+    out_band.WriteArray(radiance)
+    out_band.FlushCache()
     # Close the datasets
     dataset = None
     out_dataset = None
-
-
-def visualize_geotiff(file: str):
-    """
-    Visualize the geotiff using matplotlib.
-    """
-    import geotiff
-    geo_tiff = geotiff.GeoTiff(file)
-    # get the data
-    print(geo_tiff)
-    print(geo_tiff.tif_shape)
-    print(geo_tiff.tif_bBox)
-
-    zarr_array = geo_tiff.read()
-    import numpy as np
-
-    array = np.array(zarr_array)
-
-
-    
-
 
 
 if __name__ == "__main__":
@@ -237,7 +324,6 @@ if __name__ == "__main__":
     #exit(0)
     GDF_URL = "https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_MMR_1.json.zip"
     GDF_DOWNLOAD_PATH = DATA_DIR / Path(GDF_URL).name
-    print(GDF_DOWNLOAD_PATH)
 
     gdf = geopandas.read_file(GDF_DOWNLOAD_PATH)
     date = datetime.date(2018, 11, 2)
@@ -248,9 +334,7 @@ if __name__ == "__main__":
         for day in range(1, 31 )  # Days in November
     ]
 
-
     geotiff_list = get_geotiffs(gdf, date)
-    print(geotiff_list)
 
     # download geotiffs
     from lib.download import luojia_tile_download
@@ -258,17 +342,14 @@ if __name__ == "__main__":
         luojia_tile_download(geotiff)
     
     # merge geotiffs
-    merge_geotiffs(geotiff_list)
+    geotiff, pc02, pc98 = merge_geotiffs(geotiff_list)
 
     # get xarray
     ds = get_xarray_from_geotiff("merged.tif")
     # print the xarray
-    print(ds)
-
 
     ds = downsample_xarray(ds, factor=10)
     # print the xarray
-    print(ds)
 
     import matplotlib.pyplot as plt
     import colorcet as cc

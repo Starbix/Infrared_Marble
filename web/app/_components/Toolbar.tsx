@@ -5,7 +5,7 @@ import { Box, BoxProps, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
-import { HighlightedDatePicker } from "../../components/HighlightedDatePicker";
+import { DatePickerWithAvailability } from "../../components/DatePickerWithAvailability";
 
 export type ToolbarProps = {
   dates: string[];
@@ -37,7 +37,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ dates, initialDate = null, sx, ...pro
     <Box {...props} sx={{ width: 1, position: "fixed", bottom: 0, insetInline: 0, mb: 3, ...sx }}>
       <Panel sx={{ margin: "auto", display: "flex", alignItems: "center", gap: 1, p: 1.5 }}>
         <Typography variant="button">Select Date</Typography>
-        <HighlightedDatePicker availableDates={dates} value={selectedDate} onChange={onDateSelected} />
+        <DatePickerWithAvailability availableDates={dates} value={selectedDate} onChange={onDateSelected} />
       </Panel>
     </Box>
   );

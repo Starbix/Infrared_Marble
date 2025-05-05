@@ -4,13 +4,14 @@ contextily
 dask
 fastapi[all]
 folium
-GDAL
 geopandas
 mapclassify
 matplotlib
 numpy
 pandas
+redis
 requests
+setuptools
 scikit-learn
 seaborn
 tabulate

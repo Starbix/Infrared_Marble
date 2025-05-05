@@ -1,16 +1,16 @@
 import gzip
 import json
-from typing import Literal
+from typing import Any, Literal
 
 from fastapi.exceptions import HTTPException
 
-from lib.utils import ADMIN_AREA_FILE_MAPPING
+from lib.utils import ADMIN_AREA_FILE_MAPPING, GEOJSON_ADMIN_KEY
 
 
 Resolution = Literal["110m", "50m", "10m"]
 
 
-def get_admin_area_by_id(id: str, resolution: Resolution = "50m"):
+def get_admin_area_by_id(id: str, resolution: Resolution = "50m") -> dict[str, Any]:
     file_path = ADMIN_AREA_FILE_MAPPING[resolution]
     # Need to filter admin areas and get correct feature out
 
@@ -20,7 +20,7 @@ def get_admin_area_by_id(id: str, resolution: Resolution = "50m"):
     filtered_features = [
         feature
         for feature in geojson_data["features"]
-        if feature["properties"].get("adm0_a3") == id
+        if feature["properties"].get(GEOJSON_ADMIN_KEY) == id
     ]
 
     if len(filtered_features) == 0:

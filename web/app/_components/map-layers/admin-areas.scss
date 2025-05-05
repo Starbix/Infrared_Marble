@@ -1,3 +1,6 @@
-.leaflet-popup {
+.leaflet-popup,
+.leaflet-popup-container,
+.leaflet-popup-tip,
+.leaftlet-popup-tip-container {
     pointer-events: none;
 }

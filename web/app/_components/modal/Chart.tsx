@@ -11,6 +11,13 @@ import { useRef, useState } from "react";
 import { KeyedMutator, useSWRConfig } from "swr";
 
 const supportedChartTypes = new Set([ChartType.BlackMarble, ChartType.LuoJia]);
+const chartTitles: { [_ in ChartType]: string } = {
+  [ChartType.BaseMap]: "Base map",
+  [ChartType.BlackMarble]: "Light intensity [nW·cm⁻²·sr⁻¹]",
+  [ChartType.LuoJia]: "Light intensity [nW·cm⁻²·sr⁻¹]", // TODO: @Oli Adjust this to correct units
+  [ChartType.Overlay]: "<not yet supported>",
+  [ChartType.Difference]: "<not yet supported>",
+};
 
 export type ChartProps = {
   center: LatLngExpression;
@@ -24,6 +31,8 @@ export type ChartProps = {
 
 const Chart: React.FC<ChartProps> = ({ center, zoom, maps, mapId, date, adminId, layer }) => {
   const layerUrl = `/compare/${date}/${adminId}/${layer}`;
+  const legendTitle = chartTitles[layer];
+
   const mutateRef = useRef<KeyedMutator<any> | null>(null);
 
   const [loading, setLoading] = useState(supportedChartTypes.has(layer));
@@ -45,6 +54,7 @@ const Chart: React.FC<ChartProps> = ({ center, zoom, maps, mapId, date, adminId,
           <GeoTiffLayer
             url={layerUrl}
             mutateRef={mutateRef}
+            legendTitle={legendTitle}
             onLoadStart={() => setLoading(true)}
             onReady={() => setLoading(false)}
             onError={(e) => {

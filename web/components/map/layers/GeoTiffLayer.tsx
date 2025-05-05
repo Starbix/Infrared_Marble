@@ -131,23 +131,9 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
     else if (!error) onReady?.();
   }, [isLoading, error, onLoadStart, onReady, onError]);
 
-  useEffect(() => {
-    console.log("SWR param change:", isLoading, error, data);
-  }, [isLoading, error, data]);
-
-  useEffect(() => {
-    console.log("Map change", map);
-  }, [map]);
-
-  useEffect(() => {
-    console.log("Config change", config);
-  }, [config]);
-
   // Handle mounting raster layer
   useEffect(() => {
     if (error || isLoading || !data) return;
-
-    console.log("Rendering map", map, data, error, isLoading, config);
 
     const resetMap = () => {
       if (mapState.current) {

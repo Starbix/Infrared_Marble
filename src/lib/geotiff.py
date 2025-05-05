@@ -130,12 +130,51 @@ def downsample_xarray(ds: xarray.Dataset, factor: int = 2) -> xarray.Dataset:
 
     return ds
 
+def empty_geotiff() -> bytes:
+    """
+    Create a minimal empty GeoTIFF with NaN as the no-data value and return it as bytes.
+
+    Returns:
+    - bytes: The GeoTIFF file as bytes.
+    """
+    # Create an in-memory file for the GeoTIFF
+    driver = gdal.GetDriverByName('GTiff')
+    dataset = driver.Create('/vsimem/temp.tif', 1, 1, 1, gdal.GDT_Float32)
+
+    # Set the no-data value to NaN
+    band = dataset.GetRasterBand(1)
+    band.SetNoDataValue(np.nan)
+
+    # Write NaN to the single pixel
+    band.WriteArray(np.array([[np.nan]]))
+
+    # Flush data to the virtual file system
+    dataset.FlushCache()
+
+    # Read the dataset into a bytes object
+    vsi_file = gdal.VSIFOpenL('/vsimem/temp.tif', 'rb')
+    gdal.VSIFSeekL(vsi_file, 0, 2)  # Seek to the end
+    size = gdal.VSIFTellL(vsi_file)  # Get the size of the file
+    gdal.VSIFSeekL(vsi_file, 0, 0)  # Seek to the beginning
+
+    bytes_io = io.BytesIO()
+    buffer = bytearray(size)
+    gdal.VSIFReadL(size, size, vsi_file)
+    bytes_io.seek(0)
+
+    # Clean up
+    gdal.VSIFCloseL(vsi_file)
+    dataset = None
+    gdal.Unlink('/vsimem/temp.tif')
+
+    return bytes_io.getvalue()
 
 ## problematic: noData from geotiffs overwrite actual data
 # need to take geometry into account
 def merge_geotiffs(geotiff_list) -> tuple[bytes, float, float]:
     if geotiff_list is None or len(geotiff_list) == 0:
-        raise ValueError("No geotiffs found")
+        print("No geotiffs found, serving empty file")
+        return empty_geotiff(), 0, 0
 
     file_list = [str(LJ_DATA_DIR / "tiles" / geotiff) + "_gec.tif" for geotiff in geotiff_list]
 

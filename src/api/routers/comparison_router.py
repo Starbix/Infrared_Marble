@@ -111,7 +111,6 @@ async def get_lj_geotiff(
         percentiles_serialized = pickle.dumps((pc02, pc98))
         redis_client.set(cache_key, geotiff_serialized)
         redis_client.set(cache_key_percentiles, percentiles_serialized)
-        print(pc02, pc98)
 
     # We return some metadata in the headers as we can't use GDAL metadata on client
     headers = {

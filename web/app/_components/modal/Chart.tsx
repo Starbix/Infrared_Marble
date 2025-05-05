@@ -8,13 +8,13 @@ import ErrorIcon from "@mui/icons-material/Error";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { LatLngExpression } from "leaflet";
 import { useRef, useState } from "react";
-import { KeyedMutator, useSWRConfig } from "swr";
+import { KeyedMutator } from "swr";
 
 const supportedChartTypes = new Set([ChartType.BlackMarble, ChartType.LuoJia]);
 const chartTitles: { [_ in ChartType]: string } = {
   [ChartType.BaseMap]: "Base map",
-  [ChartType.BlackMarble]: "Light intensity [nW·cm⁻²·sr⁻¹]",
-  [ChartType.LuoJia]: "Light intensity [nW·cm⁻²·sr⁻¹]", // TODO: @Oli Adjust this to correct units
+  [ChartType.BlackMarble]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
+  [ChartType.LuoJia]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]", 
   [ChartType.Overlay]: "<not yet supported>",
   [ChartType.Difference]: "<not yet supported>",
 };

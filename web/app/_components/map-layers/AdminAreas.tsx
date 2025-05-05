@@ -1,13 +1,12 @@
 "use client";
 
 import { client } from "@/lib/api/client";
-import numeral from "numeral";
+import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
 import { GeoJSON } from "react-leaflet";
 import useSWR from "swr";
 
+import useExploreQuery from "@/hooks/explore-query";
 import "./admin-areas.scss";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
 
 export type AdminAreasProps = {
   dataUrl: string;
@@ -16,58 +15,49 @@ export type AdminAreasProps = {
 };
 
 const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m", onClick }) => {
+  const { adminId, setAdminId } = useExploreQuery();
+
   // Fetch data from server
-  const { data } = useSWR(dataUrl, (url) => client.get(url, { params: { resolution } }).then((res) => res.data), { suspense: true });
-
-  // Need to set selected admin area over search params
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const setSelectedAdminArea = (adminId: number | null) => {
-    const newSearchParams = new URLSearchParams(searchParams);
-    if (adminId) {
-      newSearchParams.set(GEOJSON_ADMIN_KEY, adminId.toString());
-    } else {
-      newSearchParams.delete(GEOJSON_ADMIN_KEY);
-    }
-    router.push(`${pathname}?${newSearchParams}`);
-  };
+  const { data } = useSWR(dataUrl, (url) => client.get(url, { params: { resolution } }).then((res) => res.data), {
+    suspense: true,
+  });
 
   // Styling
-  const getStyle = () => {
+  const getStyle = (feature: GeoJSON.Feature) => {
+    const selected = feature.properties?.[GEOJSON_ADMIN_KEY] === adminId;
     return {
-      fillOpacity: 0,
-      opacity: 0,
+      fillOpacity: selected ? 0.5 : 0,
+      opacity: selected ? 1 : 0,
+      fillColor: "#ff8c00",
+      color: "#ff8c00",
+      weight: 1,
     };
   };
 
   // Event handlers for each feature
-  const onEachFeature = (feature, layer) => {
+  const onEachFeature = (feature: GeoJSON.Feature, layer: L.Layer) => {
     layer.on({
       mouseover: (e) => {
-        const layer = e.target;
+        const layer: L.SVGOverlay = e.target;
         layer.setStyle({
-          fillOpacity: 0.7,
+          fillOpacity: 0.3,
           opacity: 1,
           fillColor: "#3388ff",
           color: "#0000ff",
+          weight: 1,
         });
 
-        layer.bindPopup(popupContent(feature.properties), { closeButton: false, autoPan: false });
-        layer.openPopup();
+        // layer.bindPopup(popupContent(feature.properties), { closeButton: false, autoPan: false });
+        // layer.openPopup();
       },
       mouseout: (e) => {
         const layer = e.target;
-        layer.setStyle({
-          fillOpacity: 0,
-          opacity: 0,
-        });
+        layer.setStyle(getStyle(feature));
 
         layer.closePopup();
       },
       click: (e) => {
-        setSelectedAdminArea(e.target.feature.properties[GEOJSON_ADMIN_KEY]);
+        setAdminId(e.target.feature.properties[GEOJSON_ADMIN_KEY]);
       },
     });
   };
@@ -76,34 +66,3 @@ const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m", on
 };
 
 export default AdminAreas;
-
-function popupContent(props: any) {
-  return `<div>
-    <h3>${props.name}</h3>
-    <table>
-      <tbody>
-        <tr>
-          <td>Population (est.)</td>
-          <td>${numeral(props.pop_est).format("0.0a")}</td>
-        </tr>
-        <tr>
-          <td>Economy</td>
-          <td>${props.economy}</td>
-        </tr>
-        <tr>
-          <td>Income Group</td>
-          <td>${props.income_grp}</td>
-        </tr>
-        <tr>
-          <td>GDP</td>
-          <td>${numeral(props.gdp_md * 1_000_000).format("$0.00a")}</td>
-        </tr>
-        <tr>
-          <td>Country Type</td>
-          <td>${props.type}</td>
-        </tr>
-      </tbody>
-    </table>
-    <p>Click the admin area to start a comparison.</p>
-  </div>`;
-}

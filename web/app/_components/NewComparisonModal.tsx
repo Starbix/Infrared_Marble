@@ -21,6 +21,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import numeral from "numeral";
 import useSWR from "swr";
+import AvailDateCalendar from "./AvailDateCalendar";
 
 export type NewComparisonModalProps = {
   availableDates?: string[];
@@ -85,7 +86,7 @@ const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta })
 
         {/* Date select */}
         <Box sx={{ flex: 1 }}>
-          <HighlightedDatePicker availableDates={availableDates} />
+          <AvailDateCalendar availDates={availableDates} />
         </Box>
       </Box>
     </Panel>

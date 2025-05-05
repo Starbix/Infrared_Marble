@@ -39,13 +39,18 @@ const AdminAreas: React.FC<AdminAreasProps> = ({ dataUrl, resolution = "50m", on
     layer.on({
       mouseover: (e) => {
         const layer: L.SVGOverlay = e.target;
-        layer.setStyle({
-          fillOpacity: 0.3,
-          opacity: 1,
-          fillColor: "#3388ff",
-          color: "#0000ff",
-          weight: 1,
-        });
+        const selected = feature.properties?.[GEOJSON_ADMIN_KEY] === adminId;
+        layer.setStyle(
+          selected
+            ? { ...getStyle(feature), weight: 3 }
+            : {
+                fillOpacity: 0.3,
+                opacity: 1,
+                fillColor: "#3388ff",
+                color: "#0000ff",
+                weight: 1,
+              },
+        );
 
         // layer.bindPopup(popupContent(feature.properties), { closeButton: false, autoPan: false });
         // layer.openPopup();

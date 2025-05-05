@@ -10,6 +10,7 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  MenuItem,
   Modal,
   NoSsr,
   Paper,
@@ -18,6 +19,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  TextField,
   Typography,
 } from "@mui/material";
 import { AnimatePresence, motion } from "motion/react";
@@ -25,6 +27,7 @@ import numeral from "numeral";
 import useSWR from "swr";
 import AvailDateCalendar from "../AvailDateCalendar";
 import CountryDetails from "./CountryDetails";
+import dayjs from "dayjs";
 
 export type NewComparisonModalProps = {
   availableDates?: string[];
@@ -90,13 +93,28 @@ const Content: React.FC<ContentProps> = ({ availableDates, adminId, adminMeta })
       </Box>
 
       {/* Main content */}
-      <Box sx={{ display: "flex", gap: 2 }}>
+      <Box sx={{ display: "flex", gap: 4 }}>
         {/* Country details */}
         <CountryDetails props={props} />
 
         {/* Date select */}
         <Box sx={{ flex: 1 }}>
           <NoSsr>
+            <TextField
+              fullWidth
+              type="date"
+              label={date ? "Selected date" : "Select a date from the list"}
+              value={date ?? ""}
+              select
+              onChange={(e) => setParams({ date: e.target.value ? dayjs(e.target.value) : null })}
+            >
+              <MenuItem value="">Select a date</MenuItem>
+              {availableDates.map((availDate) => (
+                <MenuItem key={availDate} value={availDate}>
+                  {availDate}
+                </MenuItem>
+              ))}
+            </TextField>
             <AvailDateCalendar availDates={availableDates} onChange={(date) => setParams({ date })} />
           </NoSsr>
         </Box>

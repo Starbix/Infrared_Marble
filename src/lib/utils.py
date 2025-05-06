@@ -40,9 +40,7 @@ _bm_product = os.environ.get("BM_PRODUCT")
 BM_PRODUCT: Product = Product[_bm_product] if _bm_product else Product.VNP46A2
 BM_VARIABLE: str | None = os.environ.get("BM_VARIABLE")  # Default varible for product
 _bm_quality_flag = os.environ.get("BM_QUALITY_FLAG")
-BM_QUALITY_FLAG: list[int] = (
-    [int(x) for x in _bm_quality_flag.split(",")] if _bm_quality_flag else []
-)
+BM_QUALITY_FLAG: list[int] = [int(x) for x in _bm_quality_flag.split(",")] if _bm_quality_flag else []
 
 
 DEFAULT_DATES_FILE = STATIC_DIR / "dates_luojia_myanmar.csv"

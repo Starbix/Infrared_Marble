@@ -15,21 +15,23 @@ Dependencies:
     pip install reverse_geocoder pycountry tqdm
 """
 
+import csv
 import os
 import sys
-import csv
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import List, Tuple
 
-import reverse_geocoder as rg
 import pycountry
+import reverse_geocoder as rg
 from tqdm import tqdm  # Progress bar
 
 # === Paths (change only if your layout differs) ===
-METADATA_DIR = "/mnt/c/Users/oliomap/Desktop/Oli_Studium/Semester 4/AI4good/Programming/Infrared_Marble/data/luojia/metadata"
-DATA_DIR     = os.path.dirname(METADATA_DIR)   # /…/data/luojia
-OUTPUT_CSV   = os.path.join(DATA_DIR, "image_counts.csv")
+METADATA_DIR = (
+    "/mnt/c/Users/oliomap/Desktop/Oli_Studium/Semester 4/AI4good/Programming/Infrared_Marble/data/luojia/metadata"
+)
+DATA_DIR = os.path.dirname(METADATA_DIR)  # /…/data/luojia
+OUTPUT_CSV = os.path.join(DATA_DIR, "image_counts.csv")
 
 
 def get_country_from_coords(lat: float, lon: float) -> str:
@@ -86,10 +88,7 @@ def aggregate_image_counts() -> List[Tuple[str, str, int]]:
     and return a sorted list of (date, country, count).
     """
     # 1) List all XML files so tqdm knows the total
-    all_files = [
-        fname for fname in os.listdir(METADATA_DIR)
-        if fname.lower().endswith(".xml")
-    ]
+    all_files = [fname for fname in os.listdir(METADATA_DIR) if fname.lower().endswith(".xml")]
 
     counts: dict[Tuple[str, str], int] = {}
 

@@ -1,16 +1,17 @@
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from datetime import datetime
 import gzip
 import logging
 import os
+import xml.etree.ElementTree as ET
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from datetime import datetime
+
 import geopandas
 import pandas as pd
-import xml.etree.ElementTree as ET
-
 from rasterio import CRS
 from shapely.geometry import Polygon
-from lib.utils import ADMIN_AREA_FILE_MAPPING, DATA_DIR, STATIC_DIR
 from tqdm import tqdm
+
+from lib.utils import ADMIN_AREA_FILE_MAPPING, DATA_DIR, STATIC_DIR
 
 logging.basicConfig(level=logging.DEBUG)
 

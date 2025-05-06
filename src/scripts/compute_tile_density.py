@@ -22,11 +22,13 @@ import sys
 import geopandas as gpd
 import pandas as pd
 
+from lib.utils import STATIC_DIR
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Adjust these paths to match your setup
-DATA_DIR = "/mnt/c/Users/oliomap/Desktop/Oli_Studium/Semester 4/AI4good/Programming/Infrared_Marble/data/luojia"
-CSV_IN = os.path.join(DATA_DIR, "image_counts.csv")
-CSV_OUT = os.path.join(DATA_DIR, "image_counts_with_density.csv")
+CSV_IN = STATIC_DIR / "image_counts.csv"
+CSV_OUT = STATIC_DIR / "image_counts_with_density.csv"
+
 
 # Imaging constants
 PIXELS_PER_IMAGE = 2048 * 2048
@@ -83,11 +85,12 @@ def load_country_areas() -> pd.DataFrame:
         raise RuntimeError(f"Could not detect country-name or iso columns in {cols}")
 
     name_col = name_cols[0]
-    iso_col = iso_cols[0]
+    iso_a2 = [c for c in iso_cols if c.endswith("2")][0]
+    iso_a3 = [c for c in iso_cols if c.endswith("3")][0]
 
     # slice down to just those three
-    df = world_eq[[name_col, iso_col, "area_km2"]].copy()
-    df.columns = ["lookup_name", "iso_a2", "area_km2"]
+    df = world_eq[[name_col, iso_a2, iso_a3, "area_km2"]].copy()
+    df.columns = ["lookup_name", "iso_a2", "iso_a3", "area_km2"]
     return df
 
 
@@ -122,12 +125,14 @@ def main():
     merged["CoverageFraction"] = merged["Covered_m2"] / merged["Country_m2"]
 
     # 7) write out
-    out = merged.rename(columns={"area_km2": "Area_km2"})
-    out[["Date", "Country", "Count", "Area_km2", "CoverageFraction"]].to_csv(CSV_OUT, index=False, float_format="%.8f")
+    out = merged.rename(columns={"area_km2": "Area_km2", "iso_a3": "ISO_A3"})
+    out[["Date", "ISO_A3", "Country", "Count", "Area_km2", "CoverageFraction"]].to_csv(
+        CSV_OUT, index=False, float_format="%.8f"
+    )
 
     print(f"✔ Wrote {len(out)} rows to {CSV_OUT}")
     print("Preview:")
-    print(out[["Date", "Country", "Count", "Area_km2", "CoverageFraction"]].head().to_string(index=False))
+    print(out[["Date", "ISO_A3", "Country", "Count", "Area_km2", "CoverageFraction"]].head().to_string(index=False))
 
 
 if __name__ == "__main__":

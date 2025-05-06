@@ -45,41 +45,57 @@ async def get_bm_geotiff_new(
     crs: str = "EPSG:4326",
     nocache: bool = False,
 ):
-    store_path = BM_DATA_DIR / "cache" / admin_id / date.isoformat() / f"{variable}.zarr"
+    cache_dir = BM_DATA_DIR / "cache" / admin_id / date.isoformat() / variable
+    raster_path = cache_dir / "raster.tif"
+    meta_path = cache_dir / "meta.pkl"
 
     # Try to load from cache first
-    dataset = None
-    if not nocache and store_path.exists() and store_path.is_dir():
+    geotiff_buf, pc02, pc98 = None, None, None
+    if not nocache and cache_dir.exists():
+        logger.info("BM: Loading (%s, %s) from cache", admin_id, date.isoformat())
+        geotiff_buf = raster_path.read_bytes()
+        meta = pickle.loads(meta_path.read_bytes())
+        pc02, pc98 = meta["pc02"], meta["pc98"]
+
+    if not nocache and cache_dir.exists() and cache_dir.is_dir():
         try:
-            dataset = xr.load_dataset(store_path, engine="zarr", mode="r")
-            logger.debug("Loading BM raster (%s, %s) from cache", admin_id, date.isoformat())
+            logger.info("Loading BM raster (%s, %s) from cache", admin_id, date.isoformat())
+            dataset = xr.load_dataset(cache_dir, engine="zarr", mode="r")
         except Exception as e:
             logger.warning(
-                "Zarr file exists but failed to open. The file is possibly corrupted. (Looking up %s)", store_path
+                "Zarr file exists but failed to open. The file is possibly corrupted. (Looking up %s)", cache_dir
             )
             logger.warning("Error from previous call: %s", str(e))
             dataset = None
 
     # Download if not available in cache
-    if dataset is None:
-        logger.debug("Downloading BM raster (%s, %s)", admin_id, date.isoformat())
+    if geotiff_buf is None or pc02 is None or pc98 is None:
+        logger.info("BM: Downloading (%s, %s)", admin_id, date.isoformat())
         gdf = get_region_gdf(admin_id)
         dataset = await run_in_threadpool(bm_download, gdf=gdf, date_range=date)
-        dataset.to_zarr(store_path, mode="w")
-        logger.debug("Download complete.")
+        dataset.to_zarr(cache_dir, mode="w")
+        logger.info("Download complete.")
 
-    # Convert dataset to GeoTIFF response
-    data_array = dataset[variable].rio.write_crs(crs)
+        # Convert dataset to GeoTIFF response
+        logger.info("Writing CRS...")
+        data_array = dataset[variable].rio.write_crs(crs)
 
-    # Create GeoTIFF in memory
-    with io.BytesIO() as buf:
-        data_array.rio.to_raster(buf, driver="GTiff", compress="LZW")
-        buf.seek(0)
-        content = buf.getvalue()
+        # Create GeoTIFF in memory
+        logger.info("Converting to raster...")
+        with io.BytesIO() as buf:
+            data_array.rio.to_raster(buf, driver="GTiff", compress="LZW")
+            buf.seek(0)
+            geotiff_buf = buf.getvalue()
 
-    # Calculate stats for headers
-    pc02 = float(data_array.quantile(0.02).values)
-    pc98 = float(data_array.quantile(0.98).values)
+        # Calculate stats for headers
+        logger.info("Computing quantiles...")
+        pc02 = float(data_array.quantile(0.02).values)
+        pc98 = float(data_array.quantile(0.98).values)
+
+        # Store in cache
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        raster_path.write_bytes(geotiff_buf)
+        meta_path.write_bytes(pickle.dumps({"pc02": pc02, "pc98": pc98}))
 
     # Create response with headers
     headers = {
@@ -88,7 +104,7 @@ async def get_bm_geotiff_new(
         "X-Raster-P98": str(pc98),
     }
 
-    return Response(content, media_type="image/tiff", headers=headers)
+    return Response(geotiff_buf, media_type="image/tiff", headers=headers)
 
 
 def lj_download(

@@ -42,3 +42,8 @@ def get_region_gdf(admin_id: str):
 def load_country_meta(path: str | Path | None = None):
     path = Path(path) if path else STATIC_DIR / "country_meta.csv.gz"
     return pd.read_csv(path, compression="infer")
+
+
+def load_all_dates(path: str | Path | None = None):
+    path = Path(path) if path else STATIC_DIR / "all_dates.csv"
+    return pd.read_csv(path, compression="infer")

@@ -52,10 +52,10 @@ Date,Country,Count
 2018-07-31,Bosnia and Herzegovina,8
 2018-07-31,China,52
 2018-07-31,Croatia,2
-2018-07-31,Czech Republic,7
+2018-07-31,Czechia,7
 2018-07-31,Germany,3
 2018-07-31,Hungary,6
-2018-07-31,"Montenegro, Republic of",4
+2018-07-31,Montenegro,4
 2018-07-31,Morocco,12
 2018-07-31,Norway,1
 2018-07-31,Poland,10
@@ -85,33 +85,33 @@ Date,Country,Count
 2018-08-15,Kyrgyzstan,10
 2018-08-15,Russian Federation,1
 2018-08-16,China,31
-2018-08-16,Czech Republic,2
+2018-08-16,Czechia,2
 2018-08-16,Denmark,1
 2018-08-16,Greece,10
 2018-08-16,Hungary,6
 2018-08-16,Mongolia,20
-2018-08-16,"North Macedonia, Republic of",4
+2018-08-16,North Macedonia,4
 2018-08-16,Poland,16
 2018-08-16,Russian Federation,6
 2018-08-16,Serbia,10
 2018-08-16,Slovakia,5
 2018-08-16,Sweden,1
-2018-08-16,Kosovo,3
+2018-08-16,XK,3
 2018-08-17,China,53
 2018-08-18,China,57
 2018-08-19,China,48
 2018-08-19,Viet Nam,9
 2018-08-20,China,55
-2018-08-20,Czech Republic,2
+2018-08-20,Czechia,2
 2018-08-20,Greece,18
 2018-08-20,Hungary,7
-2018-08-20,"North Macedonia, Republic of",4
+2018-08-20,North Macedonia,4
 2018-08-20,Poland,11
 2018-08-20,Serbia,9
 2018-08-20,Slovakia,4
 2018-08-20,"Taiwan, Province of China",2
 2018-08-20,United States,47
-2018-08-20,Kosovo,4
+2018-08-20,XK,4
 2018-08-21,China,53
 2018-08-21,Japan,25
 2018-08-21,Russian Federation,34
@@ -128,7 +128,7 @@ Date,Country,Count
 2018-08-25,Bosnia and Herzegovina,1
 2018-08-25,Canada,13
 2018-08-25,Croatia,5
-2018-08-25,Czech Republic,7
+2018-08-25,Czechia,7
 2018-08-25,Denmark,13
 2018-08-25,Georgia,7
 2018-08-25,Germany,13
@@ -154,7 +154,7 @@ Date,Country,Count
 2018-08-28,Hungary,7
 2018-08-28,"Iran, Islamic Republic of",23
 2018-08-28,Mongolia,3
-2018-08-28,"North Macedonia, Republic of",4
+2018-08-28,North Macedonia,4
 2018-08-28,Oman,1
 2018-08-28,Poland,16
 2018-08-28,Qatar,2
@@ -189,7 +189,7 @@ Date,Country,Count
 2018-09-05,Hungary,7
 2018-09-05,"Iran, Islamic Republic of",38
 2018-09-05,Mongolia,2
-2018-09-05,"North Macedonia, Republic of",4
+2018-09-05,North Macedonia,4
 2018-09-05,Poland,9
 2018-09-05,Romania,4
 2018-09-05,Russian Federation,10
@@ -302,7 +302,7 @@ Date,Country,Count
 2018-10-11,Romania,9
 2018-10-11,Sweden,5
 2018-10-11,Ukraine,11
-2018-10-11,Aland Islands,10
+2018-10-11,Åland Islands,10
 2018-10-12,China,9
 2018-10-12,India,41
 2018-10-12,Kyrgyzstan,2

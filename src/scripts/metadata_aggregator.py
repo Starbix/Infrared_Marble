@@ -19,19 +19,20 @@ import csv
 import os
 import sys
 import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
+from pathlib import Path
 from typing import List, Tuple
 
 import pycountry
 import reverse_geocoder as rg
 from tqdm import tqdm  # Progress bar
 
+from lib.utils import LJ_DATA_DIR, STATIC_DIR
+
 # === Paths (change only if your layout differs) ===
-METADATA_DIR = (
-    "/mnt/c/Users/oliomap/Desktop/Oli_Studium/Semester 4/AI4good/Programming/Infrared_Marble/data/luojia/metadata"
-)
-DATA_DIR = os.path.dirname(METADATA_DIR)  # /…/data/luojia
-OUTPUT_CSV = os.path.join(DATA_DIR, "image_counts.csv")
+METADATA_DIR = LJ_DATA_DIR / "metadata"
+OUTPUT_CSV = STATIC_DIR / "image_counts.csv"
 
 
 def get_country_from_coords(lat: float, lon: float) -> str:
@@ -82,6 +83,15 @@ def parse_metadata_file(xml_path: str) -> Tuple[str, str]:
     return date_str, country
 
 
+def parse_metadata_file_wrapper(xml_path, fname):
+    try:
+        date_str, country = parse_metadata_file(xml_path)
+    except Exception as e:
+        print(f"Warning: skipping {fname!r}: {e}", file=sys.stderr)
+        return None, None
+    return date_str, country
+
+
 def aggregate_image_counts() -> List[Tuple[str, str, int]]:
     """
     Scan all .xml files in METADATA_DIR, count images per (date, country),
@@ -93,16 +103,22 @@ def aggregate_image_counts() -> List[Tuple[str, str, int]]:
     counts: dict[Tuple[str, str], int] = {}
 
     # 2) Process with a progress bar
-    for fname in tqdm(all_files, desc="Scanning metadata", unit="file"):
-        path = os.path.join(METADATA_DIR, fname)
-        try:
-            date_str, country = parse_metadata_file(path)
-        except Exception as e:
-            print(f"Warning: skipping {fname!r}: {e}", file=sys.stderr)
-            continue
 
-        key = (date_str, country)
-        counts[key] = counts.get(key, 0) + 1
+    # Parallel process all file names
+    with ThreadPoolExecutor() as executor:
+        try:
+            futures = [
+                executor.submit(parse_metadata_file_wrapper, os.path.join(METADATA_DIR, fname), fname)
+                for fname in all_files
+            ]
+            for future in tqdm(as_completed(futures), desc="Scanning metadata", unit="file", total=len(all_files)):
+                date_str, country = future.result()
+                if date_str is None or country is None:
+                    continue
+                key = (date_str, country)
+                counts[key] = counts.get(key, 0) + 1
+        except KeyboardInterrupt:
+            executor.shutdown(wait=False, cancel_futures=True)
 
     # 3) Build & sort result list
     results = [(d, c, cnt) for (d, c), cnt in counts.items()]
@@ -110,7 +126,7 @@ def aggregate_image_counts() -> List[Tuple[str, str, int]]:
     return results
 
 
-def save_to_csv(rows: List[Tuple[str, str, int]], csv_path: str) -> None:
+def save_to_csv(rows: List[Tuple[str, str, int]], csv_path: str | Path) -> None:
     """
     Write the list of (date, country, count) into a CSV file.
     Overwrites any existing file at csv_path.

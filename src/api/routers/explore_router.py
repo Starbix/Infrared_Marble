@@ -29,8 +29,6 @@ async def get_admin_areas(resolution: Resolution = "50m"):
 
 
 @router.get("/admin-areas/{id}")
-async def get_admin_area(
-    id: Annotated[str, Path()], resolution: Resolution = "50m"
-):
+async def get_admin_area(id: Annotated[str, Path()], resolution: Resolution = "50m"):
     admin_area = get_admin_area_by_id(id, resolution=resolution)
     return admin_area

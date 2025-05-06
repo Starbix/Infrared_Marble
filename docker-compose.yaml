@@ -23,6 +23,9 @@ services:
         - path: ./static
           action: sync
           target: /app/static
+        - path: ./blackmarblepy/src/blackmarble
+          action: sync+restart
+          target: /app/blackmarblepy/src/blackmarble
     depends_on:
       redis:
         condition: service_healthy

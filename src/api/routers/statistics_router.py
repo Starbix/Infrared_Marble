@@ -1,3 +1,4 @@
+import pandas as pd
 from fastapi import APIRouter, HTTPException
 
 from lib.loading import load_all_dates, load_country_meta
@@ -24,10 +25,11 @@ async def get_statistics():
     }
 
 
-@router.get("/dates/{admin_id}")
+@router.get("/heatmap/{admin_id}")
 async def get_region_dates(admin_id: str):
     """
-    Get a list of dates where the region has data.
+    Gets a heatmap of the region, where the available dates are binned into monthly intervals. Each row is a year of
+    data, and each column is a month of the year. The data ranges over all contained years in the available dates.
     """
     admin_meta = load_country_meta()
 
@@ -35,4 +37,30 @@ async def get_region_dates(admin_id: str):
     if admin_data.empty:
         raise HTTPException(status_code=404, detail="Admin area not found")
 
-    return {"admin_id": admin_id, "dates": sorted(admin_data["date"].unique())}
+    # Convert dates to datetime objects
+    admin_data["date"] = pd.to_datetime(admin_data["date"])
+    admin_data["year"] = admin_data["date"].dt.year
+    admin_data["month"] = admin_data["date"].dt.month
+
+    # Compute monthly counts
+    monthly_count = admin_data.groupby(["year", "month"]).size().reset_index(name="count")
+
+    # Create heatmap grid
+    years = list(range(admin_data["year"].min(), admin_data["year"].max() + 1))
+    months = range(1, 13)
+    index = pd.MultiIndex.from_product([years, months], names=["year", "month"])
+    heatmap = pd.DataFrame(index=index, columns=["count"]).fillna(0)
+    heatmap.update(monthly_count.set_index(["year", "month"]))
+
+    # Get heatmap as 2D array where first dimension is years and second dimension is months
+    heatmap = heatmap["count"].unstack().values.tolist()
+
+    return {
+        "stats": {
+            "min_year": years[0],
+            "max_year": years[1],
+            "unique_dates": admin_data["date"].nunique(),
+            "total_tiles": len(admin_data),
+        },
+        "heatmap": heatmap,
+    }

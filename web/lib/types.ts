@@ -5,3 +5,8 @@ export enum ChartType {
   Overlay = "overlay",
   Difference = "diff",
 }
+
+export type StatsSummaryResponse = {
+  general: { geojson_resolutions: number };
+  luojia: { total_images: number; total_admin_areas: number; total_dates: number };
+};

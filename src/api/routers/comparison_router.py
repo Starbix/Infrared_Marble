@@ -83,7 +83,15 @@ async def get_bm_geotiff_new(
         # Create GeoTIFF in memory
         logger.info("Converting to raster...")
         with io.BytesIO() as buf:
-            data_array.rio.to_raster(buf, driver="GTiff", compress="LZW")
+            data_array.rio.to_raster(
+                buf,
+                driver="GTiff",
+                compress="LZW",
+                tiled=True,
+                blockxsize=256,
+                blockysize=256,
+                windowed=True,
+            )
             buf.seek(0)
             geotiff_buf = buf.getvalue()
 

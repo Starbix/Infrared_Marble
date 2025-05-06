@@ -247,10 +247,10 @@ def resample_geotiff(input_buf: bytes, resolution: tuple[float, float] = (750.0,
             output_buf,
             driver="GTiff",
             compress="LZW",
-            # tiled=True,
-            # # Additional COG-specific parameters
-            # blockxsize=256,
-            # blockysize=256,
+            tiled=True,
+            blockxsize=256,
+            blockysize=256,
+            windowed=True,
         )
         output_buf.seek(0)
         resampled_bytes = output_buf.getvalue()

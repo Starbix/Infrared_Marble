@@ -29,12 +29,8 @@ def setup_bm_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
         default=DEFAULT_DATES_FILE,
         help="Input file with dates, one date per line, ISO format",
     )
-    bm_download_parser.add_argument(
-        "-d", "--dates", nargs="+", help="Manually list dates to download in ISO format"
-    )
-    bm_download_parser.add_argument(
-        "--force", action="store_true", help="Force re-downloading and processing of files"
-    )
+    bm_download_parser.add_argument("-d", "--dates", nargs="+", help="Manually list dates to download in ISO format")
+    bm_download_parser.add_argument("--force", action="store_true", help="Force re-downloading and processing of files")
 
     # Visualize
     bm_show_parser = subparsers_bm.add_parser(
@@ -55,9 +51,7 @@ def setup_bm_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
         "--file",
         help="Input file with dates, one date per line, ISO format",
     )
-    bm_show_parser.add_argument(
-        "--diff", action="store_true", help="Show difference in radiance between two dates"
-    )
+    bm_show_parser.add_argument("--diff", action="store_true", help="Show difference in radiance between two dates")
     bm_show_parser.add_argument(
         "--time-series",
         action="store_true",

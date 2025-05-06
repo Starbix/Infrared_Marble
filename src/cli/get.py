@@ -23,7 +23,6 @@ def setup_get_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
 
 
 def handle_get_commands(args: Namespace):
-
     res = args.resource
     if res == "dates":
         dates = list_dates(args.file)

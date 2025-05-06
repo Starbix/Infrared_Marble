@@ -55,9 +55,7 @@ def plot_difference(
     date2: datetime.date,
 ):
     data = raster["Gap_Filled_DNB_BRDF-Corrected_NTL"]
-    delta = (data.sel(time=date2.isoformat()) - data.sel(time=date1.isoformat())) / data.sel(
-        time=date1.isoformat()
-    )
+    delta = (data.sel(time=date2.isoformat()) - data.sel(time=date1.isoformat())) / data.sel(time=date1.isoformat())
 
     fig, ax = get_subplots(raster)
     delta.plot.pcolormesh(ax=ax, cmap="Spectral", robust=True)
@@ -74,9 +72,7 @@ def plot_difference(
         color="black",
         weight="normal",
     )
-    ax.set_title(
-        f"NTL Radiance Increase/Decrease ({date1.isoformat()}-{date2.isoformat()})", fontsize=16
-    )
+    ax.set_title(f"NTL Radiance Increase/Decrease ({date1.isoformat()}-{date2.isoformat()})", fontsize=16)
 
 
 def plot_series(raster: "xr.Dataset", dates: list[datetime.date] | None = None):

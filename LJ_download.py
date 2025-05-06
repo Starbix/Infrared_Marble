@@ -1,16 +1,18 @@
-import requests
-import re
 import os
-from tqdm import tqdm
+import re
 import time
-from tenacity import retry, wait_fixed, stop_after_attempt, retry_if_exception_type
+
+import requests
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
+from tqdm import tqdm
 
 # Define a retry decorator
 retry_decorator = retry(
     wait=wait_fixed(5),  # Wait 5 seconds between retries
     stop=stop_after_attempt(3),  # Stop after 3 attempts
-    retry=retry_if_exception_type((requests.RequestException,))  # Retry on request exceptions
+    retry=retry_if_exception_type((requests.RequestException,)),  # Retry on request exceptions
 )
+
 
 @retry_decorator
 def download_file(url, destination_folder):
@@ -20,7 +22,7 @@ def download_file(url, destination_folder):
     # Check if the request was successful
     if response.status_code == 200:
         # Extract the filename from the Content-Disposition header
-        content_disposition = response.headers.get('Content-Disposition')
+        content_disposition = response.headers.get("Content-Disposition")
         if content_disposition:
             filename_match = re.findall('filename="(.+)"', content_disposition)
             if filename_match:
@@ -39,17 +41,20 @@ def download_file(url, destination_folder):
             return
 
         # Get the total file size for the progress bar
-        total_size = int(response.headers.get('content-length', 0))
+        total_size = int(response.headers.get("content-length", 0))
 
         # Write the content to a temporary file with a progress bar
         temp_file_path = file_path + ".part"
-        with open(temp_file_path, 'wb') as file, tqdm(
-            desc=filename,
-            total=total_size,
-            unit='B',
-            unit_scale=True,
-            unit_divisor=1024,
-        ) as bar:
+        with (
+            open(temp_file_path, "wb") as file,
+            tqdm(
+                desc=filename,
+                total=total_size,
+                unit="B",
+                unit_scale=True,
+                unit_divisor=1024,
+            ) as bar,
+        ):
             for chunk in response.iter_content(chunk_size=8192):
                 file.write(chunk)
                 bar.update(len(chunk))
@@ -59,6 +64,7 @@ def download_file(url, destination_folder):
         print(f"Downloaded and saved: {file_path}")
     else:
         print(f"Failed to download file. Status code: {response.status_code}")
+
 
 # Example usage
 base_url = "http://59.175.109.173:8888/luojiadatas/"

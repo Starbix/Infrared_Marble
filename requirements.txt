@@ -16,3 +16,4 @@ scikit-learn
 seaborn
 tabulate
 zarr
+pycountry

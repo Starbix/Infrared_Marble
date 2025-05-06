@@ -140,29 +140,13 @@ const ModalContent: React.FC<ModalContentProps> = ({
               </Select>
               {/* Chart actions */}
               <Box sx={{ height: 1, display: "flex", gap: 0.5 }}>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() => reorderChart(idx, "prev")}
-                  sx={{ p: 0.5, minWidth: 0 }}
-                >
+                <Button size="small" onClick={() => reorderChart(idx, "prev")} sx={{ p: 0.5, minWidth: 0 }}>
                   <ChevronLeftIcon />
                 </Button>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() => reorderChart(idx, "next")}
-                  sx={{ p: 0.5, minWidth: 0 }}
-                >
+                <Button size="small" onClick={() => reorderChart(idx, "next")} sx={{ p: 0.5, minWidth: 0 }}>
                   <ChevronRightIcon />
                 </Button>
-                <Button
-                  color="error"
-                  size="small"
-                  variant="outlined"
-                  onClick={() => removeChart(idx)}
-                  sx={{ p: 0.5, minWidth: 0 }}
-                >
+                <Button color="error" size="small" onClick={() => removeChart(idx)} sx={{ p: 0.5, minWidth: 0 }}>
                   <CloseIcon />
                 </Button>
               </Box>

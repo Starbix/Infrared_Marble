@@ -1,11 +1,12 @@
+from datetime import date, datetime, time, timedelta
 from pathlib import Path
+
+import pandas as pd
+import requests
 
 from lib.download import get_dates
 from lib.utils import DEFAULT_DATES_FILE
-from datetime import datetime, time, timedelta, date
-import pandas as pd
 
-import requests
 
 def list_dates(file: str | Path | None = None):
     file = Path(file) if file else DEFAULT_DATES_FILE
@@ -17,8 +18,8 @@ def list_dates(file: str | Path | None = None):
 
     return dates
 
-def get_day_cloud_coverage(date_str: str, location: str = None):
 
+def get_day_cloud_coverage(date_str: str, location: str = None):
     API_KEY = "C6FNLY48VY2CHXVP2TD9534X4"
 
     luojia_time = datetime.combine(date.fromisoformat(date_str), time(22, 0)).isoformat()
@@ -41,23 +42,25 @@ def get_day_cloud_coverage(date_str: str, location: str = None):
 
     if luojia_cloud_coverage is None or bm_cloud_coverage is None:
         raise ValueError(f"Could not find cloud coverage data for given time")
-    
+
     return luojia_cloud_coverage, bm_cloud_coverage
+
 
 def add_cloud_coverage(file: str | Path, location: str = None):
     file = Path(file)
 
     if not file.exists():
         raise ValueError(f"File does not exist: {file}")
-    
-    df = pd.read_csv(file)  
-    
+
+    df = pd.read_csv(file)
+
     for i, row in df.iterrows():
-        luojia_cloud, bm_cloud = get_day_cloud_coverage(row['date'], location)
-        df.at[i, 'luojia_cloud'] = luojia_cloud
-        df.at[i, 'bm_cloud'] = bm_cloud
+        luojia_cloud, bm_cloud = get_day_cloud_coverage(row["date"], location)
+        df.at[i, "luojia_cloud"] = luojia_cloud
+        df.at[i, "bm_cloud"] = bm_cloud
 
     df.to_csv(file, index=False)
+
 
 def sort_by_cloud_coverage(file: str | Path, location: str = None):
     file = Path(file)
@@ -66,13 +69,12 @@ def sort_by_cloud_coverage(file: str | Path, location: str = None):
 
     if not file.exists():
         raise ValueError(f"File does not exist: {file}")
-    
-    df = pd.read_csv(file)  
-    dates = df['date'].tolist()
-    
+
+    df = pd.read_csv(file)
+    dates = df["date"].tolist()
+
     for date in dates:
         luojia_cloud, bm_cloud = get_day_cloud_coverage(date, location)
-        data.append((date,luojia_cloud,bm_cloud))
+        data.append((date, luojia_cloud, bm_cloud))
 
     return sorted(data, key=lambda tup: (tup[1] + tup[2]) / 2)
-

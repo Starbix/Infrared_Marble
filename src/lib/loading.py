@@ -31,6 +31,11 @@ def avail_dates(admin_id: str):
     return np.unique(dates)
 
 
+def get_all_regions_gdf():
+    with gzip.open(ADMIN_AREA_FILE_MAPPING["50m"]) as f:
+        return geopandas.read_file(f)
+
+
 def get_region_gdf(admin_id: str):
     with gzip.open(ADMIN_AREA_FILE_MAPPING["50m"]) as f:
         gdf = geopandas.read_file(f)

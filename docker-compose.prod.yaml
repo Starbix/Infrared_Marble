@@ -1,11 +1,12 @@
 services:
   api:
+    image: infrared_marble-api:prod
     platform: linux/amd64
     volumes:
       - ./data:/app/data
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     ports:
       - 8000:8000
     environment:
@@ -13,41 +14,23 @@ services:
       - PORT=8000
       - REDIS_URL=redis://redis:6379/0
       - BLACKMARBLE_TOKEN==== REDACTED $BLACKMARBLE_TOKEN ===
-    develop:
-      watch:
-        - path: ./requirements.txt
-          action: rebuild
-        - path: ./src
-          action: sync
-          target: /app/src
-        - path: ./static
-          action: sync
-          target: /app/static
-        - path: ./blackmarblepy/src/blackmarble
-          action: sync+restart
-          target: /app/blackmarblepy/src/blackmarble
     depends_on:
       redis:
         condition: service_healthy
+
   web:
+    image: infrared_marble-web:prod
     build:
       context: ./web
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000 # Needs to be set at build-time
     ports:
       - 3000:3000
     environment:
       - API_URL=http://api:8000
       - NEXT_PUBLIC_API_URL=http://localhost:8000
-    develop:
-      watch:
-        - path: ./web/package-lock.json
-          action: rebuild
-        - path: ./web
-          action: sync
-          target: /app
-          ignore:
-            - node_modules/
-            - web/node_modules/
+
   redis:
     image: redis:7-alpine
     ports:

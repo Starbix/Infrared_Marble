@@ -1,8 +1,8 @@
 import pandas as pd
 from fastapi import APIRouter, HTTPException
 
-from lib.loading import load_all_dates, load_country_meta
-from lib.utils import ADMIN_AREA_FILE_MAPPING
+from lib.loading import get_all_regions_gdf, load_all_dates, load_country_meta
+from lib.utils import ADMIN_AREA_FILE_MAPPING, GEOJSON_ADMIN_KEY
 
 router = APIRouter(prefix="/statistics", tags=["Explore"])
 
@@ -23,6 +23,14 @@ async def get_statistics():
             "total_dates": len(dates),
         },
     }
+
+
+@router.get("/regions")
+async def get_regions():
+    gdf = get_all_regions_gdf()
+    regions = gdf[[GEOJSON_ADMIN_KEY, "name"]].drop_duplicates().rename(columns={GEOJSON_ADMIN_KEY: "admin_id"})
+    regions = regions.sort_values(by="admin_id")
+    return regions.to_dict(orient="records")
 
 
 @router.get("/heatmap/{admin_id}")
@@ -47,7 +55,7 @@ async def get_region_dates(admin_id: str):
 
     # Create heatmap grid
     years = list(range(admin_data["year"].min(), admin_data["year"].max() + 1))
-    months = range(1, 13)
+    months = list(range(1, 13))
     index = pd.MultiIndex.from_product([years, months], names=["year", "month"])
     heatmap = pd.DataFrame(index=index, columns=["count"]).fillna(0)
     heatmap.update(monthly_count.set_index(["year", "month"]))
@@ -58,9 +66,11 @@ async def get_region_dates(admin_id: str):
     return {
         "stats": {
             "min_year": years[0],
-            "max_year": years[1],
+            "max_year": years[-1],
             "unique_dates": admin_data["date"].nunique(),
             "total_tiles": len(admin_data),
         },
+        "years": years,
+        "months": months,
         "heatmap": heatmap,
     }

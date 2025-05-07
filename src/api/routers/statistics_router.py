@@ -1,7 +1,9 @@
 import pandas as pd
+import pycountry
 from fastapi import APIRouter, HTTPException
 
-from lib.loading import get_all_regions_gdf, load_all_dates, load_country_meta
+from lib.loading import avail_dates, get_all_regions_gdf, load_all_dates, load_country_meta
+from lib.misc import get_day_cloud_coverage
 from lib.utils import ADMIN_AREA_FILE_MAPPING, GEOJSON_ADMIN_KEY
 
 router = APIRouter(prefix="/statistics", tags=["Explore"])
@@ -74,3 +76,18 @@ async def get_region_dates(admin_id: str):
         "months": months,
         "heatmap": heatmap,
     }
+
+
+@router.get("/clouds/{admin_id}")
+async def get_stats_admin_area(admin_id: str):
+    """
+    Get cloud coverage for an admin area.
+    """
+    country_name = pycountry.countries.get(alpha_3=admin_id.upper()).name
+    dates = list(avail_dates(admin_id))
+    dates_clouds = {}
+    for date in dates:
+        lj, bm = get_day_cloud_coverage(date, country_name)
+        dates_clouds[date] = {"lj_cloud_coverage": lj, "bm_cloud_coverage": bm}
+
+    return dates_clouds

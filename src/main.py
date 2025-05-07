@@ -9,14 +9,10 @@ from cli.luojia import handle_lj_commands, setup_lj_parser
 def main():
     # Root parent parser
     root_parent = ArgumentParser()
-    root_parent.add_argument(
-        "-v", "--verbose", action="store_true", help="Print debugging information"
-    )
+    root_parent.add_argument("-v", "--verbose", action="store_true", help="Print debugging information")
 
     # Main argument parser
-    parser = ArgumentParser(
-        description="NTL Tool", prog="ntl-tool", formatter_class=ArgumentDefaultsHelpFormatter
-    )
+    parser = ArgumentParser(description="NTL Tool", prog="ntl-tool", formatter_class=ArgumentDefaultsHelpFormatter)
     subparsers = parser.add_subparsers(title="Commands", dest="command", help="Subcommand to run")
 
     # Blackmarble parser

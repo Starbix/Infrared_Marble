@@ -37,5 +37,7 @@ ENV HOST=0.0.0.0
 ENV PORT=8000
 ENV DISABLE_NEST_ASYNCIO=True
 
+EXPOSE 8000
+
 # Note: Environment variables don't get expanded in CMD, so just repeat them
 CMD ["fastapi", "dev", "api/main.py", "--host", "0.0.0.0", "--port", "8000", "--reload"]

@@ -128,7 +128,7 @@ const GeoTiffLayer: React.FC<GeoTiffLayerProps> = ({
   useEffect(() => {
     if (error) onError?.(error);
     if (isLoading) onLoadStart?.();
-    else if (!error) onReady?.();
+    if (!isLoading && !error) onReady?.();
   }, [isLoading, error, onLoadStart, onReady, onError]);
 
   // Handle mounting raster layer

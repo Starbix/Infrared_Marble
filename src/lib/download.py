@@ -4,10 +4,9 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pandas as pd
 import geopandas
+import pandas as pd
 import requests
-import tarfile
 import xarray as xr
 from blackmarble.raster import bm_raster
 from httpx import HTTPError
@@ -50,10 +49,10 @@ def get_dates(file: str | Path) -> list[datetime.date]:
 
     if not file.exists():
         raise ValueError(f"File does not exist: {file}")
-    
-    df = pd.read_csv(file)  
-    date_list = [datetime.date.fromisoformat(d) for d in df['date'].dropna()]
-    
+
+    df = pd.read_csv(file)
+    date_list = [datetime.date.fromisoformat(d) for d in df["date"].dropna()]
+
     return sorted(date_list)
 
 
@@ -80,9 +79,7 @@ def bm_dataset_preprocess(
     force: bool = False,
 ) -> xr.Dataset:
     # Check if already preprocessed
-    zarr_path = (
-        Path(dest) if dest else (BM_DATA_DIR / "preprocessed" / f"{BM_PRODUCT}-{BM_VARIABLE}.zarr")
-    )
+    zarr_path = Path(dest) if dest else (BM_DATA_DIR / "preprocessed" / f"{BM_PRODUCT}-{BM_VARIABLE}.zarr")
     zarr_path.parent.mkdir(parents=True, exist_ok=True)
     if not force and zarr_path.exists():
         print("Dataset already preprocessed, skipping...")
@@ -112,6 +109,7 @@ def bm_dataset_preprocess(
 
 LJ_METADATA_URL = "https://polybox.ethz.ch/index.php/s/dnP82nHZkjR4gr7/download/file?path=%2Fmetadata%2FMETA.tar.gz"
 
+
 def luojia_metadata(metadata_url: str):
     # download it, if it doesn't exist
     # unpack it
@@ -133,7 +131,10 @@ def luojia_metadata(metadata_url: str):
         tar.extractall(path=metadata_path)
         print("Metadata successfully extracted")
 
+
 TILE_URL = "https://polybox.ethz.ch/index.php/s/dnP82nHZkjR4gr7/download/file?path=%2F"
+
+
 def luojia_tile_download(tile_name: str):
     tile_url = TILE_URL + tile_name + ".tar.gz"
     # download it, if it doesn't exist
@@ -162,7 +163,6 @@ def luojia_tile_download(tile_name: str):
 
 
 if __name__ == "__main__":
-
     luojia_metadata(LJ_METADATA_URL)
     tile_name = "LuoJia1-01_LR201806057936_20180603055109_HDR_0029"
-    luojia_tile_download(tile_name)
+    # luojia_tile_download(tile_name)

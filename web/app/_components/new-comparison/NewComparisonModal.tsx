@@ -49,7 +49,7 @@ const Content = forwardRef(function Content({ availableDates, adminId, adminMeta
   };
 
   return (
-    <Panel ref={ref} sx={{ p: 4, pt: 2, maxWidth: 460, overflow: "hidden" }} transition={{ duration: 0.6 }} layout>
+    <Panel ref={ref} sx={{ p: 4, pt: 2, maxWidth: 460, overflow: "scroll", maxHeight: "100vh" }} transition={{ duration: 0.6 }} layout>
       {/* Header */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Typography variant="h3" fontWeight="bold" fontSize="14pt">

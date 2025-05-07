@@ -1,11 +1,12 @@
 services:
   api:
+    image: infrared_marble-api:prod
     platform: linux/amd64
     volumes:
       - ./data:/app/data
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     ports:
       - 8000:8000
     environment:
@@ -13,41 +14,23 @@ services:
       - PORT=8000
       - REDIS_URL=redis://redis:6379/0
       - BLACKMARBLE_TOKEN=eyJ0eXAiOiJKV1QiLCJvcmlnaW4iOiJFYXJ0aGRhdGEgTG9naW4iLCJzaWciOiJlZGxqd3RwdWJrZXlfb3BzIiwiYWxnIjoiUlMyNTYifQ.eyJ0eXBlIjoiVXNlciIsInVpZCI6ImFpNGdvb2RfYmxhY2ttYXJibGUiLCJleHAiOjE3NDc3NjgwNDYsImlhdCI6MTc0MjU4NDA0NiwiaXNzIjoiaHR0cHM6Ly91cnMuZWFydGhkYXRhLm5hc2EuZ292IiwiaWRlbnRpdHlfcHJvdmlkZXIiOiJlZGxfb3BzIiwiYWNyIjoiZWRsIiwiYXNzdXJhbmNlX2xldmVsIjozfQ.Q4RAn4miryrNFeV3L0CyAngj24WI-mertHQUuvgmRyrTgKJuZIAYmvbuqTWjwSPCsEP01E3GCLnl0cBBom5FenwM_PuupdO3Uq-gZdT5GukEgmvVANX8iCfHvyhf_I7t5yWA20ZvQzB4hqmaxSqIYDrWNBXyET1-Cte1I1LV9CuoLaqvcRmNpp-RYj42zk-ugaqmOewG8BPA2fwRMO3-PisJ9jZGu7vKHpixoPJ91EKqIxJAb9kIrMyOquDZdE_Fu-r8Mj4wBzf0KndhRuVw_AEWQ3a7IxgFqy1LD_v-SZejaKTG8XpcGlwZgM6GkV_ArzJKqnfRh_QEvU_r7Ie7NA
-    develop:
-      watch:
-        - path: ./requirements.txt
-          action: rebuild
-        - path: ./src
-          action: sync
-          target: /app/src
-        - path: ./static
-          action: sync
-          target: /app/static
-        - path: ./blackmarblepy/src/blackmarble
-          action: sync+restart
-          target: /app/blackmarblepy/src/blackmarble
     depends_on:
       redis:
         condition: service_healthy
+
   web:
+    image: infrared_marble-web:prod
     build:
       context: ./web
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000 # Needs to be set at build-time
     ports:
       - 3000:3000
     environment:
       - API_URL=http://api:8000
       - NEXT_PUBLIC_API_URL=http://localhost:8000
-    develop:
-      watch:
-        - path: ./web/package-lock.json
-          action: rebuild
-        - path: ./web
-          action: sync
-          target: /app
-          ignore:
-            - node_modules/
-            - web/node_modules/
+
   redis:
     image: redis:7-alpine
     ports:

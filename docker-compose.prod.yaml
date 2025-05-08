@@ -3,7 +3,7 @@ services:
     image: infrared_marble-api:prod
     platform: linux/amd64
     volumes:
-      - ./data:/app/data
+      - ${DATA_DIR:-./data}:/app/data
     build:
       context: .
       dockerfile: Dockerfile.prod

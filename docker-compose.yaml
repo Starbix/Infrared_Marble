@@ -2,7 +2,7 @@ services:
   api:
     platform: linux/amd64
     volumes:
-      - ./data:/app/data
+      - ${DATA_DIR:-./data}:/app/data
     build:
       context: .
       dockerfile: Dockerfile

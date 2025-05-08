@@ -1,12 +1,14 @@
 "use client";
 
-import useExploreQuery from "@/hooks/explore-query";
-import { client } from "@/lib/api/client";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { Box, Card, CardContent, CardHeader, IconButton, Modal, Skeleton, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import L from "leaflet";
 import useSWR from "swr";
+
+import useExploreQuery from "@/hooks/explore-query";
+import { client } from "@/lib/api/client";
+
 import ModalContent from "./ModalContent";
 
 export type ComparisonModalProps = {};

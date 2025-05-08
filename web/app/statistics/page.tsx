@@ -1,10 +1,12 @@
-import { Container, Divider, MenuItem, Paper, Select, Stack, Typography } from "@mui/material";
-import Summary from "./_components/Summary";
-import api from "@/lib/api/server";
-import { StatsRegionsResponse, StatsSummaryResponse } from "@/lib/types";
+import { Container, Divider, Paper, Stack, Typography } from "@mui/material";
 import numeral from "numeral";
+
+import api from "@/lib/api/server";
 import { querySchema } from "@/lib/schemas/statistics";
+import { StatsRegionsResponse, StatsSummaryResponse } from "@/lib/types";
+
 import DateHeatmap from "./_components/DateHeatmap";
+import Summary from "./_components/Summary";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] }> }) {
   const [summaryStats, regions, query] = await Promise.all([
@@ -15,6 +17,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ [
 
   const generalStats = summaryStats.general;
   const luojiaStats = summaryStats.luojia;
+  const test = "hello there";
+  console.log("You bitch");
 
   const generalStatsArray = [{ label: "GeoJSON Resolutions", value: generalStats.geojson_resolutions }];
   const luojiaStatsArray = [

@@ -1,13 +1,16 @@
-import theme from "@/lib/theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import clsx from "clsx";
 import type { Metadata } from "next";
 import { StrictMode } from "react";
+
+import { inter, jetbrainsMono } from "@/lib/fonts";
+import theme from "@/lib/theme";
+
 import ClientProviders from "./_components/ClientProviders";
 import NavBar from "./_components/navigation/NavBar";
+
 import "./global.scss";
-import { inter, jetbrainsMono } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: "Infrared Marble",

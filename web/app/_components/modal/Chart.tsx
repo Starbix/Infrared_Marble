@@ -1,14 +1,15 @@
 "use client";
 
-import GeoTiffLayer from "@/components/map/layers/GeoTiffLayer";
-import MapLoader from "@/components/map/MapLoader";
-import SyncMaps from "@/components/map/SyncMaps";
-import { ChartType } from "@/lib/types";
 import ErrorIcon from "@mui/icons-material/Error";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { LatLngExpression } from "leaflet";
 import { useRef, useState } from "react";
 import { KeyedMutator } from "swr";
+
+import GeoTiffLayer from "@/components/map/layers/GeoTiffLayer";
+import MapLoader from "@/components/map/MapLoader";
+import SyncMaps from "@/components/map/SyncMaps";
+import { ChartType } from "@/lib/types";
 
 const supportedChartTypes = new Set([ChartType.BlackMarble, ChartType.LuoJia]);
 const chartTitles: { [_ in ChartType]: string } = {

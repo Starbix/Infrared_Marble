@@ -1,10 +1,12 @@
 "use client";
 
-import Panel from "@/components/Panel";
 import { Box, BoxProps, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
+
+import Panel from "@/components/Panel";
+
 import { DatePickerWithAvailability } from "../../components/DatePickerWithAvailability";
 
 export type ToolbarProps = {

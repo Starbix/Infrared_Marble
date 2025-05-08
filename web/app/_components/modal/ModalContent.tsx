@@ -1,7 +1,5 @@
 "use client";
 
-import { getBestZoomLevel } from "@/lib/geo";
-import { ChartType } from "@/lib/types";
 import {
   Add as AddIcon,
   ChevronLeft as ChevronLeftIcon,
@@ -11,6 +9,10 @@ import {
 import { Box, Button, MenuItem, Select, Typography } from "@mui/material";
 import { LatLngExpression } from "leaflet";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+import { getBestZoomLevel } from "@/lib/geo";
+import { ChartType } from "@/lib/types";
+
 import Chart from "./Chart";
 
 const LS_KEY = "chart-config";

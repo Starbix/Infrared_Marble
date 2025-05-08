@@ -1,8 +1,10 @@
+import { Box } from "@mui/material";
+import { Suspense } from "react";
+
 import MapLoader from "@/components/map/MapLoader";
 import api from "@/lib/api/server";
 import { querySchema } from "@/lib/schemas/explore";
-import { Box } from "@mui/material";
-import { Suspense } from "react";
+
 import MapContentLoader from "./_components/MapContentLoader";
 import ComparisonModalLoader from "./_components/modal/ComparisonModalLoader";
 import NewComparisonModal from "./_components/new-comparison/NewComparisonModal";

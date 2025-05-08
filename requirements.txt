@@ -6,3 +6,4 @@ numpy
 pandas
 pycountry
 requests
+setuptools

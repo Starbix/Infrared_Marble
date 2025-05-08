@@ -26,9 +26,7 @@ services:
         - path: ./blackmarblepy/src/blackmarble
           action: sync+restart
           target: /app/blackmarblepy/src/blackmarble
-    depends_on:
-      redis:
-        condition: service_healthy
+
   web:
     build:
       context: ./web

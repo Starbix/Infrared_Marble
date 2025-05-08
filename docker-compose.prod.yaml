@@ -30,18 +30,3 @@ services:
     environment:
       - API_URL=http://api:8000
       - NEXT_PUBLIC_API_URL=http://localhost:8000
-
-  redis:
-    image: redis:7-alpine
-    ports:
-      - 6379:6379
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 1s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  redis_data:

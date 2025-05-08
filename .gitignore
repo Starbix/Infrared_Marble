@@ -180,5 +180,8 @@ cython_debug/
 .fleet/
 .idea/
 
+# Data directory
+data/
+
 # Scratch
 scratch/

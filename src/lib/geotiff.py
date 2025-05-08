@@ -6,6 +6,7 @@ import geopandas
 import numpy as np
 import rioxarray
 import xarray as xr
+from geopandas import GeoDataFrame
 from osgeo import gdal, ogr
 from rasterio.io import MemoryFile
 from rasterio.warp import Resampling
@@ -16,7 +17,6 @@ from lib.download import LJ_METADATA_URL, luojia_metadata
 
 DEBUG = False
 NODATA_VALUE = "nan"
-from geopandas import GeoDataFrame
 
 
 def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.date]) -> list:

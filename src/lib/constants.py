@@ -30,7 +30,7 @@ BM_DEFAULT_VARIABLE: dict[Product, str] = {
 
 # LuoJia constants
 LJ_DATA_DIR = DATA_DIR / "luojia"
-DEFAULT_LJ_IDS_FILE = STATIC_DIR / "luojia_image_ids.csv"
+LJ_DEFAULT_IDS_FILE = STATIC_DIR / "luojia_image_ids.csv"
 
 # GeoJSON, dates, etc
 DEFAULT_DATES_FILE = STATIC_DIR / "dates_luojia_myanmar.csv"

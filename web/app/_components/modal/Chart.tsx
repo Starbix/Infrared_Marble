@@ -16,8 +16,6 @@ const chartTitles: { [_ in ChartType]: string } = {
   [ChartType.BaseMap]: "Base map",
   [ChartType.BlackMarble]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
   [ChartType.LuoJia]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
-  [ChartType.BlackMarble]: "Light intensity [nW·cm⁻²·sr⁻¹]",
-  [ChartType.LuoJia]: "Light intensity [W·m⁻²·sr⁻¹·µm⁻¹]",
   [ChartType.Overlay]: "<not yet supported>",
   [ChartType.Difference]: "<not yet supported>",
 };

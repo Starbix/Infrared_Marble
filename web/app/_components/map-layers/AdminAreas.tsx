@@ -9,7 +9,7 @@ import useExploreQuery from "@/hooks/explore-query";
 import { client } from "@/lib/api/client";
 import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
 
-import "./admin-areas.scss";
+import "./admin-areas.css";
 
 export type AdminAreasProps = {
   dataUrl: string;

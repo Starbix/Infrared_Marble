@@ -10,7 +10,7 @@ import theme from "@/lib/theme";
 import ClientProviders from "./_components/ClientProviders";
 import NavBar from "./_components/navigation/NavBar";
 
-import "./global.scss";
+import "./global.css";
 
 export const metadata: Metadata = {
   title: "Infrared Marble",

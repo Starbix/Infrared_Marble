@@ -14,9 +14,6 @@ services:
       - PORT=8000
       - REDIS_URL=redis://redis:6379/0
       - BLACKMARBLE_TOKEN==== REDACTED $BLACKMARBLE_TOKEN ===
-    depends_on:
-      redis:
-        condition: service_healthy
 
   web:
     image: infrared_marble-web:prod

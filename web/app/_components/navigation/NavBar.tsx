@@ -1,10 +1,11 @@
 "use client";
 
-import AnimatedTabs, { TabProps } from "@/components/AnimatedTabs";
-import Panel from "@/components/Panel";
 import { Box, Divider } from "@mui/material";
 import { usePathname } from "next/navigation";
 import { Children, useEffect, useState } from "react";
+
+import AnimatedTabs, { TabProps } from "@/components/AnimatedTabs";
+import Panel from "@/components/Panel";
 
 export type NavBarProps = {
   children?: React.ReactNode;

@@ -1,13 +1,15 @@
 "use client";
 
-import CalendarWithAvailability from "@/components/CalendarWithAvailability";
-import Panel from "@/components/Panel";
-import useExploreQuery from "@/hooks/explore-query";
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Button, Divider, IconButton, MenuItem, NoSsr, TextField, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { AnimatePresence, motion } from "motion/react";
 import { forwardRef } from "react";
+
+import CalendarWithAvailability from "@/components/CalendarWithAvailability";
+import Panel from "@/components/Panel";
+import useExploreQuery from "@/hooks/explore-query";
+
 import CountryDetails from "./CountryDetails";
 
 export type NewComparisonModalProps = {
@@ -49,7 +51,12 @@ const Content = forwardRef(function Content({ availableDates, adminId, adminMeta
   };
 
   return (
-    <Panel ref={ref} sx={{ p: 4, pt: 2, maxWidth: 460, overflow: "scroll", maxHeight: "100vh" }} transition={{ duration: 0.6 }} layout>
+    <Panel
+      ref={ref}
+      sx={{ p: 4, pt: 2, maxWidth: 460, overflow: "scroll", maxHeight: "100vh" }}
+      transition={{ duration: 0.6 }}
+      layout
+    >
       {/* Header */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Typography variant="h3" fontWeight="bold" fontSize="14pt">

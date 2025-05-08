@@ -1,12 +1,13 @@
 "use client";
 
-import SSRPlot from "@/components/Plotly";
-import { client } from "@/lib/api/client";
-import { StatsHeatmapResponse, StatsRegionsResponse } from "@/lib/types";
 import { Autocomplete, Box, FormControl, FormLabel, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { CSSProperties, useState } from "react";
 import useSWR from "swr";
+
+import SSRPlot from "@/components/Plotly";
+import { client } from "@/lib/api/client";
+import { StatsHeatmapResponse, StatsRegionsResponse } from "@/lib/types";
 
 export type DateHeatmapProps = {
   regions: StatsRegionsResponse;

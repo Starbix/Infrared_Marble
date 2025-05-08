@@ -1,11 +1,12 @@
 "use client";
 
-import { DatePickerWithAvailability } from "@/components/DatePickerWithAvailability";
 import { Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/router";
 import { useState } from "react";
+
+import { DatePickerWithAvailability } from "@/components/DatePickerWithAvailability";
 
 export type DateSelectProps = {
   availableDates: string[];

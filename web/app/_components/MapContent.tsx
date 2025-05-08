@@ -1,6 +1,7 @@
 "use client";
 
 import useExploreQuery from "@/hooks/explore-query";
+
 import AdminAreas from "./map-layers/AdminAreas";
 
 export type MapContentProps = {};

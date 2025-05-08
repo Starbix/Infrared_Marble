@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+
 import { ComparisonModalProps } from "./ComparisonModal";
 
 const ComparisonModal = dynamic(() => import("./ComparisonModal"), { ssr: false });

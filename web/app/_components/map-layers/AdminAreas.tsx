@@ -1,13 +1,14 @@
 "use client";
 
-import { client } from "@/lib/api/client";
-import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
+import { FeatureGroup, LeafletMouseEvent } from "leaflet";
+import { useCallback, useEffect, useRef } from "react";
 import { GeoJSON } from "react-leaflet";
 import useSWR from "swr";
 
 import useExploreQuery from "@/hooks/explore-query";
-import { FeatureGroup, LeafletMouseEvent } from "leaflet";
-import { useCallback, useEffect, useRef } from "react";
+import { client } from "@/lib/api/client";
+import { GEOJSON_ADMIN_KEY } from "@/lib/constants";
+
 import "./admin-areas.scss";
 
 export type AdminAreasProps = {

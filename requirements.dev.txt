@@ -1,0 +1,8 @@
+bokeh
+dask
+folium
+mapclassify
+matplotlib
+tabulate
+tenacity
+zarr

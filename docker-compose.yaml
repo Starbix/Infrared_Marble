@@ -48,17 +48,3 @@ services:
           ignore:
             - node_modules/
             - web/node_modules/
-  redis:
-    image: redis:7-alpine
-    ports:
-      - 6379:6379
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 1s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  redis_data:

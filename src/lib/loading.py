@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import xarray
 
-from lib.utils import (
+from lib.constants import (
     ADMIN_AREA_FILE_MAPPING,
     BM_DATA_DIR,
     BM_PRODUCT,

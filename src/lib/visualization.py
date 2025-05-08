@@ -4,9 +4,8 @@ from typing import TYPE_CHECKING
 import colorcet as cc
 import contextily as cx
 import matplotlib.pyplot as plt
-from matplotlib import pyplot as plt
 
-from lib.utils import BM_PRODUCT, BM_VARIABLE, get_default_variable_for_product
+from lib.constants import BM_DEFAULT_VARIABLE, BM_PRODUCT, BM_VARIABLE
 
 if TYPE_CHECKING:
     import xarray as xr
@@ -23,7 +22,7 @@ def get_subplots(raster: "xr.Dataset", figwidth: float = 8.0):
 def plot_daily_radiance(gdf: "GeoDataFrame", raster: "xr.Dataset", date: datetime.date):
     fig, ax = get_subplots(raster)
 
-    variable = BM_VARIABLE or get_default_variable_for_product(BM_PRODUCT)
+    variable = BM_VARIABLE or BM_DEFAULT_VARIABLE[BM_PRODUCT]
     raster[variable].sel(time=date.isoformat()).plot.pcolormesh(
         ax=ax,
         cmap=cc.cm.bmy,

@@ -1,0 +1,53 @@
+import os
+import sys
+from pathlib import Path
+
+from blackmarble.types import Product
+
+from lib.types import Resolution
+
+# Note: This code runs whenever the module is first imported.
+# This is to make sure that the DATA_DIR and BEARER_TOKEN variables are appropriately set.
+
+# Project/general constants
+PROJECT_ROOT = Path(__file__).parents[2]
+STATIC_DIR = PROJECT_ROOT / "static"
+DATA_DIR = Path(os.getenv("DATA_DIR", PROJECT_ROOT / "data"))
+
+# Blackmarble constants
+# Get Bearer token from environment
+BEARER_TOKEN = os.getenv("BLACKMARBLE_TOKEN")
+BM_DATA_DIR = DATA_DIR / "blackmarble"
+BM_PRODUCT = Product(os.environ.get("BM_PRODUCT", Product.VNP46A2))
+BM_VARIABLE: str | None = os.environ.get("BM_VARIABLE")  # Default varible for product
+BM_QUALITY_FLAG = [int(x) for x in os.environ.get("BM_QUALITY_FLAG", "255").split(",")]
+BM_DEFAULT_VARIABLE: dict[Product, str] = {
+    Product.VNP46A1: "DNB_At_Sensor_Radiance_500m",
+    Product.VNP46A2: "Gap_Filled_DNB_BRDF-Corrected_NTL",
+    Product.VNP46A3: "NearNadir_Composite_Snow_Free",
+    Product.VNP46A4: "NearNadir_Composite_Snow_Free",
+}
+
+# LuoJia constants
+LJ_DATA_DIR = DATA_DIR / "luojia"
+DEFAULT_LJ_IDS_FILE = STATIC_DIR / "luojia_image_ids.csv"
+
+# GeoJSON, dates, etc
+DEFAULT_DATES_FILE = STATIC_DIR / "dates_luojia_myanmar.csv"
+DEFAULT_GDF_URL = "https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_MMR_1.json.zip"
+ADMIN_AREA_FILE_MAPPING: dict[Resolution, Path] = {
+    "10m": STATIC_DIR / "admin-areas_10m.json.gz",
+    "50m": STATIC_DIR / "admin-areas_50m.json.gz",
+    "110m": STATIC_DIR / "admin-areas_110m.json.gz",
+}
+GEOJSON_ADMIN_KEY = "adm0_a3"
+
+# Checks
+# Ensure data dirs exists
+for _d in [DATA_DIR, BM_DATA_DIR, LJ_DATA_DIR]:
+    _d.mkdir(parents=True, exist_ok=True)
+
+# Ensure bearer token is set
+if not BEARER_TOKEN or len(BEARER_TOKEN) == 0:
+    print("Bearer token not set. Please set the BLACKMARBLE_TOKEN environment variable", file=sys.stderr)
+    sys.exit(1)

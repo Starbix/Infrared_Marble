@@ -6,9 +6,9 @@ from pathlib import Path
 import numpy as np
 from tabulate import tabulate
 
+from lib.constants import DEFAULT_DATES_FILE, DEFAULT_GDF_URL
 from lib.loading import get_bm
 from lib.misc import list_dates
-from lib.utils import DEFAULT_DATES_FILE, DEFAULT_GDF_URL
 
 
 def setup_get_parser(parser: ArgumentParser, parents: list[ArgumentParser]):

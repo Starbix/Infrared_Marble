@@ -11,7 +11,7 @@ from rasterio import CRS
 from shapely.geometry import Polygon
 from tqdm import tqdm
 
-from lib.utils import ADMIN_AREA_FILE_MAPPING, DATA_DIR, STATIC_DIR
+from lib.constants import ADMIN_AREA_FILE_MAPPING, DATA_DIR, STATIC_DIR
 
 logging.basicConfig(level=logging.DEBUG)
 

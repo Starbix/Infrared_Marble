@@ -53,9 +53,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.pyright]
 include = ["src"]
-executionEnvironments = [
-  { root = "src" }
-]
+executionEnvironments = [{ root = "src" }]
 reportExplicitAny = false
 reportAny = false
 reportUnusedCallResult = false
@@ -63,6 +61,7 @@ reportUnknownArgumentType = false
 reportUnknownMemberType = false
 reportUnknownVariableType = false
 reportUnknownParameterType = false
+reportMissingTypeStubs = false
 
 [tool.ruff]
 line-length = 120

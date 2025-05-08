@@ -1,12 +1,11 @@
 import gzip
 import json
-from typing import Any, Literal
+from typing import Any
 
 from fastapi.exceptions import HTTPException
 
-from lib.utils import ADMIN_AREA_FILE_MAPPING, GEOJSON_ADMIN_KEY
-
-Resolution = Literal["110m", "50m", "10m"]
+from lib.constants import ADMIN_AREA_FILE_MAPPING, GEOJSON_ADMIN_KEY
+from lib.types import Resolution
 
 
 def get_admin_area_by_id(id: str, resolution: Resolution = "50m") -> dict[str, Any]:

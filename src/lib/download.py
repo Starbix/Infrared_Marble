@@ -11,8 +11,7 @@ import xarray as xr
 from blackmarble.raster import bm_raster
 from httpx import HTTPError
 
-from lib.loading import get_bm
-from lib.utils import (
+from lib.constants import (
     BEARER_TOKEN,
     BM_DATA_DIR,
     BM_PRODUCT,
@@ -20,6 +19,7 @@ from lib.utils import (
     BM_VARIABLE,
     DATA_DIR,
 )
+from lib.loading import get_bm
 
 if TYPE_CHECKING:
     from geopandas import GeoDataFrame

@@ -28,7 +28,7 @@ import pycountry
 import reverse_geocoder as rg
 from tqdm import tqdm  # Progress bar
 
-from lib.utils import LJ_DATA_DIR, STATIC_DIR
+from lib.constants import LJ_DATA_DIR, STATIC_DIR
 
 # === Paths (change only if your layout differs) ===
 METADATA_DIR = LJ_DATA_DIR / "metadata"

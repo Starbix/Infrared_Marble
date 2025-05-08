@@ -11,8 +11,8 @@ from rasterio.io import MemoryFile
 from rasterio.warp import Resampling
 from shapely.geometry import Polygon
 
+from lib.constants import DATA_DIR, LJ_DATA_DIR
 from lib.download import LJ_METADATA_URL, luojia_metadata
-from lib.utils import DATA_DIR, LJ_DATA_DIR
 
 DEBUG = False
 NODATA_VALUE = "nan"

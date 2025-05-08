@@ -4,8 +4,8 @@ from pathlib import Path
 import pandas as pd
 import requests
 
+from lib.constants import DEFAULT_DATES_FILE
 from lib.download import get_dates
-from lib.utils import DEFAULT_DATES_FILE
 
 
 def list_dates(file: str | Path | None = None):
@@ -41,7 +41,7 @@ def get_day_cloud_coverage(date_str: str, location: str = None):
     bm_cloud_coverage = bm_data["currentConditions"]["cloudcover"]
 
     if luojia_cloud_coverage is None or bm_cloud_coverage is None:
-        raise ValueError(f"Could not find cloud coverage data for given time")
+        raise ValueError("Could not find cloud coverage data for given time")
 
     return luojia_cloud_coverage, bm_cloud_coverage
 

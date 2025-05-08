@@ -10,10 +10,10 @@ from fastapi import Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.routing import APIRouter
 
+from lib.constants import BM_DATA_DIR, LJ_DATA_DIR
 from lib.download import bm_download, luojia_tile_download
 from lib.geotiff import get_geotiffs, merge_geotiffs, resample_geotiff
 from lib.loading import get_region_gdf, load_country_meta
-from lib.utils import BM_DATA_DIR, LJ_DATA_DIR
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

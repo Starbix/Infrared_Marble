@@ -6,7 +6,7 @@ from lib.constants import ADMIN_AREA_FILE_MAPPING, GEOJSON_ADMIN_KEY
 from lib.loading import avail_dates, get_all_regions_gdf, load_all_dates, load_country_meta
 from lib.misc import get_day_cloud_coverage
 
-router = APIRouter(prefix="/statistics", tags=["Explore"])
+router = APIRouter(prefix="/statistics", tags=["Statistics"])
 
 
 @router.get("/summary")

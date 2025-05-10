@@ -7,8 +7,9 @@ frontend.
 
 ## 1. LuoJia Unit Conversion
 
-> TODO: Oliver, write about differences in representation between Blackmarble and LuoJia, and what needs to be done to
-> convert btween them
+The product VNP46A2 from the blackmarble dataset comes in units nW·cm⁻²·sr⁻¹ while the Luojia data is displayed as W·m⁻²·sr⁻¹·μm⁻¹. So to do a meaningful comparison we had to integrate the Luojia data over the wavelength spectrum of the NASA satellites. Details can be found in the draft report.
+
+For the difference function we decided to use the product VNP46A1 from blackmarble, since it already comes in the same units as Luojia. Also it is not post-processed, which we assume for Luojia data as well (will be detailed in final report).
 
 ## 2. Modifications to the `blackmarbelpy` Package
 

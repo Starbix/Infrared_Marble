@@ -1,3 +1,9 @@
+---
+title: Milestone 3 (Pre-final Submission)
+authors: Oliver Calvet, Yiyang He, Alexandre Iskandar, Cédric Laubacher, Federico Mantovani
+tags: ETH, AI4Good, NTL, Project, Milestone 3
+---
+
 # Milestone 3 (Pre-final Submission) -- Progress Report
 
 This milestone's work was focused on getting the necessary framework for analyzing and comparing night-time light

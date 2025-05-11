@@ -5,7 +5,7 @@ import colorcet as cc
 import contextily as cx
 import matplotlib.pyplot as plt
 
-from lib.constants import BM_DEFAULT_VARIABLE, BM_PRODUCT, BM_VARIABLE
+from lib.config import BM_DEFAULT_VARIABLE, BM_PRODUCT, BM_VARIABLE
 
 if TYPE_CHECKING:
     import xarray as xr
@@ -58,7 +58,7 @@ def plot_difference(
 
     fig, ax = get_subplots(raster)
     delta.plot.pcolormesh(ax=ax, cmap="Spectral", robust=True)
-    cx.add_basemap(ax, crs=gdf.crs.to_string(), source=cx.providers.CartoDB.DarkMatter)  # type: ignore
+    cx.add_basemap(ax, crs=gdf.crs.to_string(), source=cx.providers.CartoDB.DarkMatter)  # pyright: ignore[reportOptionalMemberAccess,reportAttributeAccessIssue]
 
     ax.text(
         0,

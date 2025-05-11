@@ -4,22 +4,8 @@ from pathlib import Path
 import pandas as pd
 import requests
 
-from lib.constants import DEFAULT_DATES_FILE
-from lib.download import get_dates
 
-
-def list_dates(file: str | Path | None = None):
-    file = Path(file) if file else DEFAULT_DATES_FILE
-
-    if not file.exists():
-        raise ValueError(f"File does not exist: {file}")
-
-    dates = get_dates(file)
-
-    return dates
-
-
-def get_day_cloud_coverage(date_str: str, location: str = None):
+def get_day_cloud_coverage(date_str: str, location: str | None = None):
     API_KEY = "C6FNLY48VY2CHXVP2TD9534X4"
 
     luojia_time = datetime.combine(date.fromisoformat(date_str), time(22, 0)).isoformat()
@@ -46,7 +32,7 @@ def get_day_cloud_coverage(date_str: str, location: str = None):
     return luojia_cloud_coverage, bm_cloud_coverage
 
 
-def add_cloud_coverage(file: str | Path, location: str = None):
+def add_cloud_coverage(file: str | Path, location: str | None = None):
     file = Path(file)
 
     if not file.exists():
@@ -55,14 +41,14 @@ def add_cloud_coverage(file: str | Path, location: str = None):
     df = pd.read_csv(file)
 
     for i, row in df.iterrows():
-        luojia_cloud, bm_cloud = get_day_cloud_coverage(row["date"], location)
+        luojia_cloud, bm_cloud = get_day_cloud_coverage(str(row["date"]), location)
         df.at[i, "luojia_cloud"] = luojia_cloud
         df.at[i, "bm_cloud"] = bm_cloud
 
     df.to_csv(file, index=False)
 
 
-def sort_by_cloud_coverage(file: str | Path, location: str = None):
+def sort_by_cloud_coverage(file: str | Path, location: str | None = None):
     file = Path(file)
 
     data = []

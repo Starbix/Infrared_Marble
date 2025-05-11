@@ -16,7 +16,7 @@ DATA_DIR = Path(os.getenv("DATA_DIR", PROJECT_ROOT / "data"))
 
 # Blackmarble constants
 # Get Bearer token from environment
-BEARER_TOKEN = os.getenv("BLACKMARBLE_TOKEN")
+BM_TOKEN = os.getenv("BLACKMARBLE_TOKEN", "")
 BM_DATA_DIR = DATA_DIR / "blackmarble"
 BM_PRODUCT = Product(os.environ.get("BM_PRODUCT", Product.VNP46A2))
 BM_VARIABLE: str | None = os.environ.get("BM_VARIABLE")  # Default varible for product
@@ -31,6 +31,8 @@ BM_DEFAULT_VARIABLE: dict[Product, str] = {
 # LuoJia constants
 LJ_DATA_DIR = DATA_DIR / "luojia"
 LJ_DEFAULT_IDS_FILE = STATIC_DIR / "luojia_image_ids.csv"
+LJ_TILE_URL_PREFIX = "https://polybox.ethz.ch/index.php/s/dnP82nHZkjR4gr7/download/file?path=%2F"
+LJ_METADATA_URL = "https://polybox.ethz.ch/index.php/s/dnP82nHZkjR4gr7/download/file?path=%2Fmetadata%2FMETA.tar.gz"
 
 # GeoJSON, dates, etc
 DEFAULT_DATES_FILE = STATIC_DIR / "dates_luojia_myanmar.csv"
@@ -48,6 +50,6 @@ for _d in [DATA_DIR, BM_DATA_DIR, LJ_DATA_DIR]:
     _d.mkdir(parents=True, exist_ok=True)
 
 # Ensure bearer token is set
-if not BEARER_TOKEN or len(BEARER_TOKEN) == 0:
+if not BM_TOKEN or len(BM_TOKEN) == 0:
     print("Bearer token not set. Please set the BLACKMARBLE_TOKEN environment variable", file=sys.stderr)
     sys.exit(1)

@@ -4,7 +4,7 @@ from typing import Any
 
 from fastapi.exceptions import HTTPException
 
-from lib.constants import ADMIN_AREA_FILE_MAPPING, GEOJSON_ADMIN_KEY
+from lib.config import ADMIN_AREA_FILE_MAPPING, GEOJSON_ADMIN_KEY
 from lib.types import Resolution
 
 

@@ -10,10 +10,11 @@ from fastapi import Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.routing import APIRouter
 
-from lib.constants import BM_DATA_DIR, LJ_DATA_DIR
-from lib.download import bm_download, luojia_tile_download
+from lib.admin_areas import get_region_gdf, load_country_meta
+from lib.bm import bm_download
+from lib.config import BM_DATA_DIR, LJ_DATA_DIR
 from lib.geotiff import get_geotiffs, merge_geotiffs, resample_geotiff
-from lib.loading import get_region_gdf, load_country_meta
+from lib.lj import luojia_tile_download
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -168,7 +169,7 @@ async def get_lj_geotiff(
         region_meta = load_country_meta()
         # Select only rows where region and date match
         relevant_tiles = region_meta[(region_meta["country"] == admin_id) & (region_meta["date"] == date.isoformat())]
-        relevant_tiles = relevant_tiles["tile_name"].values.tolist()
+        relevant_tiles = relevant_tiles["tile_name"].values.tolist()  # pyright: ignore[reportAttributeAccessIssue]
         geotiff_buf, pc02, pc98 = await run_in_threadpool(
             lj_download, relevant_tiles, resample=resample, parallel_downloads=8
         )

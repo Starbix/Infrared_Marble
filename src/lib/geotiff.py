@@ -12,19 +12,19 @@ from rasterio.io import MemoryFile
 from rasterio.warp import Resampling
 from shapely.geometry import Polygon
 
-from lib.constants import DATA_DIR, LJ_DATA_DIR
-from lib.download import LJ_METADATA_URL, luojia_metadata
+from lib.config import DATA_DIR, LJ_DATA_DIR, LJ_METADATA_URL
+from lib.lj import luojia_metadata, luojia_tile_download
 
 DEBUG = False
 NODATA_VALUE = "nan"
 
 
-def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.date]) -> list:
+def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.date]) -> list[str]:
     """
     Get the list of geotiffs from the given GeoDataFrame and date range.
     """
     # assume metadata is downloaded in DATA_DIR / "luojia" / "metadata"
-    relevant_geotiffs = []
+    relevant_geotiffs: list[str] = []
     geotiff_metadata = LJ_DATA_DIR / "metadata"
 
     # ensure metadata is downloaded
@@ -58,15 +58,15 @@ def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.
         rb = (tree.findtext(".//RBLongitude"), tree.findtext(".//RBLatitude"))
         lb = (tree.findtext(".//LBLongitude"), tree.findtext(".//LBLatitude"))
         # check if the coordinates are valid
-        if lt is None or rt is None or rb is None or lb is None:
+        if any(x is None for x in (*lt, *rt, *rb, *lb)):
             print(f"Coordinates not found in {geotiff}")
             continue
         geotiff_polygon = Polygon(
             [
-                (float(lt[0]), float(lt[1])),
-                (float(rt[0]), float(rt[1])),
-                (float(rb[0]), float(rb[1])),
-                (float(lb[0]), float(lb[1])),
+                (float(lt[0]), float(lt[1])),  # pyright: ignore[reportArgumentType]
+                (float(rt[0]), float(rt[1])),  # pyright: ignore[reportArgumentType]
+                (float(rb[0]), float(rb[1])),  # pyright: ignore[reportArgumentType]
+                (float(lb[0]), float(lb[1])),  # pyright: ignore[reportArgumentType]
             ]
         )
         intersects = get_intersection(gdf, geotiff_polygon)
@@ -132,7 +132,7 @@ def downsample_xarray(ds: xr.Dataset, factor: int = 2) -> xr.Dataset:
     Downsample the xarray dataset by a factor.
     """
     # downsample the xarray dataset
-    ds = ds.coarsen(x=factor, y=factor, boundary="pad").mean()
+    ds = ds.coarsen(x=factor, y=factor, boundary="pad").mean()  # pyright: ignore[reportAttributeAccessIssue]
 
     return ds
 
@@ -373,8 +373,6 @@ if __name__ == "__main__":
     geotiff_list = get_geotiffs(gdf, date)
 
     # download geotiffs
-    from lib.download import luojia_tile_download
-
     for geotiff in geotiff_list:
         luojia_tile_download(geotiff)
 

@@ -1,8 +1,11 @@
 bokeh
 dask
 folium
+geotiff
 mapclassify
 matplotlib
+pycountry
+reverse_geocoder
 tabulate
 tenacity
 zarr

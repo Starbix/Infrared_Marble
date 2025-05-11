@@ -3,9 +3,9 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
 
 from matplotlib import pyplot as plt
 
-from lib.constants import DEFAULT_DATES_FILE, DEFAULT_GDF_URL
-from lib.download import bm_dataset_preprocess, fetch_gdf, get_dates
-from lib.loading import get_bm
+from lib.admin_areas import fetch_gdf, get_dates
+from lib.bm import bm_dataset_preprocess, get_bm
+from lib.config import DEFAULT_DATES_FILE, DEFAULT_GDF_URL
 from lib.visualization import plot_daily_radiance, plot_difference, plot_series
 
 

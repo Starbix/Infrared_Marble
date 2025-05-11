@@ -22,7 +22,7 @@ import sys
 import geopandas as gpd
 import pandas as pd
 
-from lib.constants import STATIC_DIR
+from lib.config import STATIC_DIR
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Adjust these paths to match your setup

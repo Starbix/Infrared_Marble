@@ -16,6 +16,12 @@ from lib.config import (
 
 
 def bm_download(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.date]) -> xr.Dataset:
+    """Downloads data from Blackmarble dataset for a given region and date range.
+
+    :param gdf: GeoDataFrame of region of interest
+    :param date_range: Single date or list of dates to download data for
+    :return: xarray.Dataset containing raster data
+    """
     out_dir = BM_DATA_DIR / "raw"
     out_dir.mkdir(parents=True, exist_ok=True)
     raster = bm_raster(
@@ -37,6 +43,14 @@ def bm_store_to_zarr(
     dest: str | Path | None = None,
     force: bool = False,
 ) -> xr.Dataset:
+    """Downloads Blackmarble data and stores it to a Zarr backend.
+
+    :param gdf: GeoDataFrame of region of interest
+    :param dates: List of dates to download
+    :param dest: Path to Zarr store, defaults to None
+    :param force: Force re-downloading all files, defaults to False
+    :return: Fresh reference to Zarr store
+    """
     # Check if already preprocessed
     zarr_path = Path(dest) if dest else (BM_DATA_DIR / "preprocessed" / f"{BM_PRODUCT}-{BM_VARIABLE}.zarr")
     zarr_path.parent.mkdir(parents=True, exist_ok=True)
@@ -64,7 +78,13 @@ def bm_store_to_zarr(
     return bm_load_from_zarr(zarr_path)
 
 
-def bm_load_from_zarr(path: str | Path | None = None):
+def bm_load_from_zarr(path: str | Path | None = None) -> xr.Dataset:
+    """Load Blackmarble dataset from Zarr store
+
+    :param path: Path to Zarr store, defaults to None
+    :raises ValueError: Zarr store does not exist
+    :return: Reference to Zarr dataset
+    """
     path = Path(path) if path else BM_DATA_DIR / "preprocessed" / f"{BM_PRODUCT}-{BM_VARIABLE}.zarr"
 
     if not path.exists():

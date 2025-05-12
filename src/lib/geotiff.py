@@ -63,10 +63,10 @@ def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.
             continue
         geotiff_polygon = Polygon(
             [
-                (float(lt[0]), float(lt[1])),  # pyright: ignore[reportArgumentType]
-                (float(rt[0]), float(rt[1])),  # pyright: ignore[reportArgumentType]
-                (float(rb[0]), float(rb[1])),  # pyright: ignore[reportArgumentType]
-                (float(lb[0]), float(lb[1])),  # pyright: ignore[reportArgumentType]
+                (float(lt[0]), float(lt[1])),
+                (float(rt[0]), float(rt[1])),
+                (float(rb[0]), float(rb[1])),
+                (float(lb[0]), float(lb[1])),
             ]
         )
         intersects = get_intersection(gdf, geotiff_polygon)
@@ -132,7 +132,7 @@ def downsample_xarray(ds: xr.Dataset, factor: int = 2) -> xr.Dataset:
     Downsample the xarray dataset by a factor.
     """
     # downsample the xarray dataset
-    ds = ds.coarsen(x=factor, y=factor, boundary="pad").mean()  # pyright: ignore[reportAttributeAccessIssue]
+    ds = ds.coarsen(x=factor, y=factor, boundary="pad").mean()
 
     return ds
 

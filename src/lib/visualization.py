@@ -50,15 +50,16 @@ def plot_daily_radiance(gdf: "GeoDataFrame", raster: "xr.Dataset", date: datetim
 def plot_difference(
     gdf: "GeoDataFrame",
     raster: "xr.Dataset",
-    date1: datetime.date,
-    date2: datetime.date,
+    date1: str,
+    date2: str,
 ):
     data = raster["Gap_Filled_DNB_BRDF-Corrected_NTL"]
-    delta = (data.sel(time=date2.isoformat()) - data.sel(time=date1.isoformat())) / data.sel(time=date1.isoformat())
+    delta = (data.sel(time=date2) - data.sel(time=date1)) / data.sel(time=date1)
 
     fig, ax = get_subplots(raster)
     delta.plot.pcolormesh(ax=ax, cmap="Spectral", robust=True)
-    cx.add_basemap(ax, crs=gdf.crs.to_string(), source=cx.providers.CartoDB.DarkMatter)  # pyright: ignore[reportOptionalMemberAccess,reportAttributeAccessIssue]
+    assert gdf.crs is not None, "No CRS"
+    cx.add_basemap(ax, crs=gdf.crs.to_string(), source=cx.providers.CartoDB.DarkMatter)  # type: ignore
 
     ax.text(
         0,
@@ -71,14 +72,14 @@ def plot_difference(
         color="black",
         weight="normal",
     )
-    ax.set_title(f"NTL Radiance Increase/Decrease ({date1.isoformat()}-{date2.isoformat()})", fontsize=16)
+    ax.set_title(f"NTL Radiance Increase/Decrease ({date1}-{date2})", fontsize=16)
 
 
-def plot_series(raster: "xr.Dataset", dates: list[datetime.date] | None = None):
+def plot_series(raster: "xr.Dataset", dates: list[str] | None = None):
     # Plot the mean NTL radiance over the dimensions x and y
     data = raster["Gap_Filled_DNB_BRDF-Corrected_NTL"]
     if dates is not None:
-        data = data.sel(time=[date.isoformat() for date in dates])
+        data = data.sel(time=dates)
     mean = data.mean(dim=["x", "y"])
 
     # Create the figure and axis

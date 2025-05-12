@@ -2,9 +2,9 @@ import pandas as pd
 import pycountry
 from fastapi import APIRouter, HTTPException
 
-from lib.admin_areas import avail_dates, get_all_regions_gdf, load_all_dates, load_country_meta
+from lib.admin_areas import dates_from_csv, get_all_regions_gdf, get_region_avail_dates, get_region_meta
 from lib.cloud_coverage import get_day_cloud_coverage
-from lib.config import ADMIN_AREA_FILE_MAPPING, GEOJSON_ADMIN_KEY
+from lib.config import ADMIN_AREA_FILE_MAPPING, GEOJSON_ADMIN_KEY, STATIC_DIR
 
 router = APIRouter(prefix="/statistics", tags=["Statistics"])
 
@@ -14,8 +14,8 @@ async def get_statistics():
     """
     Get statistics for the dataset.
     """
-    country_meta = load_country_meta()
-    dates = load_all_dates()
+    country_meta = get_region_meta()
+    dates = dates_from_csv(filename=STATIC_DIR / "all_dates.csv")
 
     return {
         "general": {"geojson_resolutions": len(ADMIN_AREA_FILE_MAPPING)},
@@ -41,7 +41,7 @@ async def get_region_dates(admin_id: str):
     Gets a heatmap of the region, where the available dates are binned into monthly intervals. Each row is a year of
     data, and each column is a month of the year. The data ranges over all contained years in the available dates.
     """
-    admin_meta = load_country_meta()
+    admin_meta = get_region_meta()
 
     admin_data = admin_meta[admin_meta["country"] == admin_id]
     if admin_data.empty:
@@ -84,7 +84,7 @@ async def get_stats_admin_area(admin_id: str):
     Get cloud coverage for an admin area.
     """
     country_name = pycountry.countries.get(alpha_3=admin_id.upper()).name
-    dates = list(avail_dates(admin_id))
+    dates = get_region_avail_dates(admin_id)
     dates_clouds = {}
     for date in dates:
         lj, bm = get_day_cloud_coverage(date, country_name)

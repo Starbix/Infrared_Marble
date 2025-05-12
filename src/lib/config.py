@@ -35,12 +35,12 @@ LJ_TILE_URL_PREFIX = "https://polybox.ethz.ch/index.php/s/dnP82nHZkjR4gr7/downlo
 LJ_METADATA_URL = "https://polybox.ethz.ch/index.php/s/dnP82nHZkjR4gr7/download/file?path=%2Fmetadata%2FMETA.tar.gz"
 
 # GeoJSON, dates, etc
-DEFAULT_DATES_FILE = STATIC_DIR / "dates_luojia_myanmar.csv"
-DEFAULT_GDF_URL = "https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_MMR_1.json.zip"
+DEFAULT_DATES_FILE = STATIC_DIR / "defaults" / "dates_luojia_myanmar.csv"
+DEFAULT_GDF_FILE = "gadm41_MMR_1.geojson.gz"
 ADMIN_AREA_FILE_MAPPING: dict[Resolution, Path] = {
-    "10m": STATIC_DIR / "admin-areas_10m.json.gz",
-    "50m": STATIC_DIR / "admin-areas_50m.json.gz",
-    "110m": STATIC_DIR / "admin-areas_110m.json.gz",
+    "10m": STATIC_DIR / "admin_areas" / "admin-areas_10m.geojson.gz",
+    "50m": STATIC_DIR / "admin_areas" / "admin-areas_50m.geojson.gz",
+    "110m": STATIC_DIR / "admin_areas" / "admin-areas_110m.geojson.gz",
 }
 GEOJSON_ADMIN_KEY = "adm0_a3"
 

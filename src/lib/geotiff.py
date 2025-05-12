@@ -4,12 +4,9 @@ from pathlib import Path
 
 import geopandas
 import numpy as np
-import rioxarray
 import xarray as xr
 from geopandas import GeoDataFrame
 from osgeo import gdal, ogr
-from rasterio.io import MemoryFile
-from rasterio.warp import Resampling
 from shapely.geometry import Polygon
 
 from lib.config import DATA_DIR, LJ_DATA_DIR, LJ_METADATA_URL
@@ -180,6 +177,11 @@ def empty_geotiff() -> bytes:
 ## problematic: noData from geotiffs overwrite actual data
 # need to take geometry into account
 def merge_geotiffs(geotiff_list) -> tuple[bytes, float, float]:
+    """Merge a list of geotiffs into a single large geotiff
+
+    :param geotiff_list: List of tile names of geotiffs to merge
+    :return: Tuple containing (buffer, 2nd percentile, 98th percentile)
+    """
     if geotiff_list is None or len(geotiff_list) == 0:
         print("No geotiffs found, serving empty file")
         return empty_geotiff(), 0, 0
@@ -233,32 +235,12 @@ def merge_geotiffs(geotiff_list) -> tuple[bytes, float, float]:
     return buffer.read(), pc02, pc98
 
 
-def resample_geotiff(input_buf: bytes, resolution: tuple[float, float] = (750.0, 750.0)) -> bytes:
-    with MemoryFile(input_buf) as memfile:
-        with memfile.open() as src:
-            da = rioxarray.open_rasterio(src)
-            assert isinstance(da, xr.DataArray), "Got more than one variable"
-
-    resampled_da = da.rio.reproject(da.rio.crs, resolution=resolution, resampling=Resampling.bilinear)
-
-    # Output to geotiff again
-    with io.BytesIO() as output_buf:
-        resampled_da.rio.to_raster(
-            output_buf,
-            driver="GTiff",
-            compress="LZW",
-            tiled=True,
-            blockxsize=256,
-            blockysize=256,
-            windowed=True,
-        )
-        output_buf.seek(0)
-        resampled_bytes = output_buf.getvalue()
-
-    return resampled_bytes
-
-
 def merge_geotiffs_to_file(geotiff_list, output_name="merged.tif"):
+    """Merge geotiffs into single large geotiff and save to file
+
+    :param geotiff_list: List of tile names to merge
+    :param output_name: Name of the output file, defaults to "merged.tif"
+    """
     file_list = [str(LJ_DATA_DIR / "tiles" / geotiff) + "_gec.tif" for geotiff in geotiff_list]
 
     for file in file_list:
@@ -281,6 +263,13 @@ def merge_geotiffs_to_file(geotiff_list, output_name="merged.tif"):
 
 # convert uint32 to float32,
 def convert_geotiff(input_path, output_path, metadata_path, nodata_value=NODATA_VALUE):
+    """Converts raw LuoJia uint32 GeoTIFFs to float32 GeoTIFFs
+
+    :param input_path: Path to raw LuoJia GeoTIFF
+    :param output_path: Output path
+    :param metadata_path: Path to LuoJia metadata file
+    :param nodata_value: Fill value, defaults to NODATA_VALUE
+    """
     # Open the input GeoTIFF file
     dataset = gdal.Open(input_path)
     geotransform = dataset.GetGeoTransform()

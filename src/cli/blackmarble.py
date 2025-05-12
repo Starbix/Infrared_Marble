@@ -1,17 +1,18 @@
 import datetime
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser, Namespace
 
+import geopandas
 from matplotlib import pyplot as plt
 
-from lib.admin_areas import fetch_gdf, get_dates
-from lib.bm import bm_dataset_preprocess, get_bm
-from lib.config import DEFAULT_DATES_FILE, DEFAULT_GDF_URL
+from lib.admin_areas import dates_from_csv
+from lib.bm import bm_load_from_zarr, bm_store_to_zarr
+from lib.config import DEFAULT_DATES_FILE, DEFAULT_GDF_FILE
 from lib.visualization import plot_daily_radiance, plot_difference, plot_series
 
 
 def setup_bm_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
     bm_parent = ArgumentParser(add_help=False)
-    bm_parent.add_argument("-g", "--gdf", default=DEFAULT_GDF_URL, help="URL to the GDF JSON file")
+    bm_parent.add_argument("-g", "--gdf", default=DEFAULT_GDF_FILE, help="URL to the GDF JSON file")
 
     subparsers_bm = parser.add_subparsers(dest="bm_command")
 
@@ -40,12 +41,7 @@ def setup_bm_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
         formatter_class=ArgumentDefaultsHelpFormatter,
         help="Visualize data in the Blackmarble dataset",
     )
-    bm_show_parser.add_argument(
-        "dates",
-        nargs="*",
-        type=datetime.date.fromisoformat,
-        help="Date(s) to visualize",
-    )
+    bm_show_parser.add_argument("dates", nargs="*", help="Date(s) to visualize")
     bm_show_parser.add_argument(
         "-f",
         "--file",
@@ -62,21 +58,21 @@ def setup_bm_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
 def handle_bm_commands(args: Namespace):
     if args.bm_command == "download":
         if args.file:
-            dates = get_dates(args.file)
+            dates = dates_from_csv(args.file)
         else:
             dates = args.dates
         print("Selected GDF:    ", args.gdf.split("/")[-1])
-        gdf = fetch_gdf(args.gdf, force=args.force)
-        print("Selected dates:", ", ".join(d.isoformat() for d in dates))
-        bm_dataset_preprocess(gdf=gdf, dates=dates, force=args.force)
+        gdf = geopandas.read_file(args.gdf, force=args.force)
+        print("Selected dates:", ", ".join(dates))
+        bm_store_to_zarr(gdf=gdf, dates=[datetime.date.fromisoformat(d) for d in dates], force=args.force)
         print("Download done.")
 
     if args.bm_command == "show":
-        gdf = fetch_gdf(args.gdf)
-        raster = get_bm()
-        dates: list[datetime.date] = args.dates
+        gdf = geopandas.read_file(args.gdf)
+        raster = bm_load_from_zarr()
+        dates: list[str] = args.dates
         if args.file:
-            dates = get_dates(args.file)
+            dates = dates_from_csv(args.file)
 
         if args.diff:
             # Show difference between two dates

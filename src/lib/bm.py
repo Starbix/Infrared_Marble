@@ -31,7 +31,7 @@ def bm_download(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.d
     return raster
 
 
-def bm_dataset_preprocess(
+def bm_store_to_zarr(
     gdf: "GeoDataFrame",
     dates: list[datetime.date],
     dest: str | Path | None = None,
@@ -42,7 +42,7 @@ def bm_dataset_preprocess(
     zarr_path.parent.mkdir(parents=True, exist_ok=True)
     if not force and zarr_path.exists():
         print("Dataset already preprocessed, skipping...")
-        return get_bm(zarr_path)
+        return bm_load_from_zarr(zarr_path)
 
     # Download all datasets for each date in parallel
     # Note: date_range does not download for each date individually, but for each date between any
@@ -61,10 +61,10 @@ def bm_dataset_preprocess(
     combined.to_zarr(zarr_path)
 
     # Loads fresh from disk
-    return get_bm(zarr_path)
+    return bm_load_from_zarr(zarr_path)
 
 
-def get_bm(path: str | Path | None = None):
+def bm_load_from_zarr(path: str | Path | None = None):
     path = Path(path) if path else BM_DATA_DIR / "preprocessed" / f"{BM_PRODUCT}-{BM_VARIABLE}.zarr"
 
     if not path.exists():

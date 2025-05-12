@@ -1,74 +1,53 @@
-import datetime
 import gzip
 from pathlib import Path
 
 import geopandas
-import numpy as np
 import pandas as pd
-import requests
 
-from lib.config import ADMIN_AREA_FILE_MAPPING, DATA_DIR, DEFAULT_DATES_FILE, GEOJSON_ADMIN_KEY, STATIC_DIR
-
-
-def get_dates(file: str | Path) -> list[datetime.date]:
-    file = Path(file)
-
-    if not file.exists():
-        raise ValueError(f"File does not exist: {file}")
-
-    df = pd.read_csv(file)
-    date_list = [datetime.date.fromisoformat(d) for d in df["date"].dropna()]
-
-    return sorted(date_list)
+from lib.config import ADMIN_AREA_FILE_MAPPING, DEFAULT_DATES_FILE, GEOJSON_ADMIN_KEY, STATIC_DIR
+from lib.types import Resolution
 
 
-def list_dates(file: str | Path | None = None):
-    file = Path(file) if file else DEFAULT_DATES_FILE
+def dates_from_csv(filename: str | Path | None = None, colname: str = "date") -> list[str]:
+    """Returns a list of dates from a CSV file.
 
-    if not file.exists():
-        raise ValueError(f"File does not exist: {file}")
-
-    dates = get_dates(file)
-
-    return dates
-
-
-def avail_dates(admin_id: str):
-    country_meta = pd.read_csv(STATIC_DIR / "country_meta.csv.gz")
-    dates = country_meta[country_meta["country"] == admin_id]["date"]
-    return np.unique(dates)
+    :param file: Path to file to load. Can be either a local file or remote URL. Defaults to DEFAULT_DATES_FILE
+    :param colname: Column name for the dates column, defaults to "date"
+    :return: List of date strings in ISO format, sorted in ascending order
+    """
+    df = pd.read_csv(filename or DEFAULT_DATES_FILE)
+    date_list = df[colname].dropna().sort_values().unique().tolist()
+    return date_list
 
 
-def load_all_dates(path: str | Path | None = None):
-    path = Path(path) if path else STATIC_DIR / "all_dates.csv"
-    return pd.read_csv(path, compression="infer")
+def get_all_regions_gdf(resolution: Resolution = "50m") -> geopandas.GeoDataFrame:
+    """Get a GeoDataFrame from a pre-defined GeoJSON file at a configurable resolution for all available regions.
 
-
-def fetch_gdf(gdf_url: str, force: bool = False):
-    # We download the file locally to avoid having to download it every time
-    gdf_download_path = DATA_DIR / "gdf_files" / gdf_url.split("/")[-1]
-    gdf_download_path.parent.mkdir(parents=True, exist_ok=True)
-
-    if force or not gdf_download_path.exists() or len(gdf_download_path.read_bytes()) < 10:
-        print(f"Downloading to {gdf_download_path}")
-        response = requests.get(gdf_url, timeout=30.0)
-        if response.status_code >= 400:
-            raise requests.HTTPError("Failed to download GDF. Please double-check the URL and try again.")
-        gdf_download_path.write_bytes(response.content)
-        print("GDF successfully downloaded")
-    else:
-        print("GDF already downloaded, skipping... (use --force to re-download)")
-
-    gdf = geopandas.read_file(gdf_download_path)
-    return gdf
-
-
-def get_all_regions_gdf():
-    with gzip.open(ADMIN_AREA_FILE_MAPPING["50m"]) as f:
+    :param resolution: Geometry resolution, defaults to "50m"
+    :return: GeoDataFrame
+    """
+    with gzip.open(ADMIN_AREA_FILE_MAPPING[resolution]) as f:
         return geopandas.read_file(f)
 
 
-def get_region_gdf(admin_id: str):
+def get_region_avail_dates(admin_id: str) -> list[str]:
+    """Gets a list of available dates for a given region
+
+    :param admin_id: Administrative ID of the region of interest
+    :return: List of dates (string), in ISO format, sorted in ascending order
+    """
+    country_meta = pd.read_csv(STATIC_DIR / "country_meta.csv.gz")
+    dates = country_meta[country_meta["country"] == admin_id]["date"]
+    dates = dates.sort_values().unique()
+    return dates.tolist()
+
+
+def get_region_gdf(admin_id: str) -> geopandas.GeoDataFrame:
+    """Get a GeoDataFrame for a particular region.
+
+    :param admin_id: Administrative ID for this region.
+    :return: GeoDataFrame of region
+    """
     with gzip.open(ADMIN_AREA_FILE_MAPPING["50m"]) as f:
         gdf = geopandas.read_file(f)
     gdf = gdf[gdf[GEOJSON_ADMIN_KEY] == admin_id]
@@ -76,6 +55,15 @@ def get_region_gdf(admin_id: str):
     return gdf
 
 
-def load_country_meta(path: str | Path | None = None):
+def get_region_meta(path: str | Path | None = None):
+    """Get a dataframe of metadata about regions and LuoJia tiles. The resulting dataframe has the following columns:
+
+    - `country`:   Alpha-3 Admin 0 country code of region
+    - `date`:      ISO date of tile
+    - `tile_name`: Name of the LuoJia tile
+
+    :param path: Path to file, if None uses default path.
+    :return: DataFrame with meta information
+    """
     path = Path(path) if path else STATIC_DIR / "country_meta.csv.gz"
     return pd.read_csv(path, compression="infer")

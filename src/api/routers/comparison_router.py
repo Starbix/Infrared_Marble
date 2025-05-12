@@ -10,10 +10,10 @@ from fastapi import Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.routing import APIRouter
 
-from lib.admin_areas import get_region_gdf
+from lib.admin_areas import get_region_gdf, get_region_meta
 from lib.bm import bm_download
 from lib.config import BM_DATA_DIR, LJ_DATA_DIR
-from lib.geotiff import get_geotiffs, merge_geotiffs, resample_geotiff
+from lib.geotiff import get_geotiffs, merge_geotiffs
 from lib.lj import lj_download_tile
 
 logger = logging.getLogger(__name__)
@@ -134,9 +134,8 @@ def lj_download(
     logger.info("Merging tiles...")
     geotiff_buf, pc02, pc98 = merge_geotiffs(relevant_tiles)
 
-    # Resample
     if resample:
-        geotiff_buf = resample_geotiff(geotiff_buf, resolution=resample)
+        raise NotImplementedError("Resampling not yet supported")
 
     return geotiff_buf, pc02, pc98
 
@@ -166,7 +165,7 @@ async def get_lj_geotiff(
     if geotiff_buf is None or pc02 is None or pc98 is None:
         logger.info("LJ: Downloading (%s, %s)", admin_id, date.isoformat())
         # Get region meta dataframe
-        region_meta = region_meta()
+        region_meta = get_region_meta()
         # Select only rows where region and date match
         relevant_tiles = region_meta[(region_meta["country"] == admin_id) & (region_meta["date"] == date.isoformat())]
         relevant_tiles = relevant_tiles["tile_name"].values.tolist()

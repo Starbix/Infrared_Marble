@@ -12,15 +12,22 @@ if TYPE_CHECKING:
     from geopandas import GeoDataFrame
 
 
-def get_subplots(raster: "xr.Dataset", figwidth: float = 8.0):
+def _get_subplots(raster: "xr.Dataset", figwidth: float = 8.0):
     ratio = raster.y.shape[0] / raster.x.shape[0]
     fig, ax = plt.subplots(figsize=(figwidth, ratio * figwidth))
 
     return fig, ax
 
 
-def plot_daily_radiance(gdf: "GeoDataFrame", raster: "xr.Dataset", date: datetime.date):
-    fig, ax = get_subplots(raster)
+def bm_plot_daily_radiance(gdf: "GeoDataFrame", raster: "xr.Dataset", date: datetime.date):
+    """Plots the daily radiance for the Blackmarble dataset
+
+    :param gdf: Region of interest
+    :param raster: Raster data, downloaded from Blackmarble
+    :param date: Date, for display only
+    :return: Figure
+    """
+    fig, ax = _get_subplots(raster)
 
     variable = BM_VARIABLE or BM_DEFAULT_VARIABLE[BM_PRODUCT]
     raster[variable].sel(time=date.isoformat()).plot.pcolormesh(
@@ -47,16 +54,23 @@ def plot_daily_radiance(gdf: "GeoDataFrame", raster: "xr.Dataset", date: datetim
     return fig
 
 
-def plot_difference(
+def bm_plot_difference(
     gdf: "GeoDataFrame",
     raster: "xr.Dataset",
     date1: str,
     date2: str,
 ):
+    """Plot the difference between two Blackmarble dates
+
+    :param gdf: Region of interest
+    :param raster: Downloaded Blackmarble dataset
+    :param date1: First date
+    :param date2: Second date
+    """
     data = raster["Gap_Filled_DNB_BRDF-Corrected_NTL"]
     delta = (data.sel(time=date2) - data.sel(time=date1)) / data.sel(time=date1)
 
-    fig, ax = get_subplots(raster)
+    fig, ax = _get_subplots(raster)
     delta.plot.pcolormesh(ax=ax, cmap="Spectral", robust=True)
     assert gdf.crs is not None, "No CRS"
     cx.add_basemap(ax, crs=gdf.crs.to_string(), source=cx.providers.CartoDB.DarkMatter)  # type: ignore
@@ -75,7 +89,12 @@ def plot_difference(
     ax.set_title(f"NTL Radiance Increase/Decrease ({date1}-{date2})", fontsize=16)
 
 
-def plot_series(raster: "xr.Dataset", dates: list[str] | None = None):
+def bm_plot_series(raster: "xr.Dataset", dates: list[str] | None = None):
+    """Plot the average radiance over time
+
+    :param raster: Downloaded Blackmarble raster dataset
+    :param dates: List of dates to plot. If None, uses all available dates.
+    """
     # Plot the mean NTL radiance over the dimensions x and y
     data = raster["Gap_Filled_DNB_BRDF-Corrected_NTL"]
     if dates is not None:

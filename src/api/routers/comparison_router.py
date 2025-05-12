@@ -14,7 +14,7 @@ from lib.admin_areas import get_region_gdf
 from lib.bm import bm_download
 from lib.config import BM_DATA_DIR, LJ_DATA_DIR
 from lib.geotiff import get_geotiffs, merge_geotiffs, resample_geotiff
-from lib.lj import luojia_tile_download
+from lib.lj import lj_download_tile
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -31,7 +31,7 @@ def bm_geotiff_task(gdf: geopandas.GeoDataFrame, date: date):
 def lj_geotiff_task(gdf: geopandas.GeoDataFrame, date: date):
     geotiff_list = get_geotiffs(gdf, date)
     for geotiff in geotiff_list:
-        luojia_tile_download(geotiff)
+        lj_download_tile(geotiff)
 
     geotiff_buf, pc02, pc98 = merge_geotiffs(geotiff_list)
 
@@ -125,10 +125,10 @@ def lj_download(
     if parallel_downloads:
         with ThreadPoolExecutor(max_workers=parallel_downloads) as executor:
             # Submit all download jobs to the executor
-            list(executor.map(luojia_tile_download, relevant_tiles))
+            list(executor.map(lj_download_tile, relevant_tiles))
     else:
         for tile_name in relevant_tiles:
-            luojia_tile_download(tile_name)
+            lj_download_tile(tile_name)
 
     # Merge
     logger.info("Merging tiles...")

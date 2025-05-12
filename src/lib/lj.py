@@ -5,7 +5,12 @@ import requests
 from lib.config import DATA_DIR, LJ_METADATA_URL, LJ_TILE_URL_PREFIX
 
 
-def luojia_metadata(metadata_url: str):
+def lj_download_metadata(metadata_url: str):
+    """Downloads LuoJia dataset metadata locally
+
+    :param metadata_url: URL to metadata file
+    :raises requests.HTTPError: Download failure
+    """
     # download it, if it doesn't exist
     # unpack it
     metadata_path = DATA_DIR / "luojia" / "metadata"
@@ -27,7 +32,12 @@ def luojia_metadata(metadata_url: str):
         print("Metadata successfully extracted")
 
 
-def luojia_tile_download(tile_name: str):
+def lj_download_tile(tile_name: str):
+    """Download a tile to local disk.
+
+    :param tile_name: LuoJia tile name
+    :raises requests.HTTPError: Download failure
+    """
     tile_url = LJ_TILE_URL_PREFIX + tile_name + ".tar.gz"
     # download it, if it doesn't exist
     # unpack it
@@ -55,6 +65,6 @@ def luojia_tile_download(tile_name: str):
 
 
 if __name__ == "__main__":
-    luojia_metadata(LJ_METADATA_URL)
+    lj_download_metadata(LJ_METADATA_URL)
     tile_name = "LuoJia1-01_LR201806057936_20180603055109_HDR_0029"
     # luojia_tile_download(tile_name)

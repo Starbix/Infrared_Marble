@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from lib.admin_areas import dates_from_csv
 from lib.bm import bm_load_from_zarr, bm_store_to_zarr
 from lib.config import DEFAULT_DATES_FILE, DEFAULT_GDF_FILE
-from lib.visualization import plot_daily_radiance, plot_difference, plot_series
+from lib.visualization import bm_plot_daily_radiance, bm_plot_difference, bm_plot_series
 
 
 def setup_bm_parser(parser: ArgumentParser, parents: list[ArgumentParser]):
@@ -77,13 +77,13 @@ def handle_bm_commands(args: Namespace):
         if args.diff:
             # Show difference between two dates
             assert len(dates) == 2, "When using --diff option, must provide exactly two dates"
-            plot_difference(gdf, raster, date1=dates[0], date2=dates[1])
+            bm_plot_difference(gdf, raster, date1=dates[0], date2=dates[1])
         if args.time_series:
-            plot_series(raster, dates)
+            bm_plot_series(raster, dates)
         else:
             # Default: Plot radiance
             # Show all figures in parallel
             for date in dates:
-                plot_daily_radiance(gdf, raster, date)
+                bm_plot_daily_radiance(gdf, raster, date)
 
         plt.show(block=True)

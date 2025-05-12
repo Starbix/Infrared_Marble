@@ -10,7 +10,7 @@ from osgeo import gdal, ogr
 from shapely.geometry import Polygon
 
 from lib.config import DATA_DIR, LJ_DATA_DIR, LJ_METADATA_URL
-from lib.lj import luojia_metadata, luojia_tile_download
+from lib.lj import lj_download_metadata, lj_download_tile
 
 DEBUG = False
 NODATA_VALUE = "nan"
@@ -26,7 +26,7 @@ def get_geotiffs(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.
 
     # ensure metadata is downloaded
     if not geotiff_metadata.exists():
-        luojia_metadata(LJ_METADATA_URL)
+        lj_download_metadata(LJ_METADATA_URL)
 
     # iterate through the geotiffs and check if they are in the date and location range
     for geotiff in geotiff_metadata.glob("*.xml"):
@@ -363,7 +363,7 @@ if __name__ == "__main__":
 
     # download geotiffs
     for geotiff in geotiff_list:
-        luojia_tile_download(geotiff)
+        lj_download_tile(geotiff)
 
     # merge geotiffs
     geotiff, pc02, pc98 = merge_geotiffs(geotiff_list)

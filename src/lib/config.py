@@ -44,6 +44,9 @@ ADMIN_AREA_FILE_MAPPING: dict[Resolution, Path] = {
 }
 GEOJSON_ADMIN_KEY = "adm0_a3"
 
+# Cloud coverage
+CLOUD_API_KEY = "C6FNLY48VY2CHXVP2TD9534X4"
+
 # Checks
 # Ensure data dirs exists
 for _d in [DATA_DIR, BM_DATA_DIR, LJ_DATA_DIR]:

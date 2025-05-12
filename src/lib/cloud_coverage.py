@@ -4,19 +4,26 @@ from pathlib import Path
 import pandas as pd
 import requests
 
+from lib.config import CLOUD_API_KEY
 
-def get_day_cloud_coverage(date_str: str, location: str | None = None):
-    API_KEY = "C6FNLY48VY2CHXVP2TD9534X4"
 
+def get_day_cloud_coverage(date_str: str, location: str | None = None) -> tuple[float, float]:
+    """Gets the average cloud coverage for Blackmarble and LuoJia datasets
+
+    :param date_str: LuoJia date
+    :param location: Full country name, defaults to None
+    :raises ValueError: Unable to fetch cloud coverage for that day
+    :return: Tuple of (bm, lj) cloud coverage percentage in range [0, 100]
+    """
     luojia_time = datetime.combine(date.fromisoformat(date_str), time(22, 0)).isoformat()
     bm_time = datetime.combine(date.fromisoformat(date_str) + timedelta(days=1), time(1, 0)).isoformat()
 
-    req_string = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}/{luojia_time}?unitGroup=metric&include=current&key={API_KEY}&contentType=json"
+    req_string = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}/{luojia_time}?unitGroup=metric&include=current&key={CLOUD_API_KEY}&contentType=json"
     response = requests.request("GET", req_string)
     luojia_data = response.json()
 
     date_str = (date.fromisoformat(date_str) + timedelta(days=1)).isoformat()
-    req_string = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}/{bm_time}?unitGroup=metric&include=current&key={API_KEY}&contentType=json"
+    req_string = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location}/{bm_time}?unitGroup=metric&include=current&key={CLOUD_API_KEY}&contentType=json"
     response = requests.request("GET", req_string)
     bm_data = response.json()
 
@@ -32,7 +39,13 @@ def get_day_cloud_coverage(date_str: str, location: str | None = None):
     return luojia_cloud_coverage, bm_cloud_coverage
 
 
-def add_cloud_coverage(file: str | Path, location: str | None = None):
+def add_cloud_coverage(file: str | Path, location: str | None = None) -> None:
+    """Adds cloud coverage information to a region metadata CSV file
+
+    :param file: Path to region meta CSV file
+    :param location: Full region name, defaults to None
+    :raises ValueError: Region meta CSV file does not exist
+    """
     file = Path(file)
 
     if not file.exists():
@@ -48,10 +61,17 @@ def add_cloud_coverage(file: str | Path, location: str | None = None):
     df.to_csv(file, index=False)
 
 
-def sort_by_cloud_coverage(file: str | Path, location: str | None = None):
+def sort_by_cloud_coverage(file: str | Path, location: str | None = None) -> list[tuple[str, float, float]]:
+    """Get a list of dates with BM and LJ cloud coverage sorted by average cloud coverage across datasets
+
+    :param file: CSV file with a "date" column
+    :param location: Full name of location, defaults to None
+    :raises ValueError: CSV file does not exist
+    :return: List of (date, bm_coverage, lj_coverage) tuples
+    """
     file = Path(file)
 
-    data = []
+    data: list[tuple[str, float, float]] = []
 
     if not file.exists():
         raise ValueError(f"File does not exist: {file}")

@@ -44,6 +44,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ [
           <Typography variant="h5" sx={{ pt: 4 }}>
             LuoJia1-01 Data Availability
           </Typography>
+          <Typography>
+            Select a region below to see data availability. All regions not listed here do not have any data in the
+            LuoJia dataset.
+          </Typography>
           <DateHeatmap regions={regions} />
         </Stack>
       </Paper>

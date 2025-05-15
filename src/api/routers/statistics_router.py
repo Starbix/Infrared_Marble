@@ -30,7 +30,11 @@ async def get_statistics():
 @router.get("/regions")
 async def get_regions():
     gdf = get_all_regions_gdf()
-    regions = gdf[[GEOJSON_ADMIN_KEY, "name"]].drop_duplicates().rename(columns={GEOJSON_ADMIN_KEY: "admin_id"})
+    region_meta = get_region_meta()
+    avail_regions = region_meta["country"].unique()
+    regions = gdf[[GEOJSON_ADMIN_KEY, "name"]].drop_duplicates()
+    regions = regions[regions[GEOJSON_ADMIN_KEY].isin(avail_regions)]
+    regions = regions.rename(columns={GEOJSON_ADMIN_KEY: "admin_id"})
     regions = regions.sort_values(by="admin_id")
     return regions.to_dict(orient="records")
 

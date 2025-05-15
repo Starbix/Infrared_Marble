@@ -26,6 +26,7 @@ export default function CoverageFraction({ geojson, coverageData }: CoverageFrac
       <Plot
         data={[
           {
+            // @ts-expect-error Not in type but works
             type: "choroplethmap",
             geojson: geojson,
             locations,

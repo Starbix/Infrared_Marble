@@ -1,7 +1,7 @@
 "use client";
 
-import { Autocomplete, Box, FormControl, FormLabel, InputLabel, MenuItem, Select, TextField } from "@mui/material";
-import dayjs, { Dayjs } from "dayjs";
+import { Autocomplete, Box, TextField } from "@mui/material";
+import dayjs from "dayjs";
 import { CSSProperties, useState } from "react";
 import useSWR from "swr";
 
@@ -72,6 +72,7 @@ function Plot({ data, style, gap = 8 }: { data: StatsHeatmapResponse; style?: CS
           colorscale: "Greens",
           showscale: false,
           reversescale: true,
+          hovertemplate: `<b>%{x} %{y}</b>: %{z} LuoJia Tiles<extra></extra>`,
         },
       ]}
       layout={{

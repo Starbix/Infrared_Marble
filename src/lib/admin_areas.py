@@ -4,7 +4,7 @@ from pathlib import Path
 import geopandas
 import pandas as pd
 
-from lib.config import ADMIN_AREA_FILE_MAPPING, DEFAULT_DATES_FILE, GEOJSON_ADMIN_KEY, STATIC_DIR
+from lib.config import ADMIN_AREA_FILE_MAPPING, DEFAULT_DATES_FILE, GEOJSON_ADMIN_KEY, STATIC_DIR, TILE_DENSITY_CSV
 from lib.types import Resolution
 
 
@@ -67,3 +67,18 @@ def get_region_meta(path: str | Path | None = None):
     """
     path = Path(path) if path else STATIC_DIR / "country_meta.csv.gz"
     return pd.read_csv(path, compression="infer")
+
+
+def get_tile_densities():
+    """Get a dataframe containing information about tile density for each region
+
+    :return: DataFrame with columns:
+
+        - `Date` (str): Date of tile
+        - `ISO_A3` (str): ISO-Alpha3 name of country
+        - `Country` (str): Full name of country
+        - `Count` (int): Number of tiles on this date
+        - `Area_km2` (float): Country area in km^2
+        - `CoverageFraction` (float): Fraction of country covered on this date
+    """
+    return pd.read_csv(TILE_DENSITY_CSV)

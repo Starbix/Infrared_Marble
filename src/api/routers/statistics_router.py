@@ -1,8 +1,15 @@
+import numpy as np
 import pandas as pd
 import pycountry
 from fastapi import APIRouter, HTTPException
 
-from lib.admin_areas import dates_from_csv, get_all_regions_gdf, get_region_avail_dates, get_region_meta
+from lib.admin_areas import (
+    dates_from_csv,
+    get_all_regions_gdf,
+    get_region_avail_dates,
+    get_region_meta,
+    get_tile_densities,
+)
 from lib.cloud_coverage import get_day_cloud_coverage
 from lib.config import ADMIN_AREA_FILE_MAPPING, GEOJSON_ADMIN_KEY, STATIC_DIR
 
@@ -30,7 +37,11 @@ async def get_statistics():
 @router.get("/regions")
 async def get_regions():
     gdf = get_all_regions_gdf()
-    regions = gdf[[GEOJSON_ADMIN_KEY, "name"]].drop_duplicates().rename(columns={GEOJSON_ADMIN_KEY: "admin_id"})
+    region_meta = get_region_meta()
+    avail_regions = region_meta["country"].unique()
+    regions = gdf[[GEOJSON_ADMIN_KEY, "name"]].drop_duplicates()
+    regions = regions[regions[GEOJSON_ADMIN_KEY].isin(avail_regions)]
+    regions = regions.rename(columns={GEOJSON_ADMIN_KEY: "admin_id"})
     regions = regions.sort_values(by="admin_id")
     return regions.to_dict(orient="records")
 
@@ -83,7 +94,7 @@ async def get_stats_admin_area(admin_id: str):
     """
     Get cloud coverage for an admin area.
     """
-    country_name = pycountry.countries.get(alpha_3=admin_id.upper()).name
+    country_name = pycountry.countries.get(alpha_3=admin_id.upper()).name  # type: ignore
     dates = get_region_avail_dates(admin_id)
     dates_clouds = {}
     for date in dates:
@@ -91,3 +102,33 @@ async def get_stats_admin_area(admin_id: str):
         dates_clouds[date] = {"lj_cloud_coverage": lj, "bm_cloud_coverage": bm}
 
     return dates_clouds
+
+
+@router.get("/coverage-fraction")
+async def get_coverage_fraction():
+    df = get_tile_densities()
+
+    # Return average country coverage over all dates where data is available
+    coverage = df.groupby("ISO_A3")["CoverageFraction"].mean().sort_values(ascending=False)
+    log_coverage = pd.Series(np.log10(coverage))
+
+    # Compute percentiles
+    pc02, pc98 = log_coverage.quantile(q=[0.02, 0.98])
+
+    # Compute ticks
+    tickvals = np.linspace(pc02, pc98, num=5)
+    ticklabels = 10**tickvals
+
+    return {
+        "index": coverage.index.tolist(),
+        "coverage": coverage.tolist(),
+        "log_coverage": np.log10(coverage).tolist(),
+        "scale": {
+            "tickvals": tickvals.tolist(),
+            "ticklabels": ticklabels.tolist(),
+        },
+        "stats": {
+            "zmin": pc02,
+            "zmax": pc98,
+        },
+    }

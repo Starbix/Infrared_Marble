@@ -10,7 +10,7 @@ import DateHeatmap from "./_components/DateHeatmap";
 import Summary from "./_components/Summary";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] }> }) {
-  const [summaryStats, regions, regions_geojson, coverageFraction, query] = await Promise.all([
+  const [summaryStats, regions, regionsGeoJSON, coverageFraction, query] = await Promise.all([
     api.get<StatsSummaryResponse>("/statistics/summary").then((res) => res.data),
     api.get<StatsRegionsResponse>("/statistics/regions").then((res) => res.data),
     api.get<any>("/explore/admin-areas", { params: { include_id: "true" } }).then((res) => res.data),
@@ -59,15 +59,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ [
             Tile coverage per country as percentage of country area. Average over all days with data. Note that the
             maximum might be over 100% as some tiles are overlapping.
           </Typography>
-          <CoverageFraction
-            geojson={regions_geojson}
-            locations={coverageFraction.index}
-            z={coverageFraction.coverage}
-            logz={coverageFraction.log_coverage}
-            tickvals={coverageFraction.scale.tickvals}
-            ticklabels={coverageFraction.scale.ticklabels}
-            scaleBounds={[coverageFraction.stats.zmin, coverageFraction.stats.zmax]}
-          />
+          <CoverageFraction geojson={regionsGeoJSON} coverageData={coverageFraction} />
           <Divider />
         </Stack>
       </Paper>

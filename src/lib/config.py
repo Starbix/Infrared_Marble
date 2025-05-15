@@ -47,6 +47,9 @@ GEOJSON_ADMIN_KEY = "adm0_a3"
 # Cloud coverage
 CLOUD_API_KEY = "C6FNLY48VY2CHXVP2TD9534X4"
 
+# Region-level metrics
+TILE_DENSITY_CSV = STATIC_DIR / "tile_density" / "image_counts_with_density_patched.csv"
+
 # Checks
 # Ensure data dirs exists
 for _d in [DATA_DIR, BM_DATA_DIR, LJ_DATA_DIR]:

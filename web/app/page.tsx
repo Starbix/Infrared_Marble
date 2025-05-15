@@ -29,7 +29,7 @@ export default async function Page({
   return (
     <Box sx={{ position: "absolute", inset: 0, bgcolor: "background.default", zIndex: 1 }}>
       <Box sx={{ p: 1, overflow: "clip", height: 1, width: 1, position: "relative" }}>
-        <MapLoader center={center} zoom={6}>
+        <MapLoader center={center} zoom={6} tileLayerProps={{ provider: "CartoDB", style: "light_all" }}>
           <Suspense>
             <MapContentLoader />
           </Suspense>

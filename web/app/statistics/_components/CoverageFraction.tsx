@@ -49,13 +49,10 @@ export default function CoverageFraction({ geojson, coverageData }: CoverageFrac
         layout={{
           height: 400,
           width: 800,
-          geo: {
-            scope: "world",
-            projection: {
-              type: "natural earth",
-            },
-            showland: true,
-            landcolor: "rgb(217, 217, 217)",
+          // @ts-expect-error Incorrect types
+          map: {
+            // More styles here: https://plotly.com/python/tile-map-layers/
+            style: "basic",
           },
           margin: { t: 0, r: 0, b: 0, l: 0 },
         }}

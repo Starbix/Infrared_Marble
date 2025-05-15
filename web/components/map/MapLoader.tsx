@@ -4,7 +4,7 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import { AnimatePresence, motion } from "motion/react";
 import dynamic from "next/dynamic";
 
-import { MapProps } from "./Map";
+import { MapProps, TileLayerProvider } from "./Map";
 
 const Loading = () => (
   <Box
@@ -28,11 +28,11 @@ const Map = dynamic(() => import("./Map"), {
   loading: Loading,
 });
 
-export type MapLoaderProps = MapProps & {
+export type MapLoaderProps<T extends TileLayerProvider> = MapProps<T> & {
   animated?: boolean;
 };
 
-const MapLoader: React.FC<MapLoaderProps> = ({ animated, ...props }) => {
+export default function MapLoader<T extends TileLayerProvider>({ animated, ...props }: MapLoaderProps<T>) {
   if (animated) {
     return (
       <AnimatePresence>
@@ -50,6 +50,4 @@ const MapLoader: React.FC<MapLoaderProps> = ({ animated, ...props }) => {
   } else {
     return <Map {...props} />;
   }
-};
-
-export default MapLoader;
+}

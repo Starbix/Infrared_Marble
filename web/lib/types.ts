@@ -24,3 +24,17 @@ export type StatsHeatmapResponse = {
   months: number[];
   heatmap: number[][];
 };
+
+export type StatsCoverageFractionResponse = {
+  index: string[];
+  coverage: number[];
+  log_coverage: number[];
+  scale: {
+    tickvals: number[];
+    ticklabels: number[];
+  };
+  stats: {
+    zmin: number;
+    zmax: number;
+  };
+};

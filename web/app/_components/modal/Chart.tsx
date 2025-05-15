@@ -49,7 +49,7 @@ const Chart: React.FC<ChartProps> = ({ center, zoom, maps, mapId, date, adminId,
 
   return (
     <>
-      <MapLoader center={center} zoom={zoom}>
+      <MapLoader center={center} zoom={zoom} tileLayerProps={{ provider: "OpenStreetMap", style: "HOT" }}>
         <SyncMaps maps={maps} currentMapId={mapId} />
         {supportedChartTypes.has(layer) && (
           <GeoTiffLayer

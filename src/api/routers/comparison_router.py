@@ -25,11 +25,6 @@ logger.setLevel(logging.INFO)
 router = APIRouter(prefix="/compare/{date}/{admin_id}", tags=["Compare"])
 
 
-def bm_geotiff_task(gdf: geopandas.GeoDataFrame, date: date):
-    bm_data = bm_download(gdf, date)
-    return bm_data
-
-
 # directly returns GeoTIFF
 def lj_geotiff_task(gdf: geopandas.GeoDataFrame, date: date):
     geotiff_list = get_geotiffs(gdf, date)

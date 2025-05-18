@@ -1,7 +1,15 @@
 export enum ChartType {
+  // Auxiliary
   BaseMap = "base_map",
-  BlackMarble = "bm",
+  // Blackmarble
+  VNP46A2_GapFilled = "vnp46a2_gap_filled",
+  VNP46A2_DNB = "vnp46a2_dnb",
+  VNP46A1_DNB = "vnp46a1_dnb",
+  VNP46A1_RadianceM10 = "vnp46a1_radiance_m10",
+  VNP46A1_RadianceM11 = "vnp46a1_radiance_m11",
+  // LuoJia
   LuoJia = "lj",
+  // Combined
   Overlay = "overlay",
   Difference = "diff",
 }

@@ -7,7 +7,6 @@ import {
   Close as CloseIcon,
 } from "@mui/icons-material";
 import { Box, Button, MenuItem, Select, Typography } from "@mui/material";
-import { LatLngExpression } from "leaflet";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { getBestZoomLevel } from "@/lib/geo";
@@ -19,27 +18,24 @@ const LS_KEY = "chart-config";
 
 const chartTypeNames: { [K in ChartType]: string } = {
   [ChartType.BaseMap]: "Base map",
-  [ChartType.BlackMarble]: "Blackmarble (moonlight-corrected, VNP46A2)",
+  [ChartType.VNP46A2_GapFilled]: "Blackmarble (VNP46A2, BRDF-Corrected, Gap-Filled)",
+  [ChartType.VNP46A2_DNB]: "Blackmarble (VNP46A2, BRDF-Corrected)",
+  [ChartType.VNP46A1_DNB]: "Blackmarble (VNP46A1, Day-Night-Band Radiance)",
+  [ChartType.VNP46A1_RadianceM10]: "Blackmarble (VNP46A1, M10 Radiance)",
+  [ChartType.VNP46A1_RadianceM11]: "Blackmarble (VNP46A1, M11 Radiance)",
   [ChartType.LuoJia]: "LuoJia1-01",
   [ChartType.Overlay]: "Overlay",
   [ChartType.Difference]: "Difference",
 };
 
 const toChartType = (str: string) => {
-  switch (str) {
-    case "base_map":
-      return ChartType.BaseMap;
-    case "bm":
-      return ChartType.BlackMarble;
-    case "lj":
-      return ChartType.LuoJia;
-    case "overlay":
-      return ChartType.Overlay;
-    case "diff":
-      return ChartType.Difference;
-    default:
-      throw new TypeError(str + " cannot be converted to ChartType");
+  for (const key of Object.keys(ChartType)) {
+    const value = ChartType[key];
+    if ([key, value].includes(str)) {
+      return ChartType[key] as ChartType;
+    }
   }
+  throw new Error(`Cannot convert to chart type: ${str}`);
 };
 
 export type ModalContentProps = {
@@ -51,7 +47,7 @@ export type ModalContentProps = {
 
 const ModalContent: React.FC<ModalContentProps> = ({
   layer,
-  defaultChartType = ChartType.BlackMarble,
+  defaultChartType = ChartType.VNP46A2_GapFilled,
   date,
   adminId,
 }) => {
@@ -96,7 +92,7 @@ const ModalContent: React.FC<ModalContentProps> = ({
       setChartTypes(config);
     } else {
       // Add default configuration
-      setChartTypes([ChartType.BlackMarble, ChartType.LuoJia]);
+      setChartTypes([ChartType.VNP46A2_GapFilled, ChartType.LuoJia]);
     }
   }, []);
 

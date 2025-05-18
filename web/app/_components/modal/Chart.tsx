@@ -30,8 +30,20 @@ export type ChartProps = {
   layer: ChartType;
 };
 
+function getLayerUrl(type: ChartType, date: string, adminId: string) {
+  switch (type) {
+    case ChartType.BlackMarble:
+      return `/compare/${date}/${adminId}/bm?variable=DNB_BRDF-Corrected_NTL`;
+    case ChartType.LuoJia:
+      return `/compare/${date}/${adminId}/lj`;
+    default:
+      // Unsupported chart types
+      return "";
+  }
+}
+
 const Chart: React.FC<ChartProps> = ({ center, zoom, maps, mapId, date, adminId, layer }) => {
-  const layerUrl = `/compare/${date}/${adminId}/${layer}`;
+  const layerUrl = getLayerUrl(layer, date, adminId);
   const legendTitle = chartTitles[layer];
 
   const mutateRef = useRef<KeyedMutator<any> | null>(null);

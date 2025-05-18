@@ -11,10 +11,21 @@ import MapLoader from "@/components/map/MapLoader";
 import SyncMaps from "@/components/map/SyncMaps";
 import { ChartType } from "@/lib/types";
 
-const supportedChartTypes = new Set([ChartType.BlackMarble, ChartType.LuoJia]);
+const supportedChartTypes = new Set([
+  ChartType.VNP46A2_GapFilled,
+  ChartType.VNP46A2_DNB,
+  ChartType.VNP46A1_DNB,
+  ChartType.VNP46A1_RadianceM10,
+  ChartType.VNP46A1_RadianceM11,
+  ChartType.LuoJia,
+]);
 const chartTitles: { [_ in ChartType]: string } = {
   [ChartType.BaseMap]: "Base map",
-  [ChartType.BlackMarble]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
+  [ChartType.VNP46A2_GapFilled]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
+  [ChartType.VNP46A2_DNB]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
+  [ChartType.VNP46A1_DNB]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
+  [ChartType.VNP46A1_RadianceM10]: "Radiance [W·m⁻²·μm⁻¹·sr⁻¹]",
+  [ChartType.VNP46A1_RadianceM11]: "Radiance [W·m⁻²·μm⁻¹·sr⁻¹]",
   [ChartType.LuoJia]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
   [ChartType.Overlay]: "<not yet supported>",
   [ChartType.Difference]: "<not yet supported>",
@@ -31,9 +42,19 @@ export type ChartProps = {
 };
 
 function getLayerUrl(type: ChartType, date: string, adminId: string) {
+  const bmUrl = (product: "VNP46A1" | "VNP46A2", variable: string) =>
+    `/compare/${date}/${adminId}/bm?product=${product}&variable=${variable}`;
   switch (type) {
-    case ChartType.BlackMarble:
-      return `/compare/${date}/${adminId}/bm?variable=DNB_BRDF-Corrected_NTL`;
+    case ChartType.VNP46A2_GapFilled:
+      return bmUrl("VNP46A2", "Gap_Filled_DNB_BRDF-Corrected_NTL");
+    case ChartType.VNP46A2_DNB:
+      return bmUrl("VNP46A2", "DNB_BRDF-Corrected_NTL");
+    case ChartType.VNP46A1_DNB:
+      return bmUrl("VNP46A1", "DNB_At_Sensor_Radiance_500m");
+    case ChartType.VNP46A1_RadianceM10:
+      return bmUrl("VNP46A1", "Radiance_M10");
+    case ChartType.VNP46A1_RadianceM11:
+      return bmUrl("VNP46A1", "Radiance_M11");
     case ChartType.LuoJia:
       return `/compare/${date}/${adminId}/lj`;
     default:

@@ -3,7 +3,6 @@ import logging
 import pickle
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
-from typing import Literal
 
 import geopandas
 import xarray as xr
@@ -40,7 +39,7 @@ def lj_geotiff_task(gdf: geopandas.GeoDataFrame, date: date):
 async def get_bm_geotiff_new(
     date: date,
     admin_id: str,
-    product: Literal[Product.VNP46A1, Product.VNP46A2] = Product.VNP46A2,
+    product: Product = Product.VNP46A2,
     variable: VNP46A1_Variable | VNP46A2_Variable = "Gap_Filled_DNB_BRDF-Corrected_NTL",
     crs: str = "EPSG:4326",
     nocache: bool = False,

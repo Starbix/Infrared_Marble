@@ -2,7 +2,7 @@ import io
 import logging
 import pickle
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date
+from datetime import date, timedelta
 
 import geopandas
 import xarray as xr
@@ -46,6 +46,8 @@ async def get_bm_geotiff_new(
     crs: str = "EPSG:4326",
     nocache: bool = False,
 ):
+    # Need to add a day to the date
+    date += timedelta(days=1)
     cache_dir = BM_DATA_DIR / "cache" / admin_id / date.isoformat() / variable
     raster_path = cache_dir / "raster.tif"
     meta_path = cache_dir / "meta.pkl"

@@ -1,21 +1,51 @@
 import datetime
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from typing import Literal, overload
 
 import xarray as xr
 from blackmarble.raster import bm_raster
+from blackmarble.types import Product
 from geopandas import GeoDataFrame
 
 from lib.config import (
     BM_DATA_DIR,
-    BM_PRODUCT,
-    BM_QUALITY_FLAG,
+    BM_DEFAULT_PRODUCT,
+    BM_DEFAULT_QUALITY_FLAG,
+    BM_DEFAULT_VARIABLE,
     BM_TOKEN,
-    BM_VARIABLE,
 )
+from lib.types import VNP46A1_Variable, VNP46A2_Variable
 
 
-def bm_download(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.date]) -> xr.Dataset:
+# Provide overloads for "variable" type hints
+@overload
+def bm_download(
+    gdf: GeoDataFrame,
+    date_range: datetime.date | list[datetime.date],
+    product: Literal[Product.VNP46A1],
+    variable: VNP46A1_Variable,
+    drop_values_by_quality_flag: list[int] | None = None,
+) -> xr.Dataset: ...
+
+
+@overload
+def bm_download(
+    gdf: GeoDataFrame,
+    date_range: datetime.date | list[datetime.date],
+    product: Literal[Product.VNP46A2],
+    variable: VNP46A2_Variable,
+    drop_values_by_quality_flag: list[int] | None = None,
+) -> xr.Dataset: ...
+
+
+def bm_download(
+    gdf: "GeoDataFrame",
+    date_range: datetime.date | list[datetime.date],
+    product: Product,
+    variable: VNP46A1_Variable | VNP46A2_Variable,
+    drop_values_by_quality_flag: list[int] | None = None,
+) -> xr.Dataset:
     """Downloads data from Blackmarble dataset for a given region and date range.
 
     :param gdf: GeoDataFrame of region of interest
@@ -26,12 +56,12 @@ def bm_download(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.d
     out_dir.mkdir(parents=True, exist_ok=True)
     raster = bm_raster(
         gdf,
-        product_id=BM_PRODUCT,
+        product_id=product,
         date_range=date_range,
         bearer=BM_TOKEN,
         output_directory=out_dir,
-        drop_values_by_quality_flag=BM_QUALITY_FLAG,
-        variable=BM_VARIABLE,
+        drop_values_by_quality_flag=drop_values_by_quality_flag or BM_DEFAULT_QUALITY_FLAG,
+        variable=variable,
         output_skip_if_exists=True,
     )
     return raster
@@ -52,7 +82,9 @@ def bm_store_to_zarr(
     :return: Fresh reference to Zarr store
     """
     # Check if already preprocessed
-    zarr_path = Path(dest) if dest else (BM_DATA_DIR / "preprocessed" / f"{BM_PRODUCT}-{BM_VARIABLE}.zarr")
+    zarr_path = (
+        Path(dest) if dest else (BM_DATA_DIR / "preprocessed" / f"{BM_DEFAULT_PRODUCT}-{BM_DEFAULT_VARIABLE}.zarr")
+    )
     zarr_path.parent.mkdir(parents=True, exist_ok=True)
     if not force and zarr_path.exists():
         print("Dataset already preprocessed, skipping...")
@@ -85,7 +117,7 @@ def bm_load_from_zarr(path: str | Path | None = None) -> xr.Dataset:
     :raises ValueError: Zarr store does not exist
     :return: Reference to Zarr dataset
     """
-    path = Path(path) if path else BM_DATA_DIR / "preprocessed" / f"{BM_PRODUCT}-{BM_VARIABLE}.zarr"
+    path = Path(path) if path else BM_DATA_DIR / "preprocessed" / f"{BM_DEFAULT_PRODUCT}-{BM_DEFAULT_VARIABLE}.zarr"
 
     if not path.exists():
         raise ValueError(f"File does not exist: {path}")

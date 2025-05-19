@@ -8,6 +8,8 @@ import xarray as xr
 from geopandas import GeoDataFrame
 from osgeo import gdal, ogr
 from shapely.geometry import Polygon
+from shapely.geometry.base import BaseGeometry
+from shapely.ops import unary_union
 
 from lib.config import DATA_DIR, LJ_DATA_DIR, LJ_METADATA_URL
 from lib.lj import lj_download_metadata, lj_download_tile
@@ -176,7 +178,7 @@ def empty_geotiff() -> bytes:
 
 ## problematic: noData from geotiffs overwrite actual data
 # need to take geometry into account
-def merge_geotiffs(geotiff_list) -> tuple[bytes, float, float]:
+def merge_geotiffs(geotiff_list) -> tuple[bytes, float, float, BaseGeometry]:
     """Merge a list of geotiffs into a single large geotiff
 
     :param geotiff_list: List of tile names of geotiffs to merge
@@ -188,9 +190,11 @@ def merge_geotiffs(geotiff_list) -> tuple[bytes, float, float]:
 
     file_list = [str(LJ_DATA_DIR / "tiles" / geotiff) + "_gec.tif" for geotiff in geotiff_list]
 
+    geometries = []
     for file in file_list:
         metadata_path = str(LJ_DATA_DIR / "metadata" / file.split("/")[-1].replace("_gec.tif", "_meta.xml"))
-        convert_geotiff(file, file.replace(".tif", "_float.tif"), metadata_path)
+        polygon = convert_geotiff(file, file.replace(".tif", "_float.tif"), metadata_path)
+        geometries.append(polygon)
 
     new_file_list = [str(LJ_DATA_DIR / "tiles" / geotiff) + "_gec_float.tif" for geotiff in geotiff_list]
 
@@ -232,7 +236,9 @@ def merge_geotiffs(geotiff_list) -> tuple[bytes, float, float]:
     # Clean up the virtual file system
     gdal.Unlink("/vsimem/temp.tif")
 
-    return buffer.read(), pc02, pc98
+    unified_geometry = unary_union(geometries)
+
+    return buffer.read(), pc02, pc98, unified_geometry
 
 
 def merge_geotiffs_to_file(geotiff_list, output_name="merged.tif"):
@@ -243,9 +249,11 @@ def merge_geotiffs_to_file(geotiff_list, output_name="merged.tif"):
     """
     file_list = [str(LJ_DATA_DIR / "tiles" / geotiff) + "_gec.tif" for geotiff in geotiff_list]
 
+    geometries = []
     for file in file_list:
         metadata_path = str(LJ_DATA_DIR / "metadata" / file.split("/")[-1].replace("_gec.tif", "_meta.xml"))
-        convert_geotiff(file, file.replace(".tif", "_float.tif"), metadata_path)
+        polygon = convert_geotiff(file, file.replace(".tif", "_float.tif"), metadata_path)
+        geometries.append(polygon)
 
     new_file_list = [str(LJ_DATA_DIR / "tiles" / geotiff) + "_gec_float.tif" for geotiff in geotiff_list]
 
@@ -259,6 +267,9 @@ def merge_geotiffs_to_file(geotiff_list, output_name="merged.tif"):
 
     # Close the in-memory VRT dataset
     vrt_dataset = None
+
+    unified_geometry = unary_union(geometries)
+    return unified_geometry
 
 
 # convert uint32 to float32,
@@ -341,6 +352,10 @@ def convert_geotiff(input_path, output_path, metadata_path, nodata_value=NODATA_
     # Close the datasets
     dataset = None
     out_dataset = None
+
+    # Create shapely polygon for returning
+    shapely_polygon = Polygon([coordinates["LT"], coordinates["RT"], coordinates["RB"], coordinates["LB"]])
+    return shapely_polygon
 
 
 if __name__ == "__main__":

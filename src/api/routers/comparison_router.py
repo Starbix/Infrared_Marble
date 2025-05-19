@@ -36,7 +36,7 @@ def lj_geotiff_task(gdf: geopandas.GeoDataFrame, date: date):
 
 
 @router.get("/bm")
-async def get_bm_geotiff_new(
+async def get_bm_geotiff(
     date: date,
     admin_id: str,
     product: Product = Product.VNP46A2,
@@ -72,7 +72,7 @@ async def get_bm_geotiff_new(
     # Download if not available in cache
     if geotiff_buf is None or pc02 is None or pc98 is None:
         logger.info("BM: Downloading (%s, %s)", admin_id, date.isoformat())
-        gdf = bm_get_unified_gdf(admin_id, date)
+        gdf = bm_get_unified_gdf(admin_id, date - timedelta(days=1))  # Use original LuoJia date for this
         dataset = await run_in_threadpool(bm_download, gdf=gdf, date_range=date, product=product, variable=variable)  # type: ignore
         dataset.to_zarr(cache_dir, mode="w")
         logger.info("Download complete.")

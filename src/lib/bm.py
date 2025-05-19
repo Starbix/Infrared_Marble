@@ -29,16 +29,17 @@ def bm_get_unified_gdf(
     gdf = get_region_gdf(admin_id, resolution=resolution)
 
     if merge_luojia_geometry:
+        print(f"Merging LuoJia geometry for {admin_id} on {date}")
         # Get and merge LuoJia geometry
         import pandas as pd
 
         from .lj import lj_get_region_geometry
 
         geometry = lj_get_region_geometry(admin_id, date)
-        gdf_lj = geopandas.GeoDataFrame(geometry=[geometry])
+        gdf_lj = geopandas.GeoDataFrame(geometry=[geometry], crs=gdf.crs)
         all_geoms = pd.concat([gdf.geometry, gdf_lj.geometry])
         geom_merged = all_geoms.union_all(method="unary")
-        gdf = geopandas.GeoDataFrame(geometry=[geom_merged])
+        gdf = geopandas.GeoDataFrame(geometry=[geom_merged], crs=gdf.crs)
 
     return gdf
 

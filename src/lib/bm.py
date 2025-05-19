@@ -3,11 +3,13 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Literal, overload
 
+import geopandas
 import xarray as xr
 from blackmarble.raster import bm_raster
 from blackmarble.types import Product
 from geopandas import GeoDataFrame
 
+from lib.admin_areas import get_region_gdf
 from lib.config import (
     BM_DATA_DIR,
     BM_DEFAULT_PRODUCT,
@@ -15,7 +17,30 @@ from lib.config import (
     BM_DEFAULT_VARIABLE,
     BM_TOKEN,
 )
-from lib.types import VNP46A1_Variable, VNP46A2_Variable
+from lib.types import Resolution, VNP46A1_Variable, VNP46A2_Variable
+
+
+def bm_get_unified_gdf(
+    admin_id: str, date: str | datetime.date, resolution: Resolution = "50m", merge_luojia_geometry: bool = True
+):
+    if isinstance(date, datetime.date):
+        date = date.isoformat()
+
+    gdf = get_region_gdf(admin_id, resolution=resolution)
+
+    if merge_luojia_geometry:
+        # Get and merge LuoJia geometry
+        import pandas as pd
+
+        from .lj import lj_get_region_geometry
+
+        geometry = lj_get_region_geometry(admin_id, date)
+        gdf_lj = geopandas.GeoDataFrame(geometry=[geometry])
+        all_geoms = pd.concat([gdf.geometry, gdf_lj.geometry])
+        geom_merged = all_geoms.union_all(method="unary")
+        gdf = geopandas.GeoDataFrame(geometry=[geom_merged])
+
+    return gdf
 
 
 # Provide overloads for "variable" type hints
@@ -26,6 +51,7 @@ def bm_download(
     product: Literal[Product.VNP46A1],
     variable: VNP46A1_Variable,
     drop_values_by_quality_flag: list[int] | None = None,
+    use_cache: bool = True,
 ) -> xr.Dataset: ...
 
 
@@ -36,6 +62,7 @@ def bm_download(
     product: Literal[Product.VNP46A2],
     variable: VNP46A2_Variable,
     drop_values_by_quality_flag: list[int] | None = None,
+    use_cache: bool = True,
 ) -> xr.Dataset: ...
 
 
@@ -45,6 +72,7 @@ def bm_download(
     product: Product,
     variable: VNP46A1_Variable | VNP46A2_Variable,
     drop_values_by_quality_flag: list[int] | None = None,
+    use_cache: bool = True,
 ) -> xr.Dataset:
     """Downloads data from Blackmarble dataset for a given region and date range.
 
@@ -62,7 +90,7 @@ def bm_download(
         output_directory=out_dir,
         drop_values_by_quality_flag=drop_values_by_quality_flag or BM_DEFAULT_QUALITY_FLAG,
         variable=variable,
-        output_skip_if_exists=True,
+        output_skip_if_exists=use_cache,
     )
     return raster
 

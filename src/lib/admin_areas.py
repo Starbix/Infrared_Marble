@@ -42,13 +42,13 @@ def get_region_avail_dates(admin_id: str) -> list[str]:
     return dates.tolist()
 
 
-def get_region_gdf(admin_id: str) -> geopandas.GeoDataFrame:
+def get_region_gdf(admin_id: str, resolution: Resolution = "50m") -> geopandas.GeoDataFrame:
     """Get a GeoDataFrame for a particular region.
 
     :param admin_id: Administrative ID for this region.
     :return: GeoDataFrame of region
     """
-    with gzip.open(ADMIN_AREA_FILE_MAPPING["50m"]) as f:
+    with gzip.open(ADMIN_AREA_FILE_MAPPING[resolution]) as f:
         gdf = geopandas.read_file(f)
     gdf = gdf[gdf[GEOJSON_ADMIN_KEY] == admin_id]
     assert isinstance(gdf, geopandas.GeoDataFrame)

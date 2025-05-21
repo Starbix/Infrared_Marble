@@ -282,6 +282,10 @@ def convert_geotiff(input_path, output_path, metadata_path, nodata_value=NODATA_
     # Apply the radiance conversion formula
     radiance = (data ** (3 / 2)) * 10 ** (-10)
 
+    # Apply the user-defined rescaling factor
+    rescaling_factor_luojia = 0.3122 * (10**5)
+    radiance = radiance * rescaling_factor_luojia
+
     driver = gdal.GetDriverByName("GTiff")
     out_dataset = driver.Create(output_path, dataset.RasterXSize, dataset.RasterYSize, 1, gdal.GDT_Float32)
     out_dataset.SetGeoTransform(dataset.GetGeoTransform())

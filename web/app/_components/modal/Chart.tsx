@@ -14,8 +14,8 @@ import { ChartType } from "@/lib/types";
 const supportedChartTypes = new Set([ChartType.BlackMarble, ChartType.LuoJia]);
 const chartTitles: { [_ in ChartType]: string } = {
   [ChartType.BaseMap]: "Base map",
-  [ChartType.BlackMarble]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
-  [ChartType.LuoJia]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
+  [ChartType.BlackMarble]: "Radiance [nW·cm⁻²·sr⁻¹]",
+  [ChartType.LuoJia]: "Radiance [nW·cm⁻²·sr⁻¹]",
   [ChartType.Overlay]: "<not yet supported>",
   [ChartType.Difference]: "<not yet supported>",
 };

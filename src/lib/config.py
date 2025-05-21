@@ -4,7 +4,7 @@ from pathlib import Path
 
 from blackmarble.types import Product
 
-from lib.types import Resolution
+from lib.app_types import Resolution
 
 # Note: This code runs whenever the module is first imported.
 # This is to make sure that the DATA_DIR and BEARER_TOKEN variables are appropriately set.

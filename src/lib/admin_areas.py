@@ -5,7 +5,7 @@ import geopandas
 import pandas as pd
 
 from lib.config import ADMIN_AREA_FILE_MAPPING, DEFAULT_DATES_FILE, GEOJSON_ADMIN_KEY, STATIC_DIR, TILE_DENSITY_CSV
-from lib.types import Resolution
+from lib.app_types import Resolution
 
 
 def dates_from_csv(filename: str | Path | None = None, colname: str = "date") -> list[str]:

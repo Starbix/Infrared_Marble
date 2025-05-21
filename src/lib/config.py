@@ -18,10 +18,10 @@ DATA_DIR = Path(os.getenv("DATA_DIR", PROJECT_ROOT / "data"))
 # Get Bearer token from environment
 BM_TOKEN = os.getenv("BLACKMARBLE_TOKEN", "")
 BM_DATA_DIR = DATA_DIR / "blackmarble"
-BM_PRODUCT = Product(os.environ.get("BM_PRODUCT", Product.VNP46A2))
-BM_VARIABLE: str | None = os.environ.get("BM_VARIABLE")  # Default varible for product
-BM_QUALITY_FLAG = [int(x) for x in os.environ.get("BM_QUALITY_FLAG", "255").split(",")]
-BM_DEFAULT_VARIABLE: dict[Product, str] = {
+BM_DEFAULT_PRODUCT = Product(os.environ.get("BM_PRODUCT", Product.VNP46A2))
+BM_DEFAULT_VARIABLE: str | None = os.environ.get("BM_VARIABLE")  # Default varible for product
+BM_DEFAULT_QUALITY_FLAG = [int(x) for x in os.environ.get("BM_QUALITY_FLAG", "").split(",") if x != ""]
+BM_DEFAULT_VARIABLES: dict[Product, str] = {
     Product.VNP46A1: "DNB_At_Sensor_Radiance_500m",
     Product.VNP46A2: "Gap_Filled_DNB_BRDF-Corrected_NTL",
     Product.VNP46A3: "NearNadir_Composite_Snow_Free",

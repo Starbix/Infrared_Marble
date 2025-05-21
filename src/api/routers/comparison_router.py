@@ -2,29 +2,26 @@ import io
 import logging
 import pickle
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date
+from datetime import date, timedelta
 
 import geopandas
 import xarray as xr
+from blackmarble.types import Product
 from fastapi import Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.routing import APIRouter
 
-from lib.admin_areas import get_region_gdf, get_region_meta
-from lib.bm import bm_download
+from lib.admin_areas import get_region_meta
+from lib.bm import bm_download, bm_get_unified_gdf
 from lib.config import BM_DATA_DIR, LJ_DATA_DIR
 from lib.geotiff import get_geotiffs, merge_geotiffs
 from lib.lj import lj_download_tile
+from lib.types import VNP46A1_Variable, VNP46A2_Variable
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 router = APIRouter(prefix="/compare/{date}/{admin_id}", tags=["Compare"])
-
-
-def bm_geotiff_task(gdf: geopandas.GeoDataFrame, date: date):
-    bm_data = bm_download(gdf, date)
-    return bm_data
 
 
 # directly returns GeoTIFF
@@ -33,19 +30,22 @@ def lj_geotiff_task(gdf: geopandas.GeoDataFrame, date: date):
     for geotiff in geotiff_list:
         lj_download_tile(geotiff)
 
-    geotiff_buf, pc02, pc98 = merge_geotiffs(geotiff_list)
+    geotiff_buf, pc02, pc98, geometry = merge_geotiffs(geotiff_list)
 
     return geotiff_buf, pc02, pc98
 
 
 @router.get("/bm")
-async def get_bm_geotiff_new(
+async def get_bm_geotiff(
     date: date,
     admin_id: str,
-    variable: str = "Gap_Filled_DNB_BRDF-Corrected_NTL",
+    product: Product = Product.VNP46A2,
+    variable: VNP46A1_Variable | VNP46A2_Variable = "Gap_Filled_DNB_BRDF-Corrected_NTL",
     crs: str = "EPSG:4326",
     nocache: bool = False,
 ):
+    # Need to add a day to the date
+    date += timedelta(days=1)
     cache_dir = BM_DATA_DIR / "cache" / admin_id / date.isoformat() / variable
     raster_path = cache_dir / "raster.tif"
     meta_path = cache_dir / "meta.pkl"
@@ -72,8 +72,8 @@ async def get_bm_geotiff_new(
     # Download if not available in cache
     if geotiff_buf is None or pc02 is None or pc98 is None:
         logger.info("BM: Downloading (%s, %s)", admin_id, date.isoformat())
-        gdf = get_region_gdf(admin_id)
-        dataset = await run_in_threadpool(bm_download, gdf=gdf, date_range=date)
+        gdf = bm_get_unified_gdf(admin_id, date - timedelta(days=1))  # Use original LuoJia date for this
+        dataset = await run_in_threadpool(bm_download, gdf=gdf, date_range=date, product=product, variable=variable)  # type: ignore
         dataset.to_zarr(cache_dir, mode="w")
         logger.info("Download complete.")
 
@@ -132,7 +132,7 @@ def lj_download(
 
     # Merge
     logger.info("Merging tiles...")
-    geotiff_buf, pc02, pc98 = merge_geotiffs(relevant_tiles)
+    geotiff_buf, pc02, pc98, geometry = merge_geotiffs(relevant_tiles)
 
     if resample:
         raise NotImplementedError("Resampling not yet supported")

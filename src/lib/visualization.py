@@ -5,7 +5,7 @@ import colorcet as cc
 import contextily as cx
 import matplotlib.pyplot as plt
 
-from lib.config import BM_DEFAULT_VARIABLE, BM_PRODUCT, BM_VARIABLE
+from lib.config import BM_DEFAULT_PRODUCT, BM_DEFAULT_VARIABLE, BM_DEFAULT_VARIABLES
 
 if TYPE_CHECKING:
     import xarray as xr
@@ -29,7 +29,7 @@ def bm_plot_daily_radiance(gdf: "GeoDataFrame", raster: "xr.Dataset", date: date
     """
     fig, ax = _get_subplots(raster)
 
-    variable = BM_VARIABLE or BM_DEFAULT_VARIABLE[BM_PRODUCT]
+    variable = BM_DEFAULT_VARIABLE or BM_DEFAULT_VARIABLES[BM_DEFAULT_PRODUCT]
     raster[variable].sel(time=date.isoformat()).plot.pcolormesh(
         ax=ax,
         cmap=cc.cm.bmy,

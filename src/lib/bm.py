@@ -1,21 +1,80 @@
 import datetime
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from typing import Literal, overload
 
+import geopandas
 import xarray as xr
 from blackmarble.raster import bm_raster
+from blackmarble.types import Product
 from geopandas import GeoDataFrame
 
+from lib.admin_areas import get_region_gdf
 from lib.config import (
     BM_DATA_DIR,
-    BM_PRODUCT,
-    BM_QUALITY_FLAG,
+    BM_DEFAULT_PRODUCT,
+    BM_DEFAULT_QUALITY_FLAG,
+    BM_DEFAULT_VARIABLE,
     BM_TOKEN,
-    BM_VARIABLE,
 )
+from lib.types import Resolution, VNP46A1_Variable, VNP46A2_Variable
 
 
-def bm_download(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.date]) -> xr.Dataset:
+def bm_get_unified_gdf(
+    admin_id: str, date: str | datetime.date, resolution: Resolution = "50m", merge_luojia_geometry: bool = True
+):
+    if isinstance(date, datetime.date):
+        date = date.isoformat()
+
+    gdf = get_region_gdf(admin_id, resolution=resolution)
+
+    if merge_luojia_geometry:
+        print(f"Merging LuoJia geometry for {admin_id} on {date}")
+        # Get and merge LuoJia geometry
+        import pandas as pd
+
+        from .lj import lj_get_region_geometry
+
+        geometry = lj_get_region_geometry(admin_id, date)
+        gdf_lj = geopandas.GeoDataFrame(geometry=[geometry], crs=gdf.crs)
+        all_geoms = pd.concat([gdf.geometry, gdf_lj.geometry])
+        geom_merged = all_geoms.union_all(method="unary")
+        gdf = geopandas.GeoDataFrame(geometry=[geom_merged], crs=gdf.crs)
+
+    return gdf
+
+
+# Provide overloads for "variable" type hints
+@overload
+def bm_download(
+    gdf: GeoDataFrame,
+    date_range: datetime.date | list[datetime.date],
+    product: Literal[Product.VNP46A1],
+    variable: VNP46A1_Variable,
+    drop_values_by_quality_flag: list[int] | None = None,
+    use_cache: bool = True,
+) -> xr.Dataset: ...
+
+
+@overload
+def bm_download(
+    gdf: GeoDataFrame,
+    date_range: datetime.date | list[datetime.date],
+    product: Literal[Product.VNP46A2],
+    variable: VNP46A2_Variable,
+    drop_values_by_quality_flag: list[int] | None = None,
+    use_cache: bool = True,
+) -> xr.Dataset: ...
+
+
+def bm_download(
+    gdf: "GeoDataFrame",
+    date_range: datetime.date | list[datetime.date],
+    product: Product,
+    variable: VNP46A1_Variable | VNP46A2_Variable,
+    drop_values_by_quality_flag: list[int] | None = None,
+    use_cache: bool = True,
+) -> xr.Dataset:
     """Downloads data from Blackmarble dataset for a given region and date range.
 
     :param gdf: GeoDataFrame of region of interest
@@ -26,13 +85,13 @@ def bm_download(gdf: "GeoDataFrame", date_range: datetime.date | list[datetime.d
     out_dir.mkdir(parents=True, exist_ok=True)
     raster = bm_raster(
         gdf,
-        product_id=BM_PRODUCT,
+        product_id=product,
         date_range=date_range,
         bearer=BM_TOKEN,
         output_directory=out_dir,
-        drop_values_by_quality_flag=BM_QUALITY_FLAG,
-        variable=BM_VARIABLE,
-        output_skip_if_exists=True,
+        drop_values_by_quality_flag=drop_values_by_quality_flag or BM_DEFAULT_QUALITY_FLAG,
+        variable=variable,
+        output_skip_if_exists=use_cache,
     )
     return raster
 
@@ -52,7 +111,9 @@ def bm_store_to_zarr(
     :return: Fresh reference to Zarr store
     """
     # Check if already preprocessed
-    zarr_path = Path(dest) if dest else (BM_DATA_DIR / "preprocessed" / f"{BM_PRODUCT}-{BM_VARIABLE}.zarr")
+    zarr_path = (
+        Path(dest) if dest else (BM_DATA_DIR / "preprocessed" / f"{BM_DEFAULT_PRODUCT}-{BM_DEFAULT_VARIABLE}.zarr")
+    )
     zarr_path.parent.mkdir(parents=True, exist_ok=True)
     if not force and zarr_path.exists():
         print("Dataset already preprocessed, skipping...")
@@ -85,7 +146,7 @@ def bm_load_from_zarr(path: str | Path | None = None) -> xr.Dataset:
     :raises ValueError: Zarr store does not exist
     :return: Reference to Zarr dataset
     """
-    path = Path(path) if path else BM_DATA_DIR / "preprocessed" / f"{BM_PRODUCT}-{BM_VARIABLE}.zarr"
+    path = Path(path) if path else BM_DATA_DIR / "preprocessed" / f"{BM_DEFAULT_PRODUCT}-{BM_DEFAULT_VARIABLE}.zarr"
 
     if not path.exists():
         raise ValueError(f"File does not exist: {path}")

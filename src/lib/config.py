@@ -33,6 +33,7 @@ LJ_DATA_DIR = DATA_DIR / "luojia"
 LJ_DEFAULT_IDS_FILE = STATIC_DIR / "luojia_image_ids.csv"
 LJ_TILE_URL_PREFIX = "https://polybox.ethz.ch/index.php/s/dnP82nHZkjR4gr7/download/file?path=%2F"
 LJ_METADATA_URL = "https://polybox.ethz.ch/index.php/s/dnP82nHZkjR4gr7/download/file?path=%2Fmetadata%2FMETA.tar.gz"
+LJ_METADATA_DOWNLOAD_DIR = LJ_DATA_DIR / "metadata"
 
 # GeoJSON, dates, etc
 DEFAULT_DATES_FILE = STATIC_DIR / "defaults" / "dates_luojia_myanmar.csv"

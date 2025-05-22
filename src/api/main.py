@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers.comparison_router import router as comparison_router
 from api.routers.explore_router import router as explore_router
 from api.routers.statistics_router import router as statistics_router
+from lib.config import LJ_METADATA_DOWNLOAD_DIR
+from lib.lj import lj_download_metadata
 
 app = FastAPI()
 
@@ -16,6 +18,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Pre-emptively download LuoJia metadata
+if not LJ_METADATA_DOWNLOAD_DIR.exists():
+    lj_download_metadata()
 
 
 @app.get("/")

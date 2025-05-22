@@ -7,7 +7,7 @@ from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
 from lib.admin_areas import get_region_meta
-from lib.config import DATA_DIR, LJ_DATA_DIR, LJ_METADATA_URL, LJ_TILE_URL_PREFIX
+from lib.config import LJ_DATA_DIR, LJ_METADATA_DOWNLOAD_DIR, LJ_METADATA_URL, LJ_TILE_URL_PREFIX
 
 
 def lj_download_metadata(metadata_url: str = LJ_METADATA_URL):
@@ -18,7 +18,7 @@ def lj_download_metadata(metadata_url: str = LJ_METADATA_URL):
     """
     # download it, if it doesn't exist
     # unpack it
-    metadata_path = DATA_DIR / "luojia" / "metadata"
+    metadata_path = LJ_METADATA_DOWNLOAD_DIR
     metadata_path.mkdir(parents=True, exist_ok=True)
     metadata_file = metadata_path / "META.tar.gz"
     if not metadata_file.exists():

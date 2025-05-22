@@ -41,6 +41,7 @@ To get the latest published production version, run the following commands:
 
 ```sh
 # Update docker-compose.prod.yaml from latest main branch
+git fetch
 git checkout origin/main -- docker-compose.prod.yaml
 # Update downloaded docker images
 docker compose -f docker-compose.prod.yaml pull

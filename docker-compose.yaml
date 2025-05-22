@@ -12,7 +12,7 @@ services:
       - HOST=0.0.0.0
       - PORT=8000
       - REDIS_URL=redis://redis:6379/0
-      - BLACKMARBLE_TOKEN==== REDACTED $BLACKMARBLE_TOKEN ===
+      - BLACKMARBLE_TOKEN=${BM_TOKEN:-=== REDACTED $BLACKMARBLE_TOKEN ===}
     develop:
       watch:
         - path: ./requirements.txt

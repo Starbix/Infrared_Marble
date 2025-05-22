@@ -35,6 +35,13 @@ def lj_geotiff_task(gdf: geopandas.GeoDataFrame, date: date):
     return geotiff_buf, pc02, pc98
 
 
+def bm_download_wrapper(*args, **kwargs):
+    try:
+        return bm_download(*args, **kwargs)
+    except Exception as e:
+        raise HTTPException(getattr(e, "status") if hasattr(e, "status") else 500, detail=[str(x) for x in e.args])
+
+
 @router.get("/bm")
 async def get_bm_geotiff(
     date: date,
@@ -73,7 +80,9 @@ async def get_bm_geotiff(
     if geotiff_buf is None or pc02 is None or pc98 is None:
         logger.info("BM: Downloading (%s, %s, %s, %s)", admin_id, date.isoformat(), product.name, variable)
         gdf = bm_get_unified_gdf(admin_id, date - timedelta(days=1))  # Use original LuoJia date for this
-        dataset = await run_in_threadpool(bm_download, gdf=gdf, date_range=date, product=product, variable=variable)  # type: ignore
+        dataset = await run_in_threadpool(
+            bm_download_wrapper, gdf=gdf, date_range=date, product=product, variable=variable
+        )
         dataset.to_zarr(cache_dir, mode="w")
         logger.info("Download complete.")
 

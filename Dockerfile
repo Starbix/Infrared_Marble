@@ -2,6 +2,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Faster compilation from source
+RUN export MAKEFLAGS="-j$(nproc)"
+RUN export CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
+
 # Install required packages
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \

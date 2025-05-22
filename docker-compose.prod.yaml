@@ -7,10 +7,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-      x-bake:
-        platforms:
-          - linux/amd64
-          - linux/arm64
+      platforms:
+        - linux/amd64
+        - linux/arm64
     ports:
       - 8000:8000
     environment:
@@ -25,10 +24,9 @@ services:
       dockerfile: Dockerfile.prod
       args:
         NEXT_PUBLIC_API_URL: http://localhost:8000 # Needs to be set at build-time
-      x-bake:
-        platforms:
-          - linux/amd64
-          - linux/arm64
+      platforms:
+        - linux/amd64
+        - linux/arm64
     ports:
       - 3000:3000
     environment:

@@ -1,11 +1,12 @@
 import gzip
+from datetime import date, timedelta
 from pathlib import Path
 
 import geopandas
 import pandas as pd
 
 from lib.config import ADMIN_AREA_FILE_MAPPING, DEFAULT_DATES_FILE, GEOJSON_ADMIN_KEY, STATIC_DIR, TILE_DENSITY_CSV
-from lib.types import Resolution
+from lib.types import DatasetName, Resolution
 
 
 def dates_from_csv(filename: str | Path | None = None, colname: str = "date") -> list[str]:
@@ -30,7 +31,7 @@ def get_all_regions_gdf(resolution: Resolution = "50m") -> geopandas.GeoDataFram
         return geopandas.read_file(f)
 
 
-def get_region_avail_dates(admin_id: str) -> list[str]:
+def get_region_avail_dates(admin_id: str, dataset: DatasetName = DatasetName.luojia) -> list[str]:
     """Gets a list of available dates for a given region
 
     :param admin_id: Administrative ID of the region of interest
@@ -38,8 +39,10 @@ def get_region_avail_dates(admin_id: str) -> list[str]:
     """
     country_meta = pd.read_csv(STATIC_DIR / "country_meta.csv.gz")
     dates = country_meta[country_meta["country"] == admin_id]["date"]
-    dates = dates.sort_values().unique()
-    return dates.tolist()
+    dates = dates.sort_values().unique().tolist()
+    if dataset == DatasetName.blackmarble:
+        return [(date.fromisoformat(d) + timedelta(days=1)).isoformat() for d in dates]
+    return dates
 
 
 def get_region_gdf(admin_id: str, resolution: Resolution = "50m") -> geopandas.GeoDataFrame:

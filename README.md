@@ -10,6 +10,22 @@
 -   [Cédric Laubacher](mailto:cedric@laubacher.io)
 -   [Federico Mantovani](mailto:fmantova@student.ethz.ch)
 
+## Quickstart
+
+You can run the latest production version of the application locally with [Docker](https://www.docker.com/). Please
+install it and make sure that the `docker compose` command is available.
+
+```sh
+# Clone the repository but don't check out any files
+git clone -n git@github.com:Starbix/Infrared_Marble.git --depth 1 Infrared_Marble_prod
+# CD into production repository copy
+cd Infrared_Marble_prod
+# Checkout just the necessary docker-compose file
+git checkout docker-compose.prod.yaml
+# Run app in production mode. This pulls the latest version from Docker Hub.
+docker compose -f docker-compose.prod.yaml up
+```
+
 ## Contributing
 
 ### Cloning the Repo

@@ -1,6 +1,6 @@
 services:
   api:
-    image: infrared_marble-api:prod
+    image: fedemanto/infrared-marble-api:latest
     platform: linux/amd64
     volumes:
       - ${DATA_DIR:-./data}:/app/data
@@ -12,11 +12,10 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=8000
-      - REDIS_URL=redis://redis:6379/0
       - BLACKMARBLE_TOKEN=${BLACKMARBLE_TOKEN:-=== REDACTED $BLACKMARBLE_TOKEN ===}
 
   web:
-    image: infrared_marble-web:prod
+    image: fedemanto/infrared-marble-web:latest
     build:
       context: ./web
       dockerfile: Dockerfile.prod

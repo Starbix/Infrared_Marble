@@ -7,7 +7,7 @@ from datetime import date, timedelta
 import geopandas
 import xarray as xr
 from blackmarble.types import Product
-from fastapi import Response
+from fastapi import HTTPException, Response
 from fastapi.concurrency import run_in_threadpool
 from fastapi.routing import APIRouter
 
@@ -71,7 +71,7 @@ async def get_bm_geotiff(
 
     # Download if not available in cache
     if geotiff_buf is None or pc02 is None or pc98 is None:
-        logger.info("BM: Downloading (%s, %s)", admin_id, date.isoformat())
+        logger.info("BM: Downloading (%s, %s, %s, %s)", admin_id, date.isoformat(), product.name, variable)
         gdf = bm_get_unified_gdf(admin_id, date - timedelta(days=1))  # Use original LuoJia date for this
         dataset = await run_in_threadpool(bm_download, gdf=gdf, date_range=date, product=product, variable=variable)  # type: ignore
         dataset.to_zarr(cache_dir, mode="w")
@@ -168,6 +168,15 @@ async def get_lj_geotiff(
         region_meta = get_region_meta()
         # Select only rows where region and date match
         relevant_tiles = region_meta[(region_meta["country"] == admin_id) & (region_meta["date"] == date.isoformat())]
+        # Check if there is data on this day
+        if len(relevant_tiles) == 0:
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "code": "LJ_NO_DATA",
+                    "message": f"No tiles found for admin {admin_id} and date {date}. Please try a different date.",
+                },
+            )
         relevant_tiles = relevant_tiles["tile_name"].values.tolist()
         geotiff_buf, pc02, pc98 = await run_in_threadpool(
             lj_download, relevant_tiles, resample=resample, parallel_downloads=8

@@ -77,14 +77,14 @@ install it and make sure that the `docker compose` command is available.
 
     for a development instance with hot-reloading enabled.
 
-## Project Structure
+4. For local development of the API and library, run `conda env create -f environment.yaml` and select the newly created
+   `infrared-marble` environment.
+5. For local development of the web frontend, cd into the `web/` directory, and run `npm install`.
 
-For a better understanding of how the project is structured, have a look at the
-[Project Structure section](./CONTRIBUTING.md#project-structure) in the contribution guide.
+## Project Strcture, Contributing
 
-## Contributing
-
-For help on setting up the environment for development, please check out [CONTRIBUTING.md](./CONTRIBUTING.md)
+For more details on project structure and how to continue developing this project, see
+[CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ## Milestones
 

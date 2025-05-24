@@ -23,7 +23,7 @@ git clone -n git@github.com:Starbix/Infrared_Marble.git --depth 1 Infrared_Marbl
 # CD into production repository copy
 cd Infrared_Marble_prod
 # Checkout just the necessary docker-compose file
-git checkout docker-compose.prod.yaml
+git checkout origin/main -- docker-compose.prod.yaml
 ```
 
 **Running:**

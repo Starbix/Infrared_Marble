@@ -15,6 +15,7 @@
 **Requirements:**
 
 -   A recent version of Docker and Docker Compose
+-   cURL (`curl`)
 -   A few GB of free disk space
 
 After cloning this repo or downloading the source files, you can start up the application with:

@@ -12,43 +12,69 @@
 
 ## Quickstart
 
-You can run the latest production version of the application locally with [Docker](https://www.docker.com/). Please
-install it and make sure that the `docker compose` command is available.
+**Requirements:**
 
-**First-time setup:**
+-   A recent version of Docker and Docker Compose
+-   A few GB of free disk space
+
+After cloning this repo or downloading the source files, you can start up the application with:
 
 ```sh
-# Clone the repository but don't check out any files
-git clone -n git@github.com:Starbix/Infrared_Marble.git --depth 1 Infrared_Marble_prod
-# CD into production repository copy
-cd Infrared_Marble_prod
-# Checkout just the necessary docker-compose file
-git checkout origin/main -- docker-compose.prod.yaml
+bin/start.sh
 ```
 
-**Running:**
+on macOS/Linux, and with
 
-From within the folder, run the app with:
+```cmd
+bin/start.bat
+```
+
+Note: The Windows start script is untested. The app should still run on Windows though (check [Set Up](#set-up) if the
+start script does not work).
+
+## Set Up
+
+### Docker Image Only
+
+The code is available on Docker Hub with pre-built images for x86 and ARM. To run the app, you'll need the
+`docker-compose.prod.yaml` file, as this sets up the containers and contains a Black Marble API token. Once you have
+obtained the `docker-compose.prod.yaml` file, run:
 
 ```sh
-# Run app in production mode. This pulls the latest version from Docker Hub if not already downloaded
 docker compose -f docker-compose.prod.yaml up --pull=always
 ```
 
-**Updating to the latest version:**
+This should start all the containers. Note that the API needs to download some data on first startup, which could take
+up to a few minutes. The app won't work before you see:
 
-To get the latest published production version, run the following commands:
-
-```sh
-# Update docker-compose.prod.yaml from latest main branch
-git fetch
-git checkout origin/main -- docker-compose.prod.yaml
-# Update downloaded docker images
-docker compose -f docker-compose.prod.yaml pull
+```
+server   Server started at http://0.0.0.0:8000
 ```
 
-Then you can run it again as before. This should only be necessary if something in the `docker-compose.prod.yaml`
-configuration changed, as images get updated automatically when you call `up` with `--pull=always`.
+You can then access the web UI at <http://localhost:3000>.
+
+### Full Project Setup
+
+You can run the latest production version of the application locally with [Docker](https://www.docker.com/). Please
+install it and make sure that the `docker compose` command is available.
+
+**Steps for full setup:**
+
+1. Clone the code or obtain source through other means
+2. Inside of the source directory, you should run `git submodule update --init --recursive`
+3. Then, depending on what you want to do, run one of:
+
+    ```sh
+    docker compose -f docker-compose.prod.yaml up --build
+    ```
+
+    for a production build based on the latest files, or
+
+    ```sh
+    docker-compose up --build --watch
+    ```
+
+    for a development instance with hot-reloading enabled.
 
 ## Project Structure
 

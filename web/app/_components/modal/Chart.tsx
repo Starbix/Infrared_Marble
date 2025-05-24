@@ -21,12 +21,12 @@ const supportedChartTypes = new Set([
 ]);
 const chartTitles: { [_ in ChartType]: string } = {
   [ChartType.BaseMap]: "Base map",
-  [ChartType.VNP46A2_GapFilled]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
-  [ChartType.VNP46A2_DNB]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
-  [ChartType.VNP46A1_DNB]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
-  [ChartType.VNP46A1_RadianceM10]: "Radiance [W·m⁻²·μm⁻¹·sr⁻¹]",
-  [ChartType.VNP46A1_RadianceM11]: "Radiance [W·m⁻²·μm⁻¹·sr⁻¹]",
-  [ChartType.LuoJia]: "Radiance [W·m⁻²·sr⁻¹·μm⁻¹]",
+  [ChartType.VNP46A2_GapFilled]: "DNB Radiance (gap-filled, BRDF-corrected) [nW·cm⁻²·sr⁻¹]",
+  [ChartType.VNP46A2_DNB]: "DNB Radiance (BRDF-corrected) [nW·cm⁻²·sr⁻¹]",
+  [ChartType.VNP46A1_DNB]: "At-sensor DNB Radiance [nW·cm⁻²·sr⁻¹]",
+  [ChartType.VNP46A1_RadianceM10]: "Radiance (band M10) [W·m⁻²·μm⁻¹·sr⁻¹]",
+  [ChartType.VNP46A1_RadianceM11]: "Radiance (band M11) [W·m⁻²·μm⁻¹·sr⁻¹]",
+  [ChartType.LuoJia]: "At-sensor Radiance [nW·cm⁻²·sr⁻¹]",
   [ChartType.Overlay]: "<not yet supported>",
   [ChartType.Difference]: "<not yet supported>",
 };

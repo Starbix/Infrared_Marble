@@ -1,9 +1,3 @@
----
-title: Milestone 3 (Pre-final Submission)
-authors: Oliver Calvet, Yiyang He, Alexandre Iskandar, Cédric Laubacher, Federico Mantovani
-tags: ETH, AI4Good, NTL, Project, Milestone 3
----
-
 # Milestone 3 (Pre-final Submission) -- Progress Report
 
 This milestone's work was focused on getting the necessary framework for analyzing and comparing night-time light
@@ -13,9 +7,13 @@ frontend.
 
 ## 1. LuoJia Unit Conversion
 
-The product VNP46A2 from the blackmarble dataset comes in units nW·cm⁻²·sr⁻¹ while the Luojia data is displayed as W·m⁻²·sr⁻¹·μm⁻¹. So to do a meaningful comparison we had to integrate the Luojia data over the wavelength spectrum of the NASA satellites. Details can be found in the draft report.
+The product VNP46A2 from the blackmarble dataset comes in units nW·cm⁻²·sr⁻¹ while the Luojia data is displayed as
+W·m⁻²·sr⁻¹·μm⁻¹. So to do a meaningful comparison we had to integrate the Luojia data over the wavelength spectrum of
+the NASA satellites. Details can be found in the draft report.
 
-For the difference function we decided to use the product VNP46A1 from blackmarble, since it already comes in the same units as Luojia. Also it is not post-processed, which we assume for Luojia data as well (will be detailed in final report).
+For the difference function we decided to use the product VNP46A1 from blackmarble, since it already comes in the same
+units as Luojia. Also it is not post-processed, which we assume for Luojia data as well (will be detailed in final
+report).
 
 ## 2. Modifications to the `blackmarbelpy` Package
 
@@ -50,7 +48,15 @@ analysis. To mitigate these issues, we forked the
 All the modifications are applied to the [`ai4good_trunk`](https://github.com/fedj99/blackmarblepy/tree/ai4good_trunk)
 branch of our own private fork of the Blackmarble repository.
 
-## 3. Library Functions
+## 3. LuoJia Dataset Preprocessing
+
+> TODO: Cédric, write something about
+>
+> -   Downloading data from website
+> -   Generating/downloading metadata files
+> -   Convert/merge GeoTIFFs
+
+## 4. Library Functions
 
 We expose the main functionality in our combined library. It allows users to:
 
@@ -62,7 +68,7 @@ We expose the main functionality in our combined library. It allows users to:
 This code is intended to be used as a python package in analysis, and this is also the point of entry for the
 functionality implemented in both the CLI and API components.
 
-## 4. REST API
+## 5. REST API
 
 We implement a REST API to interface with the `blackmarblepy` package, as well as our own library functions for
 downloading and analyzing Blackmarble and LuoJia raster data.
@@ -87,7 +93,7 @@ downloading and analyzing Blackmarble and LuoJia raster data.
 | `/statistics/heatmap/{admin_id}`        | Get a heatmap representation of the data availability over time for an administrative area. Rows are years, columns are months, and intensity represents # of LuoJia tiles available. |
 | `/statistics/clouds/{admin_id}`         | Gets the average cloud coverage for each day where LuoJia data is available in the given admin area.                                                                                  |
 
-## 5. Graphical Interface
+## 6. Graphical Interface
 
 The primary goal of the graphical interface (GUI) is to allow comparing LuoJia and Blackmarble data. A secondary goal is
 to allow researchers to explore the availability of data within the LuoJia dataset, which is sparse in comparison to

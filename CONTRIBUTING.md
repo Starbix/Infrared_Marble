@@ -146,3 +146,38 @@ official documentation fails to mention this step and gives no indication on the
 | -------- | --------------------------------------------------------------------- |
 | Email    | <=== REDACTED login email ===>                                                |
 | Password | === REDACTED visualcrossing password ===                                     |
+
+## Project Structure
+
+The project consists of three main components:
+
+-   **Library:** Library code for interfacing with Black Marble and LuoJia datasets.
+-   **API:** FastAPI server for requesting BM and LJ resources over a REST API.
+-   **Web:** Web interface for visualizing and analyzing NTL data.
+
+```sh
+.
+├── blackmarblepy/  # Our fork of blackmarble Python package
+├── data/           # Downloaded data (untracked in Git)
+├── docs/
+├── notebooks/
+├── src/
+│   ├── api         # API source (FastAPI)
+│   ├── cli         # CLI source (unused/unmaintained in latest version)
+│   ├── lib         # Library code
+│   ├── scripts     # One-off preprocessing and data processing scripts
+│   └── ...
+├── static/         # Static binary/data files (e.g. file indexes). Tracked in Git (LFS)
+├── web/            # Web interface source (NextJS)
+│   ├── app/
+│   ├── Dockerfile            # Web interface Dockerfile
+│   ├── package.json
+│   └── ...
+├── Dockerfile                # Lib+API Dockerfile (excludes web/)
+├── docker-compose.yaml       # Development docker-compose file
+├── docker-compose.prod.yaml  # Production docker-compose file
+├── environment.yaml          # Conda environment file
+├── pyproject.toml            # Python project and linter/formatter settings
+├── requirements.txt          # Requirements for Lib+API
+└── requirements.dev.txt      # Requirements for local development (e.g. pre-processing)
+```

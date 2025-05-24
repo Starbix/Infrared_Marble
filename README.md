@@ -52,3 +52,7 @@ Then you can run it again as before.
 ## Contributing
 
 For help on setting up the environment for development, please check out [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+## Milestones
+
+Some notes on milestones, progress reports, and general project documentation can be found under [Docs](./docs).

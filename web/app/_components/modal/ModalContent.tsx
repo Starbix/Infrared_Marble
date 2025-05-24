@@ -16,6 +16,8 @@ import Chart from "./Chart";
 
 const LS_KEY = "chart-config";
 
+const DEFAULT_CHARTS = [ChartType.VNP46A2_GapFilled, ChartType.LuoJia];
+
 const chartTypeNames: { [K in ChartType]: string } = {
   [ChartType.BaseMap]: "Base map",
   [ChartType.VNP46A2_GapFilled]: "Blackmarble (VNP46A2, BRDF-Corrected, Gap-Filled)",
@@ -88,11 +90,16 @@ const ModalContent: React.FC<ModalContentProps> = ({
     }
     const configStr = localStorage.getItem(LS_KEY);
     if (configStr) {
-      const config = JSON.parse(configStr).map(toChartType); // Convert string to ChartType
-      setChartTypes(config);
+      try {
+        const config = JSON.parse(configStr).map(toChartType); // Convert string to ChartType
+        setChartTypes(config);
+      } catch (e) {
+        // Incompatible config, use default
+        setChartTypes(DEFAULT_CHARTS);
+      }
     } else {
       // Add default configuration
-      setChartTypes([ChartType.VNP46A2_GapFilled, ChartType.LuoJia]);
+      setChartTypes(DEFAULT_CHARTS);
     }
   }, []);
 

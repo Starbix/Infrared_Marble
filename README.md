@@ -32,7 +32,7 @@ From within the folder, run the app with:
 
 ```sh
 # Run app in production mode. This pulls the latest version from Docker Hub if not already downloaded
-docker compose -f docker-compose.prod.yaml up
+docker compose -f docker-compose.prod.yaml up --pull=always
 ```
 
 **Updating to the latest version:**
@@ -47,7 +47,8 @@ git checkout origin/main -- docker-compose.prod.yaml
 docker compose -f docker-compose.prod.yaml pull
 ```
 
-Then you can run it again as before.
+Then you can run it again as before. This should only be necessary if something in the `docker-compose.prod.yaml`
+configuration changed, as images get updated automatically when you call `up` with `--pull=always`.
 
 ## Project Structure
 

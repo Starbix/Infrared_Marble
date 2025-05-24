@@ -1,6 +1,6 @@
-# AI4Good - Satellite Overpass Time Comparison
-
 ![plots](assets/teaser_image.webp)
+
+# AI4Good - Satellite Overpass Time Comparison
 
 ## Members
 

@@ -5,7 +5,7 @@ import colorcet as cc
 import contextily as cx
 import matplotlib.pyplot as plt
 
-from lib.config import BM_DEFAULT_PRODUCT, BM_DEFAULT_VARIABLE, BM_DEFAULT_VARIABLES
+from .config import BM_DEFAULT_PRODUCT, BM_DEFAULT_VARIABLE, BM_DEFAULT_VARIABLES
 
 if TYPE_CHECKING:
     import xarray as xr

@@ -17,7 +17,7 @@ from lib.config import (
     BM_DEFAULT_VARIABLE,
     BM_TOKEN,
 )
-from lib.types import Resolution, VNP46A1_Variable, VNP46A2_Variable
+from lib.app_types import Resolution, VNP46A1_Variable, VNP46A2_Variable
 
 
 def bm_get_unified_gdf(

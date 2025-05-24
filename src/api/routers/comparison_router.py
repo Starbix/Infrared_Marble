@@ -16,7 +16,7 @@ from lib.bm import bm_download, bm_get_unified_gdf
 from lib.config import BM_DATA_DIR, LJ_DATA_DIR
 from lib.geotiff import get_geotiffs, merge_geotiffs
 from lib.lj import lj_download_tile
-from lib.types import VNP46A1_Variable, VNP46A2_Variable
+from lib.app_types import VNP46A1_Variable, VNP46A2_Variable
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

@@ -11,8 +11,8 @@ from shapely.geometry import Polygon
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
 
-from lib.config import DATA_DIR, LJ_DATA_DIR, LJ_METADATA_URL
-from lib.lj import lj_download_metadata, lj_download_tile
+from .config import DATA_DIR, LJ_DATA_DIR, LJ_METADATA_URL
+from .lj import lj_download_metadata, lj_download_tile
 
 DEBUG = False
 NODATA_VALUE = "nan"

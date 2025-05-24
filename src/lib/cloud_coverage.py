@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import requests
 
-from lib.config import CLOUD_API_KEY
+from .config import CLOUD_API_KEY
 
 
 def get_day_cloud_coverage(date_str: str, location: str | None = None) -> tuple[float, float]:

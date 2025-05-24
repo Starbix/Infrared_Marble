@@ -2,9 +2,12 @@ import os
 import sys
 from pathlib import Path
 
+project_root = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(project_root))
+
 from blackmarble.types import Product
 
-from lib.app_types import Resolution
+from .app_types import Resolution
 
 # Note: This code runs whenever the module is first imported.
 # This is to make sure that the DATA_DIR and BEARER_TOKEN variables are appropriately set.

@@ -49,6 +49,11 @@ docker compose -f docker-compose.prod.yaml pull
 
 Then you can run it again as before.
 
+## Project Structure
+
+For a better understanding of how the project is structured, have a look at the
+[Project Structure section](./CONTRIBUTING.md#project-structure) in the contribution guide.
+
 ## Contributing
 
 For help on setting up the environment for development, please check out [CONTRIBUTING.md](./CONTRIBUTING.md)

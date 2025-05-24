@@ -21,6 +21,11 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # Reinstall correct version of GDAL
 RUN pip install -v --no-build-isolation --no-cache-dir --force-reinstall gdal==$(gdal-config --version)
 
+# First copy only blackmarble requirements and install (this ensures efficient layer caching)
+COPY ./blackmarblepy/requirements.txt ./requirements.blackmarblepy.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements.blackmarblepy.txt
+
 # Copy over Blackmarble package and install
 COPY .gitmodules ./
 COPY .git/modules/blackmarblepy .git/modules/blackmarblepy

@@ -26,8 +26,3 @@ def get_admin_area_by_id(id: str, resolution: Resolution = "50m") -> dict[str, A
         raise HTTPException(status_code=400, detail="More than one admin areas match given ID")
 
     return filtered_features[0]
-
-
-def get_region_or_404(admin_id: str, resolution: Resolution = "50m") -> geopandas.GeoDataFrame:
-    # Implementation of the function
-    pass

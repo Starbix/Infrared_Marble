@@ -17,7 +17,7 @@ import { buildMemoryStorage, setupCache } from "axios-cache-interceptor";
  */
 export const client = setupCache(
   axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL(),
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
   }),
   { ttl: 1000 * 60 * 15, storage: buildMemoryStorage() },
 );

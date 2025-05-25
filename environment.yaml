@@ -6,9 +6,15 @@
 # If you want to add a new dependency, don't forget to add it to this file too.
 name: infrared-marble
 variables:
-  # Black Marble profile Bearer token. This token expires on 2025-05-20. When
-  # that happens, you need to re-generate one with the account info provided in
-  # the README.
+  # Black Marble profile Bearer token. Generate one on https://urs.earthdata.nasa.gov/profile, and give access to the
+  # following applications:
+  #
+  # - LAADS DAAC Cumulus (PROD)
+  # - LAADS Web
+  # - NASA GESDISC DATA ARCHIVE
+  #
+  # Then proceed to creating the envrionment with conda. Note to mamba users: mamba does not support environment
+  # variables, set them in your rc files or $CONDA_PREFIX/etc/conda/activate.d
   BLACKMARBLE_TOKEN: "=== REDACTED $BLACKMARBLE_TOKEN ==="
 channels:
   - conda-forge
@@ -23,8 +29,5 @@ dependencies:
       # image size. You can still include them in this environment file.
       - -r requirements.txt
       - -r requirements.dev.txt
-      - ipykernel
-      - ipywidgets
-      - notebook
       # Install this separately as Dockerfile needs to install this in stages
       - -e ./blackmarblepy

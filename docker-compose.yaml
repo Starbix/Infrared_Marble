@@ -11,7 +11,7 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=8000
-      - BLACKMARBLE_TOKEN=${BM_TOKEN:-=== REDACTED $BLACKMARBLE_TOKEN ===}
+      - BLACKMARBLE_TOKEN=${BLACKMARBLE_TOKEN}
     develop:
       watch:
         - path: ./requirements.txt

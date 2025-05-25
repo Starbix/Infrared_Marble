@@ -2,8 +2,11 @@ bokeh
 dask
 folium
 geotiff
+ipykernel
+ipywidgets
 mapclassify
 matplotlib
+notebook
 pycountry
 reverse_geocoder
 tabulate

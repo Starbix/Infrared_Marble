@@ -16,7 +16,7 @@ cd ~/git/projects  # Or wherever you want to put the code
 git clone git@github.com:Starbix/Infrared_Marble.git
 cd Infrared_Marble
 # Set up Git LFS and Git submodules
-git lfs install && git lfs fetch
+git lfs install && git lfs fetch && git lfs checkout
 git submodule update --init --recursive
 ```
 
@@ -30,6 +30,26 @@ git submodule update --init --recursive
 -   gdal
 
 macOS: `brew install gdal`
+
+## API Tokens
+
+Before you continue, create an account on [EarthData](https://urs.earthdata.nasa.gov/profile), and generate a token with
+the following application permissions:
+
+-   LAADS DAAC Cumulus (PROD)
+-   LAADS Web
+-   NASA GESDISC DATA ARCHIVE
+
+Then:
+
+1. Replace the token in the `environment.yaml` file
+2. Create a `.env` file and add `BLACKMARBLE_TOKEN=<your generated BM token>` to the end of it.
+
+This way, the environment variable will be loaded whenever you work on the project (command line with conda env active),
+in VSCode (`.env` file) and when using Docker Compose (`.env` file).
+
+Now you can proceed with the next step. LuoJia requires a login if you want to use their web interface, but you do not
+need a LuoJia login to use this project.
 
 ## Python Environment
 
@@ -53,13 +73,6 @@ environment variables.
 ## Development with Docker Compose
 
 We provide Dockerfiles and a `docker-compose.yaml` file for spinning up a development API server and web interface.
-
-### Black Marble API Token
-
-Please note that the Black Marble token is hard-coded in the `docker-compose.yaml`. See
-[Black Marble Login](#login-and-authorization) for details on where to obtain the token. Once created, and given the
-correct permissions, you can set the `BLACKMARBLE_TOKEN` environment variable and run the docker commands. The commands
-will automatically detect and use the token from the environment variable.
 
 ### Running the Services
 
@@ -94,58 +107,6 @@ images are built and are considerably faster than the development images.
 docker compose -f docker-compose.prod.yaml build  # Builds all images (API server and web frontend)
 docker compose -f docker-compose.prod.yaml up     # Creates and starts all containers
 ```
-
-## Login and Authorization
-
-> [!WARNING]
->
-> The following is sensitive information. If the repo should become public, please remove this information first (on
-> whole repo history, e.g. with `git-filter-repo`)
-
-### Black Marble
-
-The Black Marble dataset requires users to authenticate with a Bearer token. This can be set up from the account I set
-up:
-
-| Login    | [Earthdata Login](https://urs.earthdata.nasa.gov/profile) |
-| -------- | --------------------------------------------------------- |
-| Username | === REDACTED EarthData username ===                                       |
-| Password | === REDACTED EarthDAta password ===                                       |
-
-Please do not share this information with externals, nor set the GitHub repository to public, as this would reveal the
-login credentials.
-
-A bearer token can now be generated on the "Generate Token" page. I already generated one for convenience. This token
-**expires on July 10th 2025**. It is set as an environment variable in the Conda `environment.yaml` file, and should be
-available as an envrionment variable as `BLACKMARBLE_TOKEN`.
-
-#### Authorized Apps
-
-In order to use the Black Marble API, you still need to provide the appropriate application authorization on the
-EarthData page. On [your profile](https://urs.earthdata.nasa.gov/profile), in the navigation bar, select
-<kbd>Applications</kbd> &#9654; <kbd>Authorized Apps</kbd> &#9654; <kbd>APPROVE MORE APPLICATIONS</kbd>. Then find and
-add the following applications:
-
--   LAADS DAAC Cumulus (PROD)
--   LAADS Web
--   NASA GESDISC DATA ARCHIVE
-
-I couldn't verify that this is the minimal set of permissions required, but this combination seems to be working. The
-official documentation fails to mention this step and gives no indication on the required permissions.
-
-### Luojia
-
-| Login    | [Luojia Login](http://59.175.109.173:8888/app/login_en.html) |
-| -------- | ------------------------------------------------------------ |
-| Email    | <=== REDACTED login email ===>                                       |
-| Password | === REDACTED luojia_password ===                                               |
-
-### Visual Crossing
-
-| Login    | [Visual Crossing Login](https://www.visualcrossing.com/account/login) |
-| -------- | --------------------------------------------------------------------- |
-| Email    | <=== REDACTED login email ===>                                                |
-| Password | === REDACTED visualcrossing password ===                                     |
 
 ## Project Structure
 
